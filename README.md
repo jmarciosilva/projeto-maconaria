@@ -1,58 +1,228 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema Corporativo — ARLS Ferraz de Vasconcelos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Sobre o projeto
 
-## About Laravel
+Sistema corporativo da **Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem**, construído como um monólito modular em Laravel. O sistema substitui e amplia o site institucional atual, oferecendo:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. Landing page pública administrável por CMS.
+2. Painel administrativo corporativo.
+3. Área restrita para usuários e Irmãos Maçons.
+4. Módulos administrativos da Loja (Secretaria, Tesouraria, Chancelaria etc.).
+5. Base arquitetural preparada para um futuro aplicativo em Flutter.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Objetivos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Centralizar a gestão institucional, documental, financeira e social da Loja.
+- Separar claramente a área pública, a área restrita e o painel administrativo.
+- Manter uma arquitetura desacoplada, testável e pronta para evoluir incrementalmente por módulos.
 
-## Learning Laravel
+## Funcionalidades previstas
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Consulte [`ROADMAP.md`](ROADMAP.md) para o detalhamento por fase e [`docs/MODULOS.md`](docs/MODULOS.md) para as decisões e suposições registradas em cada módulo.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Stack tecnológica
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| Camada | Tecnologia |
+|---|---|
+| Backend | PHP 8.3, Laravel 13 |
+| Banco de dados | MySQL 8 (utf8mb4) |
+| Views | Blade |
+| CSS | Tailwind CSS v4 (via Vite) |
+| Interatividade leve | Alpine.js |
+| Build de assets | Vite |
+| Autenticação | Laravel Breeze (stack Blade) |
+| Papéis e permissões | spatie/laravel-permission |
+| Testes | PHPUnit (via `php artisan test`) |
+| Estilo de código | Laravel Pint |
+| Análise estática | Larastan (PHPStan para Laravel) |
+| Internacionalização | laravel-lang/lang + laravel-lang/publisher (pt_BR) |
 
-## Agentic Development
+### Dependências adicionadas e finalidade
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| Pacote | Finalidade |
+|---|---|
+| `spatie/laravel-permission` | Perfis (roles) e permissões granulares usados em todo o sistema |
+| `laravel/breeze` (dev) | Scaffolding de autenticação (login, recuperação de senha, verificação de e-mail) com Blade + Tailwind |
+| `laravel-lang/lang` + `laravel-lang/publisher` (dev) | Publicam as traduções pt_BR de validação, autenticação, paginação e senhas |
+| `larastan/larastan` (dev) | Análise estática de código (PHPStan com extensões para Laravel) |
+| `laravel/pint` (dev, já incluso no skeleton) | Formatação de código (PSR-12 / preset Laravel) |
 
-```bash
-composer require laravel/boost --dev
+## Requisitos do ambiente
 
-php artisan boost:install
+- Windows com [Laragon](https://laragon.org/) (Apache na porta 80, MySQL na porta 3306)
+- PHP 8.3.30
+- Composer 2.9+
+- Node.js 22+ e npm 10+
+- MySQL 8
+
+## Instalação no Windows com Laragon
+
+```powershell
+cd D:\PROJETO-MACONARIA
+composer install
+copy .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Configuração do banco MySQL
 
-## Contributing
+Crie o banco de dados (se ainda não existir):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```sql
+CREATE DATABASE projeto_maconaria
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
 
-## Code of Conduct
+## Configuração do arquivo .env
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Copie `.env.example` para `.env` e ajuste conforme o seu ambiente. Principais chaves:
 
-## Security Vulnerabilities
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=projeto_maconaria
+DB_USERNAME=root
+DB_PASSWORD=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+ADMIN_NAME="Administrador Local"
+ADMIN_EMAIL="admin@localhost.test"
+ADMIN_PASSWORD="alterar-senha"
+```
 
-## License
+As variáveis `ADMIN_*` são usadas exclusivamente pelo `AdministradorLocalSeeder` em ambiente de desenvolvimento — nunca em produção.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Instalação das dependências PHP
+
+```powershell
+composer install
+```
+
+## Instalação das dependências JavaScript
+
+```powershell
+npm install
+```
+
+## Execução das migrations
+
+```powershell
+php artisan migrate
+```
+
+## Execução dos seeders
+
+```powershell
+php artisan db:seed
+```
+
+Isso cria os perfis/permissões iniciais (`PerfilPermissaoSeeder`) e o administrador local (`AdministradorLocalSeeder`), com o perfil **Superadministrador**.
+
+## Compilação dos assets
+
+```powershell
+npm run build
+```
+
+Para desenvolvimento com recarregamento automático:
+
+```powershell
+npm run dev
+```
+
+## Execução dos testes
+
+```powershell
+php artisan test
+```
+
+Os testes usam SQLite em memória (configurado em `phpunit.xml`), isolados do banco MySQL de desenvolvimento.
+
+## Análise estática
+
+```powershell
+composer analyse
+```
+
+Executa o Larastan (PHPStan) com o nível configurado em `phpstan.neon.dist`.
+
+## Formatação do código
+
+```powershell
+composer format
+```
+
+Executa o Laravel Pint (preset `laravel`) sobre `app/`, `database/`, `routes/` e `tests/`.
+
+## Estrutura do projeto
+
+```text
+app/
+├── Enums/                  # Enums de domínio (ex.: StatusUsuario)
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/          # Painel administrativo
+│   │   ├── AreaRestrita/   # Área restrita a usuários autenticados
+│   │   ├── Auth/           # Autenticação (gerado pelo Breeze)
+│   │   ├── Api/V1/         # Reservado para a futura API do app Flutter
+│   │   └── Site/           # Páginas públicas
+│   └── Requests/
+│       ├── Admin/          # Form Requests do painel administrativo
+│       └── Auth/           # Form Requests de autenticação
+├── Models/
+├── Policies/
+├── Providers/
+├── Support/                # Serviços transversais (ex.: RegistradorDeAuditoria)
+resources/views/
+├── components/
+│   ├── layouts/            # x-layouts.site, x-layouts.admin, x-layouts.restrito
+│   └── ui/                 # Componentes reutilizáveis (botão, tabela, alerta etc.)
+├── site/                   # Views públicas
+├── area-restrita/          # Views da área restrita
+├── admin/                  # Views do painel administrativo
+└── auth/, profile/         # Views de autenticação e perfil (Breeze)
+```
+
+A estrutura por camadas (`Application/` e `Domain/` por módulo) sugerida no escopo original será adotada de forma incremental, apenas quando um módulo específico realmente precisar dela — ver [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
+
+## Perfis e permissões
+
+Perfis iniciais: Superadministrador, Administrador, Venerável Mestre, Secretário, Tesoureiro, Chanceler, Bibliotecário, Editor de Conteúdo, Instrutor, Irmão, Visitante Autorizado.
+
+O perfil **Superadministrador** sempre tem acesso total via `Gate::before` (`app/Providers/AppServiceProvider.php`), independentemente das permissões atribuídas a ele.
+
+O mapeamento completo perfil → permissões está em `database/seeders/PerfilPermissaoSeeder.php` e documentado como suposição em [`docs/MODULOS.md`](docs/MODULOS.md).
+
+## Segurança
+
+Ver [`docs/SEGURANCA.md`](docs/SEGURANCA.md).
+
+## Preparação para Flutter
+
+Ver [`docs/API-FUTURA.md`](docs/API-FUTURA.md).
+
+## Roadmap
+
+Ver [`ROADMAP.md`](ROADMAP.md).
+
+## Estratégia de branches
+
+- `main`: branch principal, sempre estável.
+- `feature/<nome>`: uma branch por funcionalidade, criada apenas quando a funcionalidade é iniciada.
+
+## Padrão de commits
+
+```text
+chore: configura estrutura inicial do projeto
+docs: cria documentação inicial
+feat: adiciona autenticação de usuários
+fix: corrige autorização de acesso à tesouraria
+test: adiciona testes de permissões
+refactor: desacopla criação de notícias
+style: ajusta layout responsivo do painel
+```
+
+## Licença e uso institucional
+
+Uso interno e institucional da Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem. Não distribuído publicamente.

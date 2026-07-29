@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Sao_Paulo',
 
     /*
     |--------------------------------------------------------------------------
@@ -121,6 +121,22 @@ return [
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Administrador local (seeder)
+    |--------------------------------------------------------------------------
+    |
+    | Utilizado exclusivamente pelo AdministradorLocalSeeder em ambiente de
+    | desenvolvimento/teste. Nunca é aplicado em produção.
+    |
+    */
+
+    'admin_seed' => [
+        'name' => env('ADMIN_NAME', 'Administrador Local'),
+        'email' => env('ADMIN_EMAIL', 'admin@localhost.test'),
+        'password' => env('ADMIN_PASSWORD', 'alterar-senha'),
     ],
 
 ];
