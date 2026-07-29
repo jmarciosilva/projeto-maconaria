@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PerfilPermissaoSeeder::class,
             AdministradorLocalSeeder::class,
+            PaginaInstitucionalSeeder::class,
         ]);
     }
 }

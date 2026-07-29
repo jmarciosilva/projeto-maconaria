@@ -46,6 +46,9 @@ Consulte [`ROADMAP.md`](ROADMAP.md) para o detalhamento por fase e [`docs/MODULO
 | `laravel-lang/lang` + `laravel-lang/publisher` (dev) | Publicam as traduções pt_BR de validação, autenticação, paginação e senhas |
 | `larastan/larastan` (dev) | Análise estática de código (PHPStan com extensões para Laravel) |
 | `laravel/pint` (dev, já incluso no skeleton) | Formatação de código (PSR-12 / preset Laravel) |
+| `mews/purifier` | Sanitização de HTML (HTMLPurifier) do conteúdo das páginas institucionais, editado via Quill.js |
+| `quill` (npm) | Editor de texto rico (WYSIWYG) para o conteúdo das páginas institucionais no painel |
+| `@tailwindcss/typography` (npm, dev) | Classe `.prose`, usada para estilizar o HTML das páginas institucionais no site público |
 
 ## Requisitos do ambiente
 

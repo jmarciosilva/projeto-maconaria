@@ -1,8 +1,67 @@
 import Alpine from 'alpinejs';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 
 window.Alpine = Alpine;
 
 Alpine.start();
+
+/**
+ * Inicializa o editor Quill em qualquer elemento com [data-quill-editor],
+ * sincronizando o HTML gerado com o campo oculto indicado em
+ * data-quill-target antes do envio do formulário. O conteúdo ainda é
+ * sanitizado no backend (mews/purifier) — o Quill cuida só da experiência
+ * de edição, nunca é a única camada de proteção contra HTML malicioso.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-quill-editor]').forEach((elementoEditor) => {
+        const campoOculto = document.getElementById(elementoEditor.dataset.quillTarget);
+
+        if (!campoOculto) {
+            return;
+        }
+
+        const conteudoInicial = campoOculto.value;
+
+        // O conteúdo inicial precisa ser carregado ANTES de o Quill inicializar
+        // a partir do próprio elemento, para não conflitar com o parsing.
+        elementoEditor.innerHTML = '';
+
+        const quill = new Quill(elementoEditor, {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ header: [1, 2, 3, false] }],
+                    ['blockquote'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link'],
+                    ['clean'],
+                ],
+            },
+        });
+
+        // Importante: usar a API do Quill (dangerouslyPasteHTML) para carregar
+        // o conteúdo inicial, nunca "quill.root.innerHTML = ..." diretamente.
+        // Setar o innerHTML manualmente deixa o modelo interno do Quill (o
+        // Delta) dessincronizado do DOM visível — o editor parece funcionar,
+        // mas ao editar e salvar, o conteúdo real digitado pelo usuário não é
+        // capturado corretamente e a página volta ao texto original.
+        if (conteudoInicial) {
+            quill.clipboard.dangerouslyPasteHTML(conteudoInicial);
+        }
+
+        campoOculto.value = quill.root.innerHTML;
+
+        quill.on('text-change', () => {
+            campoOculto.value = quill.root.innerHTML;
+        });
+
+        elementoEditor.closest('form')?.addEventListener('submit', () => {
+            campoOculto.value = quill.root.innerHTML;
+        });
+    });
+});
 
 /**
  * Máscara de telefone no formato (00) 00000-0000 (15 caracteres), aplicada a

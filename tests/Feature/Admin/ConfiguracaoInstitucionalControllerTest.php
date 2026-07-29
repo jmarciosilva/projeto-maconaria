@@ -93,4 +93,47 @@ class ConfiguracaoInstitucionalControllerTest extends TestCase
             ])
             ->assertSessionHasErrors('facebook_url');
     }
+
+    public function test_user_with_permission_can_update_identidade_institucional(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('cms.editar');
+
+        $this->actingAs($usuario)->put(route('admin.configuracoes.institucional.update'), [
+            'nome_loja' => 'ARLS Ferraz de Vasconcelos',
+            'titulo_institucional' => 'Bem-vindos à nossa Loja',
+            'subtitulo_institucional' => 'Fraternidade, verdade e progresso.',
+            'telefone_institucional' => '(11) 4444-5555',
+        ])->assertRedirect(route('admin.configuracoes.institucional.edit'));
+
+        $configuracao = ConfiguracaoInstitucional::atual();
+
+        $this->assertSame('ARLS Ferraz de Vasconcelos', $configuracao->nome_loja);
+        $this->assertSame('Bem-vindos à nossa Loja', $configuracao->titulo_institucional);
+        $this->assertSame('Fraternidade, verdade e progresso.', $configuracao->subtitulo_institucional);
+        $this->assertSame('(11) 4444-5555', $configuracao->telefone_institucional);
+    }
+
+    public function test_invalid_telefone_institucional_format_is_rejected(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('cms.editar');
+
+        $this->actingAs($usuario)
+            ->put(route('admin.configuracoes.institucional.update'), [
+                'telefone_institucional' => '1144445555',
+            ])
+            ->assertSessionHasErrors('telefone_institucional');
+    }
+
+    public function test_nome_falls_back_to_app_name_when_not_configured(): void
+    {
+        $configuracao = ConfiguracaoInstitucional::atual();
+
+        $this->assertSame(config('app.name'), $configuracao->nome());
+    }
 }

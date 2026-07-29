@@ -4,6 +4,15 @@
         @method('PUT')
 
         <fieldset class="space-y-4">
+            <legend class="text-sm font-semibold text-gray-900">Identidade institucional</legend>
+
+            <x-ui.input rotulo="Nome da Loja" nome="nome_loja" :valor="$configuracao->nome_loja" :erro="$errors->first('nome_loja')" placeholder="{{ config('app.name') }}" />
+            <x-ui.input rotulo="Título institucional (exibido na home)" nome="titulo_institucional" :valor="$configuracao->titulo_institucional" :erro="$errors->first('titulo_institucional')" />
+            <x-ui.input rotulo="Subtítulo institucional (exibido na home)" nome="subtitulo_institucional" :valor="$configuracao->subtitulo_institucional" :erro="$errors->first('subtitulo_institucional')" />
+            <x-ui.input rotulo="Telefone institucional" nome="telefone_institucional" :valor="$configuracao->telefone_institucional" :erro="$errors->first('telefone_institucional')" placeholder="(00) 0000-0000 ou (00) 00000-0000" />
+        </fieldset>
+
+        <fieldset class="space-y-4">
             <legend class="text-sm font-semibold text-gray-900">Logotipo</legend>
 
             @if ($configuracao->logotipo)

@@ -1,10 +1,14 @@
-<x-layouts.site>
+@php
+$configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
+@endphp
+
+<x-layouts.site :meta-descricao="$configuracaoInstitucional->subtitulo_institucional">
     @if ($itensCarrossel->isEmpty())
         <section class="bg-gradient-to-b from-blue-950 to-blue-900 py-20 text-white">
             <div class="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold sm:text-4xl">{{ config('app.name') }}</h1>
+                <h1 class="text-3xl font-bold sm:text-4xl">{{ $configuracaoInstitucional->titulo_institucional ?: $configuracaoInstitucional->nome() }}</h1>
                 <p class="mx-auto mt-4 max-w-2xl text-blue-100">
-                    Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem.
+                    {{ $configuracaoInstitucional->subtitulo_institucional ?: 'Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem.' }}
                 </p>
             </div>
         </section>
@@ -97,13 +101,26 @@
         </section>
     @endif
 
-    <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-        <div class="rounded-lg border border-dashed border-gray-300 p-8 text-center text-gray-600">
-            <p>
-                Esta página inicial é o ponto de partida da nova landing page institucional.
-                As demais seções (notícias, sobre nós, o que é a Maçonaria etc.) serão
-                adicionadas nas próximas fases do projeto.
-            </p>
-        </div>
-    </section>
+    @if ($paginasInstitucionais->isNotEmpty())
+        <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+            <div class="mb-8 max-w-3xl">
+                <h2 class="text-2xl font-bold text-gray-900">Conheça a Loja e a Maçonaria</h2>
+                <p class="mt-2 text-gray-600">Acesse os conteúdos institucionais preparados pela administração da Loja.</p>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach ($paginasInstitucionais as $pagina)
+                    <a href="{{ route('paginas.mostrar', $pagina->slug) }}" class="rounded-md border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
+                        <h3 class="text-base font-semibold text-gray-900">{{ $pagina->titulo }}</h3>
+
+                        @if ($pagina->meta_descricao)
+                            <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ $pagina->meta_descricao }}</p>
+                        @endif
+
+                        <span class="mt-4 inline-flex text-sm font-semibold text-blue-800">Ler conteúdo</span>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+    @endif
 </x-layouts.site>

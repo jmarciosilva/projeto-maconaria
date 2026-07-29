@@ -19,6 +19,10 @@ use Illuminate\Database\Eloquent\Model;
  * corrigido — ver docs/MODULOS.md).
  */
 #[Fillable([
+    'nome_loja',
+    'titulo_institucional',
+    'subtitulo_institucional',
+    'telefone_institucional',
     'logotipo',
     'endereco_rodape',
     'email_institucional',
@@ -39,5 +43,10 @@ final class ConfiguracaoInstitucional extends Model
     public function possuiRedesSociais(): bool
     {
         return $this->facebook_url || $this->instagram_url || $this->twitter_url || $this->tiktok_url;
+    }
+
+    public function nome(): string
+    {
+        return $this->nome_loja ?: (string) config('app.name');
     }
 }

@@ -84,10 +84,13 @@ Tabela única para o histórico de cargo, grau, situação cadastral e demais al
 
 ### `configuracoes_institucionais` (Fase 3 — singleton)
 
-Tabela com um único registro (`id = 1`), acessado via `ConfiguracaoInstitucional::atual()`. Evita a complexidade de uma tabela chave-valor genérica para um punhado de campos que sempre existem juntos.
+Tabela com um único registro, acessado via `ConfiguracaoInstitucional::atual()` (`self::query()->first() ?? self::query()->create()` — **não** depende de um ID fixo; ver bug corrigido em `docs/MODULOS.md`). Evita a complexidade de uma tabela chave-valor genérica para um punhado de campos que sempre existem juntos.
 
 | Coluna | Tipo | Descrição |
 |---|---|---|
+| `nome_loja` | string, nullable | Se vazio, usa `config('app.name')` (ver `ConfiguracaoInstitucional::nome()`) |
+| `titulo_institucional`, `subtitulo_institucional` | string, nullable | Exibidos no hero da home quando não há itens de carrossel |
+| `telefone_institucional` | string, nullable | Formato `(00) 0000-0000` ou `(00) 00000-0000` |
 | `logotipo` | string, nullable | Caminho no disco público `public` |
 | `endereco_rodape` | text, nullable | Exibido no rodapé do site público |
 | `email_institucional` | string, nullable | E-mail público exibido no rodapé |
@@ -109,10 +112,25 @@ Tabela com um único registro (`id = 1`), acessado via `ConfiguracaoInstituciona
 
 O nome da tabela (`carrossel_itens`, plural em português) diverge da convenção automática do Eloquent (que geraria `carrossel_items`), por isso o Model `CarrosselItem` declara `protected $table` explicitamente. O mesmo vale para `ConfiguracaoInstitucional` → `configuracoes_institucionais`.
 
+### `paginas_institucionais` (Fase 3)
+
+Conteúdo das páginas institucionais do site público (Sobre Nós, O que é Maçonaria, Maçonaria para Jovens, Como a Maçonaria pode mudar um cidadão, Política de Privacidade, Termos de Uso), além de páginas adicionais criadas livremente pelo painel.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `slug` | string, único | Identificador da URL (ex.: `sobre-nos`) |
+| `titulo` | string | |
+| `conteudo` | text, nullable | HTML sanitizado (`mews/purifier`, perfil `institucional`) gerado pelo editor Quill.js |
+| `meta_titulo`, `meta_descricao` | string, nullable | SEO básico; `meta_titulo` cai para `titulo` quando vazio |
+| `publicado` | boolean | Páginas não publicadas retornam 404 no site público |
+
+Seis slugs são considerados fixos (`App\Http\Controllers\Admin\PaginaInstitucionalController::SLUGS_FIXOS`) por estarem vinculados a URLs específicas em `routes/web.php`: `sobre-nos`, `maconaria`, `maconaria-jovens`, `mudar-cidadao`, `politica-privacidade`, `termos-de-uso`. Essas páginas podem ser editadas mas não excluídas pelo painel.
+
 ## Seeders
 
 - `PerfilPermissaoSeeder`: cria o catálogo de permissões e os perfis iniciais.
 - `AdministradorLocalSeeder`: cria/atualiza o administrador local a partir das variáveis `ADMIN_*` do `.env`. Nunca executa em produção (`App::environment('production')` é verificado explicitamente).
+- `PaginaInstitucionalSeeder`: cria as 6 páginas institucionais fixas com conteúdo placeholder, se ainda não existirem (`firstOrCreate` por slug).
 
 ## Migrations relevantes
 
@@ -124,3 +142,5 @@ O nome da tabela (`carrossel_itens`, plural em português) diverge da convençã
 - `2026_07_29_112905_adiciona_irmao_id_a_usuarios`
 - `2026_07_29_142844_cria_tabela_configuracoes_institucionais`
 - `2026_07_29_142845_cria_tabela_carrossel_itens`
+- `2026_07_29_153743_adiciona_campos_institucionais_a_configuracoes`
+- `2026_07_29_153758_cria_tabela_paginas_institucionais`

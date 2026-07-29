@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CarrosselItemController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
 use App\Http\Controllers\Admin\IrmaoController;
+use App\Http\Controllers\Admin\PaginaInstitucionalController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\UsuarioController;
 use Illuminate\Support\Facades\Route;
@@ -44,4 +45,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/carrossel/{carrossel}/editar', [CarrosselItemController::class, 'edit'])->name('carrossel.edit');
     Route::put('/carrossel/{carrossel}', [CarrosselItemController::class, 'update'])->name('carrossel.update');
     Route::delete('/carrossel/{carrossel}', [CarrosselItemController::class, 'destroy'])->name('carrossel.destroy');
+
+    Route::get('/paginas-institucionais', [PaginaInstitucionalController::class, 'index'])->name('paginas-institucionais.index');
+    Route::get('/paginas-institucionais/nova', [PaginaInstitucionalController::class, 'create'])->name('paginas-institucionais.create');
+    Route::post('/paginas-institucionais', [PaginaInstitucionalController::class, 'store'])->name('paginas-institucionais.store');
+    Route::get('/paginas-institucionais/{pagina}/editar', [PaginaInstitucionalController::class, 'edit'])->name('paginas-institucionais.edit');
+    Route::put('/paginas-institucionais/{pagina}', [PaginaInstitucionalController::class, 'update'])->name('paginas-institucionais.update');
+    Route::delete('/paginas-institucionais/{pagina}', [PaginaInstitucionalController::class, 'destroy'])->name('paginas-institucionais.destroy');
 });
