@@ -25,4 +25,14 @@
             Irmãos
         </a>
     @endcan
+
+    @can('cms.visualizar')
+        <a href="{{ route('admin.configuracoes.institucional.edit') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.configuracoes.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Configurações do Site
+        </a>
+
+        <a href="{{ route('admin.carrossel.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.carrossel.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Carrossel
+        </a>
+    @endcan
 </nav>

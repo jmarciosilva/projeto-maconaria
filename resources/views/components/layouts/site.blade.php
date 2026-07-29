@@ -1,5 +1,12 @@
 @props(['titulo' => null])
 
+@php
+$configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
+$logotipoSite = $configuracaoInstitucional->logotipo
+    ? asset('storage/'.$configuracaoInstitucional->logotipo)
+    : asset('images/logo-loja.png');
+@endphp
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,6 +22,7 @@
     <header class="border-b border-gray-200 bg-blue-950 text-white">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <a href="{{ route('home') }}" class="flex items-center gap-3 text-lg font-semibold tracking-wide">
+                <img src="{{ $logotipoSite }}" alt="{{ config('app.name') }}" class="h-10 w-10 rounded-full object-contain">
                 {{ config('app.name') }}
             </a>
 
@@ -69,7 +77,45 @@
 
     <footer class="mt-16 border-t border-gray-200 bg-gray-50">
         <div class="mx-auto max-w-7xl px-4 py-8 text-sm text-gray-600 sm:px-6 lg:px-8">
-            <p>&copy; {{ now()->year }} {{ config('app.name') }}. Todos os direitos reservados.</p>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="font-semibold text-gray-800">{{ config('app.name') }}</p>
+
+                    @if ($configuracaoInstitucional->endereco_rodape)
+                        <p class="mt-1 whitespace-pre-line">{{ $configuracaoInstitucional->endereco_rodape }}</p>
+                    @endif
+
+                    @if ($configuracaoInstitucional->email_institucional)
+                        <p class="mt-1">
+                            <a href="mailto:{{ $configuracaoInstitucional->email_institucional }}" class="hover:text-blue-900 hover:underline">
+                                {{ $configuracaoInstitucional->email_institucional }}
+                            </a>
+                        </p>
+                    @endif
+                </div>
+
+                @if ($configuracaoInstitucional->possuiRedesSociais())
+                    <div class="flex items-center gap-4">
+                        @if ($configuracaoInstitucional->facebook_url)
+                            <a href="{{ $configuracaoInstitucional->facebook_url }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-900" aria-label="Facebook">Facebook</a>
+                        @endif
+
+                        @if ($configuracaoInstitucional->instagram_url)
+                            <a href="{{ $configuracaoInstitucional->instagram_url }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-900" aria-label="Instagram">Instagram</a>
+                        @endif
+
+                        @if ($configuracaoInstitucional->twitter_url)
+                            <a href="{{ $configuracaoInstitucional->twitter_url }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-900" aria-label="Twitter / X">Twitter / X</a>
+                        @endif
+
+                        @if ($configuracaoInstitucional->tiktok_url)
+                            <a href="{{ $configuracaoInstitucional->tiktok_url }}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-900" aria-label="TikTok">TikTok</a>
+                        @endif
+                    </div>
+                @endif
+            </div>
+
+            <p class="mt-6 border-t border-gray-200 pt-4">&copy; {{ now()->year }} {{ config('app.name') }}. Todos os direitos reservados.</p>
         </div>
     </footer>
 </body>

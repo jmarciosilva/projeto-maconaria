@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\CarrosselItemController;
+use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
 use App\Http\Controllers\Admin\IrmaoController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\UsuarioController;
@@ -32,4 +34,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/irmaos/{irmao}', [IrmaoController::class, 'update'])->name('irmaos.update');
     Route::delete('/irmaos/{irmao}', [IrmaoController::class, 'destroy'])->name('irmaos.destroy');
     Route::get('/irmaos/{irmao}/foto', [IrmaoController::class, 'foto'])->name('irmaos.foto');
+
+    Route::get('/configuracoes/institucional', [ConfiguracaoInstitucionalController::class, 'edit'])->name('configuracoes.institucional.edit');
+    Route::put('/configuracoes/institucional', [ConfiguracaoInstitucionalController::class, 'update'])->name('configuracoes.institucional.update');
+
+    Route::get('/carrossel', [CarrosselItemController::class, 'index'])->name('carrossel.index');
+    Route::get('/carrossel/novo', [CarrosselItemController::class, 'create'])->name('carrossel.create');
+    Route::post('/carrossel', [CarrosselItemController::class, 'store'])->name('carrossel.store');
+    Route::get('/carrossel/{carrossel}/editar', [CarrosselItemController::class, 'edit'])->name('carrossel.edit');
+    Route::put('/carrossel/{carrossel}', [CarrosselItemController::class, 'update'])->name('carrossel.update');
+    Route::delete('/carrossel/{carrossel}', [CarrosselItemController::class, 'destroy'])->name('carrossel.destroy');
 });

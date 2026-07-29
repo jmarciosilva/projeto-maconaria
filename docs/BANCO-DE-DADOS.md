@@ -82,6 +82,33 @@ Tabela única para o histórico de cargo, grau, situação cadastral e demais al
 | `user_agent` | string | User agent da requisição |
 | `criado_em` | timestamp | Data/hora do registro (imutável, sem `updated_at`) |
 
+### `configuracoes_institucionais` (Fase 3 — singleton)
+
+Tabela com um único registro (`id = 1`), acessado via `ConfiguracaoInstitucional::atual()`. Evita a complexidade de uma tabela chave-valor genérica para um punhado de campos que sempre existem juntos.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `logotipo` | string, nullable | Caminho no disco público `public` |
+| `endereco_rodape` | text, nullable | Exibido no rodapé do site público |
+| `email_institucional` | string, nullable | E-mail público exibido no rodapé |
+| `facebook_url`, `instagram_url`, `twitter_url`, `tiktok_url` | string, nullable | Links das redes sociais |
+
+### `carrossel_itens` (Fase 3)
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `titulo`, `subtitulo` | string, nullable | |
+| `imagem_desktop` | string | Obrigatória, disco público |
+| `imagem_mobile` | string, nullable | Se ausente, a home usa `imagem_desktop` como fallback |
+| `texto_alternativo` | string | Obrigatório (acessibilidade) |
+| `link`, `texto_botao` | string, nullable | Chamada para ação opcional |
+| `abrir_em_nova_aba` | boolean | |
+| `ordem` | unsigned int | Ordenação manual (ver `docs/MODULOS.md`) |
+| `data_inicio`, `data_fim` | date, nullable | Período de exibição; `null` = sem limite naquele lado |
+| `ativo` | boolean | |
+
+O nome da tabela (`carrossel_itens`, plural em português) diverge da convenção automática do Eloquent (que geraria `carrossel_items`), por isso o Model `CarrosselItem` declara `protected $table` explicitamente. O mesmo vale para `ConfiguracaoInstitucional` → `configuracoes_institucionais`.
+
 ## Seeders
 
 - `PerfilPermissaoSeeder`: cria o catálogo de permissões e os perfis iniciais.
@@ -95,3 +122,5 @@ Tabela única para o histórico de cargo, grau, situação cadastral e demais al
 - `2026_07_29_112902_cria_tabela_irmaos`
 - `2026_07_29_112904_cria_tabela_irmao_historicos`
 - `2026_07_29_112905_adiciona_irmao_id_a_usuarios`
+- `2026_07_29_142844_cria_tabela_configuracoes_institucionais`
+- `2026_07_29_142845_cria_tabela_carrossel_itens`

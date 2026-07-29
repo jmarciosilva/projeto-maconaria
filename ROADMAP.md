@@ -47,15 +47,21 @@
 
 ## Fase 3 — CMS e landing page
 
-- [ ] Configurações institucionais
-- [ ] Menu
-- [ ] Carrossel
-- [x] 🚧 Página inicial (placeholder estático; conteúdo administrável pelo CMS pendente)
+- [ ] 🚧 Configurações institucionais
+  - [x] Logotipo da Loja (upload pelo painel)
+  - [x] Endereço (usado no rodapé)
+  - [x] E-mail institucional
+  - [x] Redes sociais (Facebook, Instagram, Twitter/X, TikTok)
+  - [ ] Nome da Loja, título/subtítulo institucional, telefone público (ainda hardcoded/pendente)
+  - [ ] Mapa de localização, política de privacidade, termos de uso
+- [ ] Menu (links/ordem/visibilidade configuráveis pelo painel)
+- [x] Carrossel (CRUD completo, imagem desktop/mobile, período de exibição, ordem)
+- [x] 🚧 Página inicial (carrossel dinâmico funcional; demais seções institucionais ainda pendentes)
 - [ ] Sobre nós
 - [ ] O que é Maçonaria
 - [ ] Maçonaria para Jovens
 - [ ] Como a Maçonaria pode mudar um cidadão
-- [ ] Rodapé
+- [ ] 🚧 Rodapé (endereço, e-mail e redes sociais virão das configurações institucionais; falta política de privacidade/termos de uso)
 - [ ] SEO
 
 ## Fase 4 — Notícias e conteúdo
