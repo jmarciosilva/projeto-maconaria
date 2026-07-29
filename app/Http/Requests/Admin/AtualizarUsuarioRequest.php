@@ -24,7 +24,7 @@ final class AtualizarUsuarioRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario->id)],
-            'telefone' => ['nullable', 'string', 'max:20'],
+            'telefone' => ['nullable', 'string', 'regex:/^\(\d{2}\) \d{5}-\d{4}$/'],
             'deve_alterar_senha' => ['boolean'],
             'perfis' => ['array'],
             'perfis.*' => ['string', Rule::exists('roles', 'name')],
@@ -40,6 +40,7 @@ final class AtualizarUsuarioRequest extends FormRequest
             'name.required' => 'Informe o nome do usuário.',
             'email.required' => 'Informe o e-mail de acesso.',
             'email.unique' => 'Já existe um usuário cadastrado com este e-mail.',
+            'telefone.regex' => 'Informe o telefone no formato (00) 00000-0000.',
         ];
     }
 }

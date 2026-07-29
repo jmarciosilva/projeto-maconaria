@@ -28,6 +28,7 @@
 - [x] Recuperação de senha
 - [x] Alteração de senha
 - [ ] Alteração de e-mail (com confirmação e auditoria — pendente, ver `docs/MODULOS.md`)
+- [ ] ⚠️ Verificação de e-mail (scaffolding pronta, mas **temporariamente desativada** — não há SMTP configurado ainda; ver `docs/MODULOS.md`)
 - [x] Usuários (CRUD básico, ativar/desativar/bloquear/desbloquear)
 - [x] Perfis (seed inicial; CRUD pelo painel pendente)
 - [x] Permissões

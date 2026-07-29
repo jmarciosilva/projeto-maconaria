@@ -14,14 +14,14 @@
 <body class="min-h-screen bg-gray-100 font-sans text-gray-900 antialiased" x-data="{ menuAberto: false }">
     <div class="flex min-h-screen">
         {{-- Menu lateral (desktop) --}}
-        <aside class="hidden w-64 shrink-0 bg-blue-950 text-white lg:block">
+        <aside class="hidden w-64 shrink-0 bg-[#14213D] text-white lg:block">
             @include('components.layouts.partials.admin-nav')
         </aside>
 
         {{-- Menu lateral (mobile, sobreposto) --}}
         <div x-show="menuAberto" x-cloak class="fixed inset-0 z-40 lg:hidden">
             <div class="fixed inset-0 bg-black/50" @click="menuAberto = false"></div>
-            <aside class="relative z-50 h-full w-64 bg-blue-950 text-white">
+            <aside class="relative z-50 h-full w-64 bg-[#14213D] text-white">
                 @include('components.layouts.partials.admin-nav')
             </aside>
         </div>

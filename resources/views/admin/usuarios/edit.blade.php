@@ -5,7 +5,7 @@
 
         <x-ui.input rotulo="Nome" nome="name" :valor="$usuario->name" :erro="$errors->first('name')" obrigatorio />
         <x-ui.input rotulo="E-mail de acesso" nome="email" tipo="email" :valor="$usuario->email" :erro="$errors->first('email')" obrigatorio />
-        <x-ui.input rotulo="Telefone" nome="telefone" :valor="$usuario->telefone" :erro="$errors->first('telefone')" />
+        <x-ui.input rotulo="Telefone" nome="telefone" :valor="$usuario->telefone" :erro="$errors->first('telefone')" data-mascara="telefone" maxlength="15" placeholder="(00) 00000-0000" />
 
         <div>
             <span class="block text-sm font-medium text-gray-700">Perfis</span>

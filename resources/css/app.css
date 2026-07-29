@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * O Alpine.js exige essa regra para que [x-cloak] realmente esconda o
+ * elemento até a diretiva ser inicializada. Sem ela, modais e menus com
+ * x-cloak (ex.: x-ui.confirmation, menu mobile) aparecem brevemente na
+ * tela assim que a página carrega, antes do Alpine escondê-los.
+ */
+[x-cloak] {
+    display: none !important;
+}

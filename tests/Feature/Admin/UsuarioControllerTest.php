@@ -73,4 +73,45 @@ class UsuarioControllerTest extends TestCase
         $registro = Auditoria::where('entidade_id', $alvo->id)->firstOrFail();
         $this->assertSame('Nome Novo', $registro->dados_novos['name']);
     }
+
+    public function test_telefone_with_invalid_format_is_rejected(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $administrador = User::factory()->create();
+        $administrador->givePermissionTo('usuarios.criar');
+
+        $this->actingAs($administrador)
+            ->post(route('admin.usuarios.store'), [
+                'name' => 'Novo Usuário',
+                'email' => 'novo.usuario@example.com',
+                'password' => 'senha-forte-123',
+                'telefone' => '11987654321',
+            ])
+            ->assertSessionHasErrors('telefone');
+
+        $this->assertDatabaseMissing('users', ['email' => 'novo.usuario@example.com']);
+    }
+
+    public function test_telefone_with_valid_format_is_accepted(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $administrador = User::factory()->create();
+        $administrador->givePermissionTo('usuarios.criar');
+
+        $this->actingAs($administrador)
+            ->post(route('admin.usuarios.store'), [
+                'name' => 'Novo Usuário',
+                'email' => 'novo.usuario@example.com',
+                'password' => 'senha-forte-123',
+                'telefone' => '(11) 98765-4321',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'novo.usuario@example.com',
+            'telefone' => '(11) 98765-4321',
+        ]);
+    }
 }

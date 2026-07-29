@@ -23,7 +23,7 @@ final class CriarUsuarioRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
-            'telefone' => ['nullable', 'string', 'max:20'],
+            'telefone' => ['nullable', 'string', 'regex:/^\(\d{2}\) \d{5}-\d{4}$/'],
             'password' => ['required', 'string', 'min:8'],
             'deve_alterar_senha' => ['boolean'],
             'perfis' => ['array'],
@@ -42,6 +42,7 @@ final class CriarUsuarioRequest extends FormRequest
             'email.unique' => 'Já existe um usuário cadastrado com este e-mail.',
             'password.required' => 'Informe uma senha inicial.',
             'password.min' => 'A senha deve ter pelo menos 8 caracteres.',
+            'telefone.regex' => 'Informe o telefone no formato (00) 00000-0000.',
         ];
     }
 }

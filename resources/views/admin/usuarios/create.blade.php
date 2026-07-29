@@ -4,7 +4,7 @@
 
         <x-ui.input rotulo="Nome" nome="name" :erro="$errors->first('name')" obrigatorio />
         <x-ui.input rotulo="E-mail de acesso" nome="email" tipo="email" :erro="$errors->first('email')" obrigatorio />
-        <x-ui.input rotulo="Telefone" nome="telefone" :erro="$errors->first('telefone')" />
+        <x-ui.input rotulo="Telefone" nome="telefone" :erro="$errors->first('telefone')" data-mascara="telefone" maxlength="15" placeholder="(00) 00000-0000" />
         <x-ui.input rotulo="Senha inicial" nome="password" tipo="password" :erro="$errors->first('password')" obrigatorio />
 
         <div>
