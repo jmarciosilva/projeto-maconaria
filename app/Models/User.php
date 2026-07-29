@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -46,5 +47,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function estaBloqueado(): bool
     {
         return $this->bloqueado_em !== null;
+    }
+
+    public function irmao(): BelongsTo
+    {
+        return $this->belongsTo(Irmao::class);
     }
 }

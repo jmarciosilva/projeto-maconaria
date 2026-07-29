@@ -24,11 +24,48 @@
 | `ultimo_acesso_em` | timestamp, nullable | Atualizado a cada login bem-sucedido |
 | `email_verified_at` | timestamp, nullable | Verificação de e-mail |
 
-O campo `irmao_id` (vínculo com o cadastro de Irmãos) **não foi criado ainda** — será adicionado como coluna nullable com chave estrangeira quando a tabela `irmaos` for criada na Fase 2 (ver `docs/MODULOS.md`).
+| `irmao_id` | FK nullable, único → `irmaos` | Irmão vinculado a este usuário (adicionado na Fase 2) |
 
 ### `roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions`
 
 Geradas pelo `spatie/laravel-permission` (migration `create_permission_tables`). Guardam os perfis, permissões e seus vínculos com os usuários.
+
+### `irmaos` (Fase 2)
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `nome_completo` | string | Nome completo do Irmão |
+| `nome_social` | string, nullable | Nome social |
+| `data_nascimento` | date, nullable | |
+| `cpf` | string(11), único | Validado por `App\Rules\CpfValido` (dígitos verificadores) |
+| `rg` | string, nullable | |
+| `email`, `telefone` | string, nullable | Contato do Irmão (distinto do e-mail de acesso do usuário) |
+| `endereco`, `numero`, `complemento`, `bairro`, `cidade`, `estado`, `cep` | string, nullable | Endereço |
+| `data_iniciacao`, `data_elevacao`, `data_exaltacao` | date, nullable | |
+| `cim` | string, nullable | CIM ou matrícula |
+| `grau_atual` | string (`GrauMaconico`), nullable | aprendiz \| companheiro \| mestre |
+| `situacao_cadastral` | string (`SituacaoCadastralIrmao`) | ativo \| inativo \| licenciado \| irregular \| desligado \| falecido |
+| `cargo_atual` | string, nullable | Texto livre (ver `docs/MODULOS.md`) |
+| `data_ingresso_loja`, `data_desligamento` | date, nullable | |
+| `observacoes_administrativas` | text, nullable | Sensível — nunca exposta publicamente |
+| `fotografia` | string, nullable | Caminho no disco privado `local` (não no disco `public`) |
+| Soft deletes | `deleted_at` | Exclusão lógica |
+
+O vínculo com `users` é opcional e fica em `users.irmao_id` (não em `irmaos.usuario_id`) — um Irmão pode não ter usuário de acesso, e um usuário só pode estar vinculado a, no máximo, um Irmão (`unique` em `users.irmao_id`).
+
+### `irmao_historicos` (Fase 2)
+
+Tabela única para o histórico de cargo, grau, situação cadastral e demais alterações cadastrais relevantes, discriminada pelo campo `tipo` (`App\Enums\TipoHistoricoIrmao`). Optou-se por uma tabela consolidada em vez de quatro tabelas separadas — ver `docs/MODULOS.md`.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `irmao_id` | FK → `irmaos` | |
+| `tipo` | string | `cargo` \| `grau` \| `situacao_cadastral` \| `cadastral` |
+| `valor_anterior`, `valor_novo` | string, nullable | |
+| `data_referencia` | date | Data efetiva da alteração |
+| `observacao` | text, nullable | |
+| `registrado_por` | FK nullable → `users` | Quem registrou |
+| `criado_em` | timestamp | Imutável |
 
 ### `auditorias`
 
@@ -55,3 +92,6 @@ Geradas pelo `spatie/laravel-permission` (migration `create_permission_tables`).
 - `2026_07_29_130150_create_permission_tables` (spatie/laravel-permission)
 - `2026_07_29_130231_adiciona_campos_administrativos_a_usuarios`
 - `2026_07_29_130232_cria_tabela_auditorias`
+- `2026_07_29_112902_cria_tabela_irmaos`
+- `2026_07_29_112904_cria_tabela_irmao_historicos`
+- `2026_07_29_112905_adiciona_irmao_id_a_usuarios`

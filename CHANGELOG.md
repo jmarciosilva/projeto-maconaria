@@ -16,3 +16,4 @@ Todas as alterações relevantes deste projeto são documentadas neste arquivo.
 - Seeder do administrador local (`AdministradorLocalSeeder`), configurável via `.env`.
 - Testes automatizados (autenticação, permissões, auditoria) e Laravel Pint configurado.
 - Documentação inicial (`README.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `docs/*`).
+- **Fase 2 — Cadastro de Irmãos**: módulo completo (`Irmao`, `IrmaoHistorico`), com CPF validado por dígitos verificadores (`App\Rules\CpfValido`), histórico unificado de cargo/grau/situação cadastral/alterações cadastrais, vínculo opcional 1:1 com usuário (`users.irmao_id`), fotografia armazenada em disco privado e servida apenas via Controller autenticado + Policy, e proteção de dados sensíveis (CPF/RG/observações ocultos em serializações). CRUD completo no painel administrativo (`admin/irmaos`), com permissões `irmaos.*` concedidas a Administrador e Secretário.

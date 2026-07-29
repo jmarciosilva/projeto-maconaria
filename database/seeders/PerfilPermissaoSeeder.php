@@ -48,7 +48,7 @@ final class PerfilPermissaoSeeder extends Seeder
             'documentos.visualizar', 'auditoria.visualizar',
         ],
         'Secretário' => [
-            'irmaos.visualizar', 'secretaria.visualizar', 'secretaria.criar-ata',
+            'irmaos.visualizar', 'irmaos.criar', 'irmaos.editar', 'secretaria.visualizar', 'secretaria.criar-ata',
             'secretaria.editar-ata', 'secretaria.publicar-ata', 'eventos.visualizar', 'eventos.criar', 'eventos.editar',
         ],
         'Tesoureiro' => [

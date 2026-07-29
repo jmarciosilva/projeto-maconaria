@@ -36,13 +36,13 @@
 
 ## Fase 2 — Cadastro de Irmãos
 
-- [ ] Cadastro
-- [ ] Histórico
-- [ ] Graus
-- [ ] Cargos
-- [ ] Situação cadastral
-- [ ] Usuário vinculado
-- [ ] Proteção de dados
+- [x] Cadastro
+- [x] Histórico
+- [x] Graus
+- [x] Cargos (campo de texto livre — ver `docs/MODULOS.md`)
+- [x] Situação cadastral
+- [x] Usuário vinculado
+- [x] Proteção de dados
 
 ## Fase 3 — CMS e landing page
 
