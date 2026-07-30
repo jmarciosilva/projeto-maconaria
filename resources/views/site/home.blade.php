@@ -1,13 +1,15 @@
 @php
 $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
+$noticiaPrincipal = $noticiasEmDestaque->first();
+$noticiasSecundarias = $noticiasEmDestaque->slice(1);
 @endphp
 
 <x-layouts.site :meta-descricao="$configuracaoInstitucional->subtitulo_institucional">
     @if ($itensCarrossel->isEmpty())
-        <section class="bg-gradient-to-b from-blue-950 to-blue-900 py-20 text-white">
-            <div class="mx-auto max-w-5xl px-4 text-center sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold sm:text-4xl">{{ $configuracaoInstitucional->titulo_institucional ?: $configuracaoInstitucional->nome() }}</h1>
-                <p class="mx-auto mt-4 max-w-2xl text-blue-100">
+        <section class="bg-gradient-to-b from-brand-navy to-brand-navyDeep py-20 text-white">
+            <div class="mx-auto max-w-5xl px-5 text-center lg:px-8">
+                <h1 class="font-siteDisplay text-3xl font-bold sm:text-4xl">{{ $configuracaoInstitucional->titulo_institucional ?: $configuracaoInstitucional->nome() }}</h1>
+                <p class="mx-auto mt-4 max-w-2xl text-lg text-white/85">
                     {{ $configuracaoInstitucional->subtitulo_institucional ?: 'Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem.' }}
                 </p>
             </div>
@@ -16,7 +18,7 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
         <section
             x-data="{ indice: 0, total: {{ $itensCarrossel->count() }} }"
             x-init="setInterval(() => indice = (indice + 1) % total, 6000)"
-            class="relative overflow-hidden bg-blue-950"
+            class="relative overflow-hidden bg-brand-navyDeep"
             role="region"
             aria-label="Carrossel de destaques"
         >
@@ -41,21 +43,21 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
                         >
 
                         @if ($item->titulo || $item->subtitulo || $item->link)
-                            <div class="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-                                <div class="mx-auto w-full max-w-5xl px-4 pb-10 text-white sm:px-6 lg:px-8">
+                            <div class="absolute inset-0 flex items-end bg-gradient-to-t from-brand-navyDeep/90 via-brand-navyDeep/30 to-transparent">
+                                <div class="mx-auto w-full max-w-6xl px-5 pb-11 text-white lg:px-8">
                                     @if ($item->titulo)
-                                        <h2 class="text-2xl font-bold sm:text-3xl">{{ $item->titulo }}</h2>
+                                        <h2 class="font-siteDisplay text-2xl font-bold leading-tight sm:text-3xl">{{ $item->titulo }}</h2>
                                     @endif
 
                                     @if ($item->subtitulo)
-                                        <p class="mt-2 max-w-2xl text-blue-100">{{ $item->subtitulo }}</p>
+                                        <p class="mt-2.5 max-w-2xl text-lg text-white/85">{{ $item->subtitulo }}</p>
                                     @endif
 
                                     @if ($item->link && $item->texto_botao)
                                         <a
                                             href="{{ $item->link }}"
                                             @if ($item->abrir_em_nova_aba) target="_blank" rel="noopener noreferrer" @endif
-                                            class="mt-4 inline-block rounded-md bg-[#C9A227] px-5 py-2 text-sm font-semibold text-[#14213D] hover:bg-[#b8931f]"
+                                            class="mt-5 inline-block rounded-md bg-white px-6 py-2.5 font-bold text-brand-navy hover:bg-brand-sky"
                                         >
                                             {{ $item->texto_botao }}
                                         </a>
@@ -71,22 +73,22 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
                 <button
                     type="button"
                     @click="indice = (indice - 1 + total) % total"
-                    class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60"
+                    class="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-navyDeep/50 text-white hover:bg-brand-navyDeep/75"
                     aria-label="Slide anterior"
                 >
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
                 </button>
 
                 <button
                     type="button"
                     @click="indice = (indice + 1) % total"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60"
+                    class="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-navyDeep/50 text-white hover:bg-brand-navyDeep/75"
                     aria-label="Próximo slide"
                 >
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
                 </button>
 
-                <div class="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
+                <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2.5">
                     @foreach ($itensCarrossel as $posicao => $item)
                         <button
                             type="button"
@@ -102,54 +104,23 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
     @endif
 
     @if ($paginasInstitucionais->isNotEmpty())
-        <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mb-8 max-w-3xl">
-                <h2 class="text-2xl font-bold text-gray-900">Conheça a Loja e a Maçonaria</h2>
-                <p class="mt-2 text-gray-600">Acesse os conteúdos institucionais preparados pela administração da Loja.</p>
-            </div>
-
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                @foreach ($paginasInstitucionais as $pagina)
-                    <a href="{{ route('paginas.mostrar', $pagina->slug) }}" class="rounded-md border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
-                        <h3 class="text-base font-semibold text-gray-900">{{ $pagina->titulo }}</h3>
-
-                        @if ($pagina->meta_descricao)
-                            <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ $pagina->meta_descricao }}</p>
-                        @endif
-
-                        <span class="mt-4 inline-flex text-sm font-semibold text-blue-800">Ler conteúdo</span>
-                    </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    @if ($noticiasEmDestaque->isNotEmpty())
-        <section class="bg-gray-50 py-16">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Notícias em destaque</h2>
-                        <p class="mt-2 text-gray-600">Comunicados e conteúdos públicos recentes.</p>
-                    </div>
-
-                    <a href="{{ route('noticias.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver todas</a>
+        <section class="py-14 lg:py-16">
+            <div class="mx-auto max-w-6xl px-5 lg:px-8">
+                <div class="mb-7 max-w-2xl">
+                    <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Conheça a Loja e a Maçonaria</h2>
+                    <p class="mt-1 text-brand-inkSoft">Acesse os conteúdos institucionais preparados pela administração da Loja.</p>
                 </div>
 
-                <div class="grid gap-4 md:grid-cols-3">
-                    @foreach ($noticiasEmDestaque as $noticia)
-                        <a href="{{ route('noticias.mostrar', $noticia->slug) }}" class="rounded-md border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
-                            @if ($noticia->categoria)
-                                <p class="text-xs font-semibold uppercase tracking-wide text-blue-800">{{ $noticia->categoria->nome }}</p>
+                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach ($paginasInstitucionais as $pagina)
+                        <a href="{{ route('paginas.mostrar', $pagina->slug) }}" class="rounded-lg border border-brand-navy/10 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                            <h3 class="font-siteDisplay text-lg font-bold text-brand-navy">{{ $pagina->titulo }}</h3>
+
+                            @if ($pagina->meta_descricao)
+                                <p class="mt-2 line-clamp-3 text-[0.95rem] text-brand-inkSoft">{{ $pagina->meta_descricao }}</p>
                             @endif
 
-                            <h3 class="mt-2 text-lg font-semibold text-gray-900">{{ $noticia->titulo }}</h3>
-
-                            @if ($noticia->resumo)
-                                <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ $noticia->resumo }}</p>
-                            @endif
-
-                            <span class="mt-4 inline-flex text-sm font-semibold text-blue-800">Ler notícia</span>
+                            <span class="mt-4 inline-flex font-bold text-brand-navy">Ler conteúdo →</span>
                         </a>
                     @endforeach
                 </div>
@@ -157,91 +128,160 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
         </section>
     @endif
 
-    @if ($proximosEventos->isNotEmpty())
-        <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Próximos eventos</h2>
-                    <p class="mt-2 text-gray-600">Agenda pública da Loja.</p>
+    @if ($noticiasEmDestaque->isNotEmpty())
+        <section class="py-14 lg:py-16">
+            <div class="mx-auto max-w-6xl px-5 lg:px-8">
+                <div class="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-brand-navy/15 pb-4">
+                    <div>
+                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Notícias</h2>
+                        <p class="mt-1 text-brand-inkSoft">Comunicados e conteúdos públicos recentes.</p>
+                    </div>
+
+                    <a href="{{ route('noticias.index') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Todas as notícias →</a>
                 </div>
 
-                <a href="{{ route('eventos.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver agenda</a>
-            </div>
+                <div class="grid gap-10 {{ $noticiasSecundarias->isNotEmpty() ? 'lg:grid-cols-[1.7fr_1fr]' : '' }}">
+                    <article>
+                        <a href="{{ route('noticias.mostrar', $noticiaPrincipal->slug) }}" class="mb-5 flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-brand-navy to-brand-navyDeep">
+                            <svg class="h-24 w-24 opacity-50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M100 25 L158 122 H42 Z" stroke="#dcecf2" stroke-width="3" stroke-linejoin="round" />
+                                <path d="M52 140 A50 50 0 0 1 148 140" stroke="#dcecf2" stroke-width="3" />
+                            </svg>
+                        </a>
 
-            <div class="grid gap-4 md:grid-cols-3">
-                @foreach ($proximosEventos as $evento)
-                    <a href="{{ route('eventos.mostrar', $evento->slug) }}" class="rounded-md border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-blue-800">{{ $evento->tipo->rotulo() }}</p>
-                        <h3 class="mt-2 text-lg font-semibold text-gray-900">{{ $evento->titulo }}</h3>
-                        <p class="mt-2 text-sm text-gray-600">{{ $evento->inicio_em->format('d/m/Y H:i') }}</p>
-
-                        @if ($evento->local)
-                            <p class="mt-1 text-sm text-gray-600">{{ $evento->local }}</p>
+                        @if ($noticiaPrincipal->categoria)
+                            <span class="inline-block rounded bg-brand-sky px-3 py-1 text-sm font-bold text-brand-navy">{{ $noticiaPrincipal->categoria->nome }}</span>
                         @endif
-                    </a>
-                @endforeach
+
+                        <h3 class="mt-3 font-siteDisplay text-2xl font-bold leading-tight text-brand-navy sm:text-3xl">
+                            <a href="{{ route('noticias.mostrar', $noticiaPrincipal->slug) }}" class="hover:underline hover:decoration-brand-skyDeep hover:decoration-2 hover:underline-offset-4">{{ $noticiaPrincipal->titulo }}</a>
+                        </h3>
+
+                        @if ($noticiaPrincipal->resumo)
+                            <p class="mt-3 max-w-[60ch] text-lg text-brand-inkSoft">{{ $noticiaPrincipal->resumo }}</p>
+                        @endif
+
+                        <p class="mt-3 text-brand-inkSoft">
+                            @if ($noticiaPrincipal->publicado_em)
+                                Publicado {{ $noticiaPrincipal->publicado_em->diffForHumans() }}
+                            @endif
+                            @if ($noticiaPrincipal->autor)
+                                · por {{ $noticiaPrincipal->autor->name }}
+                            @endif
+                        </p>
+                    </article>
+
+                    @if ($noticiasSecundarias->isNotEmpty())
+                        <aside class="flex flex-col" aria-label="Mais notícias">
+                            @foreach ($noticiasSecundarias as $noticia)
+                                <a href="{{ route('noticias.mostrar', $noticia->slug) }}" class="block border-t border-brand-navy/12 py-5 first:border-t-0 first:pt-0">
+                                    @if ($noticia->categoria)
+                                        <span class="text-sm font-bold uppercase tracking-wide text-brand-navy">{{ $noticia->categoria->nome }}</span>
+                                    @endif
+                                    <p class="mt-2 font-bold leading-snug text-brand-ink hover:underline">{{ $noticia->titulo }}</p>
+                                    @if ($noticia->publicado_em)
+                                        <p class="mt-2 text-sm text-brand-inkSoft">{{ $noticia->publicado_em->diffForHumans() }}</p>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </aside>
+                    @endif
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if ($proximosEventos->isNotEmpty())
+        <section class="bg-brand-paperSoft py-14 lg:py-16">
+            <div class="mx-auto max-w-6xl px-5 lg:px-8">
+                <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Próximos encontros</h2>
+                        <p class="mt-1 text-brand-inkSoft">Agenda pública de sessões e atividades.</p>
+                    </div>
+
+                    <a href="{{ route('calendario') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Ver calendário completo →</a>
+                </div>
+
+                <div class="grid gap-5 md:grid-cols-3">
+                    @foreach ($proximosEventos as $evento)
+                        <a href="{{ route('eventos.mostrar', $evento->slug) }}" class="flex overflow-hidden rounded-lg border border-brand-navy/10 bg-white shadow-sm transition hover:shadow-md">
+                            <div class="flex w-20 shrink-0 flex-col items-center justify-center bg-brand-navy py-4 text-white">
+                                <span class="font-siteDisplay text-3xl font-bold leading-none">{{ $evento->inicio_em->format('d') }}</span>
+                                <span class="mt-1 text-xs font-bold uppercase tracking-wide text-brand-sky">{{ Illuminate\Support\Str::upper($evento->inicio_em->translatedFormat('M')) }}</span>
+                            </div>
+                            <div class="flex flex-col justify-center px-4 py-3">
+                                <p class="font-bold leading-snug text-brand-ink">{{ $evento->titulo }}</p>
+                                <p class="mt-1.5 text-sm text-brand-inkSoft">
+                                    {{ $evento->inicio_em->format('H:i') }}
+                                    @if ($evento->local)
+                                        · {{ $evento->local }}
+                                    @endif
+                                </p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </section>
     @endif
 
     @if ($publicacoesMural->isNotEmpty())
-        <section class="bg-gray-50 py-16">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-                    <div class="max-w-3xl">
-                        <h2 class="text-2xl font-bold text-gray-900">Mural da Loja</h2>
-                        <p class="mt-2 text-gray-600">Publicações públicas da Loja, com comentários moderados e reações da comunidade.</p>
+        <section class="py-14 lg:py-16">
+            <div class="mx-auto max-w-6xl px-5 lg:px-8">
+                <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+                    <div class="max-w-2xl">
+                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Mural da Loja</h2>
+                        <p class="mt-1 text-brand-inkSoft">Publicações públicas da Loja, com comentários moderados e reações da comunidade.</p>
                     </div>
-                    <a href="{{ route('mural.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver mural completo</a>
+                    <a href="{{ route('mural.index') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Ver mural completo →</a>
                 </div>
 
-                <div class="grid gap-5 lg:grid-cols-3">
+                <div class="grid gap-6 lg:grid-cols-3">
                     @foreach ($publicacoesMural as $publicacao)
-                        <article class="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
-                            <div class="mb-4 flex items-start gap-3">
-                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-950 text-sm font-semibold text-white">
+                        <article class="flex flex-col gap-3.5 rounded-lg border border-brand-navy/10 bg-white p-6 shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-navy font-siteDisplay text-lg font-bold text-white">
                                     {{ mb_substr($publicacao->autor->name ?? config('app.name'), 0, 1) }}
                                 </div>
                                 <div>
-                                    <h3 class="text-base font-semibold text-gray-900">{{ $publicacao->titulo }}</h3>
-                                    <p class="text-xs text-gray-500">{{ $publicacao->autor->name ?? 'Administração da Loja' }} · {{ $publicacao->publicado_em?->format('d/m/Y H:i') }}</p>
+                                    <p class="font-siteDisplay font-bold text-brand-navy">{{ $publicacao->titulo }}</p>
+                                    <p class="text-sm text-brand-inkSoft">{{ $publicacao->autor->name ?? 'Administração da Loja' }} · {{ $publicacao->publicado_em?->diffForHumans() }}</p>
                                 </div>
                             </div>
 
-                            <p class="whitespace-pre-line text-sm text-gray-700">{{ $publicacao->conteudo }}</p>
+                            <p class="whitespace-pre-line text-brand-ink">{{ $publicacao->conteudo }}</p>
 
-                            <div class="mt-4 flex items-center justify-between border-y border-gray-100 py-3 text-sm text-gray-600">
-                                <span>{{ $publicacao->reacoes_count }} curtida(s)</span>
+                            <div class="flex items-center justify-between border-t border-brand-navy/10 pt-3 text-sm text-brand-inkSoft">
+                                <span>♥ {{ $publicacao->reacoes_count }} curtida(s)</span>
                                 <span>{{ $publicacao->comentarios_aprovados_count }} comentário(s)</span>
                             </div>
 
-                            @auth
-                                <form method="POST" action="{{ route('mural.reacoes.store', $publicacao) }}" class="mt-3">
-                                    @csrf
-                                    <input type="hidden" name="tipo" value="curtir">
-                                    <button type="submit" class="w-full rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50">Curtir</button>
-                                </form>
-                            @else
-                                <a href="{{ route('login') }}" class="mt-3 block rounded-md border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-800 hover:bg-blue-50">Entrar para curtir</a>
-                            @endauth
-
                             @if ($publicacao->comentarios->isNotEmpty())
-                                <div class="mt-4 space-y-3">
+                                <div class="flex flex-col gap-2.5">
                                     @foreach ($publicacao->comentarios->take(2) as $comentario)
-                                        <div class="rounded-md bg-gray-50 p-3 text-sm">
-                                            <p class="font-medium text-gray-900">{{ $comentario->usuario->name ?? 'Usuário' }}</p>
-                                            <p class="mt-1 text-gray-700">{{ $comentario->comentario }}</p>
+                                        <div class="rounded-md bg-brand-paperSoft p-3 text-sm">
+                                            <p class="font-bold text-brand-ink">{{ $comentario->usuario->name ?? 'Usuário' }}</p>
+                                            <p class="mt-1 text-brand-inkSoft">{{ $comentario->comentario }}</p>
                                         </div>
                                     @endforeach
                                 </div>
                             @endif
 
                             @auth
-                                <form method="POST" action="{{ route('mural.comentarios.store', $publicacao) }}" class="mt-4 space-y-2">
+                                <form method="POST" action="{{ route('mural.reacoes.store', $publicacao) }}">
                                     @csrf
-                                    <textarea name="comentario" rows="2" class="block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="Escreva um comentário" required></textarea>
-                                    <button type="submit" class="text-sm font-semibold text-blue-800 hover:underline">Comentar</button>
+                                    <input type="hidden" name="tipo" value="curtir">
+                                    <button type="submit" class="w-full rounded-md border-2 border-brand-skyDeep py-2.5 font-bold text-brand-navy hover:bg-brand-sky">Curtir</button>
                                 </form>
+
+                                <form method="POST" action="{{ route('mural.comentarios.store', $publicacao) }}" class="flex flex-col gap-2">
+                                    @csrf
+                                    <textarea name="comentario" rows="2" class="block w-full rounded-md border-brand-navy/20 text-sm shadow-sm focus:border-brand-navy focus:ring-brand-navy" placeholder="Escreva um comentário" required></textarea>
+                                    <button type="submit" class="self-start font-bold text-brand-navy hover:underline">Comentar</button>
+                                </form>
+                            @else
+                                <a href="{{ route('login') }}" class="block rounded-md border-2 border-brand-skyDeep py-2.5 text-center font-bold text-brand-navy hover:bg-brand-sky">Entrar para curtir</a>
                             @endauth
                         </article>
                     @endforeach
@@ -251,33 +291,39 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
     @endif
 
     @if ($albunsGaleria->isNotEmpty())
-        <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-                <div class="max-w-3xl">
-                    <h2 class="text-2xl font-bold text-gray-900">Galeria da Loja</h2>
-                    <p class="mt-2 text-gray-600">Registros públicos de eventos, sessões e momentos institucionais.</p>
+        <section class="bg-brand-paperSoft py-14 lg:py-16">
+            <div class="mx-auto max-w-6xl px-5 lg:px-8">
+                <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+                    <div class="max-w-2xl">
+                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Galeria da Loja</h2>
+                        <p class="mt-1 text-brand-inkSoft">Registros públicos de eventos, sessões e momentos institucionais.</p>
+                    </div>
+                    <a href="{{ route('galeria.index') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Ver galeria completa →</a>
                 </div>
-                <a href="{{ route('galeria.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver galeria completa</a>
-            </div>
 
-            <div class="grid gap-5 md:grid-cols-3">
-                @foreach ($albunsGaleria as $album)
-                    @php($fotoPrincipal = $album->fotografias->first())
-                    <article class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
-                        @if ($fotoPrincipal)
-                            <img src="{{ Storage::url($fotoPrincipal->caminho) }}" alt="{{ $fotoPrincipal->texto_alternativo }}" class="aspect-video w-full object-cover">
-                        @else
-                            <div class="flex aspect-video w-full items-center justify-center bg-blue-950 text-sm font-semibold text-white">Galeria</div>
-                        @endif
-                        <div class="p-5">
-                            <h3 class="text-base font-semibold text-gray-900">{{ $album->titulo }}</h3>
-                            @if ($album->descricao)
-                                <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ $album->descricao }}</p>
+                <div class="grid gap-6 md:grid-cols-3">
+                    @foreach ($albunsGaleria as $album)
+                        @php($fotoPrincipal = $album->fotografias->first())
+                        <a href="{{ route('galeria.mostrar', $album->slug) }}" class="overflow-hidden rounded-lg border border-brand-navy/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                            @if ($fotoPrincipal)
+                                <img src="{{ Storage::url($fotoPrincipal->caminho) }}" alt="{{ $fotoPrincipal->texto_alternativo }}" class="aspect-[4/3] w-full object-cover">
+                            @else
+                                <div class="flex aspect-[4/3] w-full items-center justify-center bg-gradient-to-br from-brand-skyDeep to-brand-navy">
+                                    <svg class="h-14 w-14 opacity-70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path d="M50 15 L78 62 H22 Z" stroke="#fff" stroke-width="2" />
+                                    </svg>
+                                </div>
                             @endif
-                            <p class="mt-3 text-sm text-gray-500">{{ $album->fotografias_count }} fotografia(s)</p>
-                        </div>
-                    </article>
-                @endforeach
+                            <div class="p-5">
+                                <h3 class="font-bold text-brand-ink">{{ $album->titulo }}</h3>
+                                @if ($album->descricao)
+                                    <p class="mt-1.5 line-clamp-2 text-sm text-brand-inkSoft">{{ $album->descricao }}</p>
+                                @endif
+                                <p class="mt-3 text-sm text-brand-inkSoft">{{ $album->fotografias_count }} fotografia(s)</p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </section>
     @endif

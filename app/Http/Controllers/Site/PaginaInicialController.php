@@ -35,12 +35,14 @@ final class PaginaInicialController extends Controller
             ->sortBy(fn (PaginaInstitucional $pagina): int => $ordem[$pagina->slug] ?? PHP_INT_MAX)
             ->values();
 
+        // Limite 5: a primeira vira a matéria principal e as demais formam a
+        // coluna de manchetes secundárias (ver resources/views/site/home.blade.php).
         $noticiasEmDestaque = Noticia::query()
             ->with('categoria')
             ->publicaNoSite()
             ->destaque()
             ->latest('publicado_em')
-            ->limit(3)
+            ->limit(5)
             ->get();
 
         $proximosEventos = Evento::query()
