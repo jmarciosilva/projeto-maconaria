@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             SecretariaSeeder::class,
             ChancelariaSeeder::class,
             TesourariaSeeder::class,
+            DocumentoTrabalhoSeeder::class,
         ]);
     }
 }

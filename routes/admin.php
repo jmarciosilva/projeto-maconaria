@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\ChancelariaController;
 use App\Http\Controllers\Admin\ChancelariaFrequenciaController;
 use App\Http\Controllers\Admin\ChancelariaVisitanteController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
+use App\Http\Controllers\Admin\DocumentoAtividadeController;
+use App\Http\Controllers\Admin\DocumentoEntregaController;
 use App\Http\Controllers\Admin\EventoController;
 use App\Http\Controllers\Admin\IrmaoController;
 use App\Http\Controllers\Admin\NoticiaCategoriaController;
@@ -131,4 +133,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/tesouraria/mensalidades', [TesourariaMensalidadeController::class, 'store'])->name('tesouraria.mensalidades.store');
     Route::get('/tesouraria/fechamentos', [TesourariaFechamentoController::class, 'index'])->name('tesouraria.fechamentos.index');
     Route::post('/tesouraria/fechamentos', [TesourariaFechamentoController::class, 'store'])->name('tesouraria.fechamentos.store');
+
+    Route::get('/documentos/atividades', [DocumentoAtividadeController::class, 'index'])->name('documentos.atividades.index');
+    Route::get('/documentos/atividades/nova', [DocumentoAtividadeController::class, 'create'])->name('documentos.atividades.create');
+    Route::post('/documentos/atividades', [DocumentoAtividadeController::class, 'store'])->name('documentos.atividades.store');
+    Route::get('/documentos/atividades/{atividade}', [DocumentoAtividadeController::class, 'show'])->name('documentos.atividades.show');
+    Route::get('/documentos/atividades/{atividade}/editar', [DocumentoAtividadeController::class, 'edit'])->name('documentos.atividades.edit');
+    Route::put('/documentos/atividades/{atividade}', [DocumentoAtividadeController::class, 'update'])->name('documentos.atividades.update');
+    Route::delete('/documentos/atividades/{atividade}', [DocumentoAtividadeController::class, 'destroy'])->name('documentos.atividades.destroy');
+    Route::post('/documentos/atividades/{atividade}/entregas', [DocumentoEntregaController::class, 'store'])->name('documentos.entregas.store');
+    Route::post('/documentos/atividades/{atividade}/comentarios', [DocumentoEntregaController::class, 'comentar'])->name('documentos.comentarios.store');
+    Route::patch('/documentos/entregas/{entrega}/avaliar', [DocumentoEntregaController::class, 'avaliar'])->name('documentos.entregas.avaliar');
+    Route::get('/documentos/arquivos/{arquivo}', [DocumentoAtividadeController::class, 'baixarArquivo'])->name('documentos.arquivos.baixar');
 });

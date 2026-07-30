@@ -117,12 +117,12 @@
 
 ## Fase 9 — Documentos e trabalhos
 
-- [ ] Atividades
-- [ ] Entregas
-- [ ] Avaliações
-- [ ] Comentários
-- [ ] Arquivos privados
-- [ ] Policies de download
+- [x] Atividades
+- [x] Entregas
+- [x] Avaliações
+- [x] Comentários
+- [x] Arquivos privados
+- [x] Policies de download
 
 ## Fase 10 — Galeria e Mural da Loja
 

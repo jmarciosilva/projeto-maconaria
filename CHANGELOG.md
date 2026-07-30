@@ -24,3 +24,4 @@ Todas as alterações relevantes deste projeto são documentadas neste arquivo.
 - **Fase 6 — Secretaria**: adicionados documentos da Secretaria com tipos para atas, correspondências e documentos oficiais, numeração automática por tipo/ano, versões, aprovação, publicação e auditoria.
 - **Fase 7 — Chancelaria**: adicionados registro de frequência por evento/sessão, controle de presenças, ausências e justificativas, cadastro de visitantes, comunicados internos e painel de relatórios.
 - **Fase 8 — Tesouraria**: adicionados categorias, contas, lançamentos de receitas/despesas, geração de mensalidades, aprovação, baixa de pagamentos/recebimentos, fechamento de período, auditoria financeira e painel de resumo.
+- **Fase 9 — Documentos e trabalhos**: adicionados atividades, entregas com arquivos privados, avaliações, comentários, auditoria e download protegido por Policy.

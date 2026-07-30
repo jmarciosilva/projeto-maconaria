@@ -98,6 +98,14 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Fechamento de período**: `tesouraria_fechamentos` bloqueia novas alterações no mês/ano fechado por meio de `PeriodoFinanceiroFechadoException`. O bloqueio é aplicado dentro das transações para impedir gravação parcial de lançamento ou mensalidades.
 - **Transações e auditoria financeira**: criação/edição/aprovação/baixa de lançamentos, geração de mensalidades e fechamento de período registram auditoria e usam transações quando alteram dados financeiros junto com logs.
 
+## Documentos e trabalhos (Fase 9)
+
+- **Atividades como unidade central**: trabalhos, leituras orientadas e tarefas usam `DocumentoAtividade`. A atividade pode ter anexos privados e recebe entregas de usuários.
+- **Entregas com arquivos privados**: cada entrega pertence a uma atividade e a um usuário, com arquivos em `storage/app/private` no disco `local`. Não há URL pública direta para os anexos.
+- **Download por Policy**: `DocumentoArquivoPolicy::download` permite o download para usuários com `documentos.visualizar` ou para o próprio autor da entrega. Usuários sem autorização recebem 403.
+- **Avaliações e comentários**: avaliações ficam em `DocumentoAvaliacao` e exigem `documentos.avaliar`; comentários ficam vinculados à atividade e, opcionalmente, à entrega.
+- **Transações e auditoria**: criação/edição de atividades, entregas, avaliações e comentários usam transação quando gravam mais de uma tabela e registram auditoria no módulo `documentos`.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

@@ -80,4 +80,10 @@
             Tesouraria
         </a>
     @endcan
+
+    @can('documentos.visualizar')
+        <a href="{{ route('admin.documentos.atividades.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.documentos.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Documentos e Trabalhos
+        </a>
+    @endcan
 </nav>

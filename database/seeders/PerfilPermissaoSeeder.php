@@ -30,7 +30,7 @@ final class PerfilPermissaoSeeder extends Seeder
         'tesouraria.visualizar', 'tesouraria.criar', 'tesouraria.editar', 'tesouraria.aprovar', 'tesouraria.excluir',
         'secretaria.visualizar', 'secretaria.criar-ata', 'secretaria.editar-ata', 'secretaria.aprovar-ata', 'secretaria.publicar-ata',
         'chancelaria.visualizar', 'chancelaria.criar', 'chancelaria.editar',
-        'documentos.visualizar', 'documentos.enviar', 'documentos.avaliar',
+        'documentos.visualizar', 'documentos.enviar', 'documentos.avaliar', 'documentos.excluir',
         'configuracoes.visualizar', 'configuracoes.editar',
         'auditoria.visualizar',
     ];
