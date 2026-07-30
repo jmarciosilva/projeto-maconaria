@@ -72,6 +72,15 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Capacidade e prazo**: quando `capacidade` é informada, apenas confirmações ativas consomem vagas. `inscricoes_ate` bloqueia novas confirmações após o prazo.
 - **Transações**: criação/edição de eventos e confirmação de presença usam transação quando gravam dados do módulo junto com auditoria ou quando precisam validar vaga e persistir presença de forma atômica.
 
+## Secretaria (Fase 6)
+
+- **Documentos em uma estrutura única**: atas, correspondências e documentos oficiais usam `SecretariaDocumento`, diferenciados por `TipoDocumentoSecretaria`. Isso evita três CRUDs quase iguais e mantém numeração, versões, aprovação e publicação em um fluxo comum.
+- **Numeração por tipo e ano**: `secretaria_numeradores` controla a próxima numeração de cada série (`ATA`, `COR`, `DOC`) por ano. A reserva do número ocorre na mesma transação da criação do documento, com `lockForUpdate()`, para reduzir risco de duplicidade em cadastros simultâneos.
+- **Fluxo de aprovação**: documentos podem ser salvos como `rascunho` ou `em_aprovacao`. A aprovação exige `secretaria.aprovar-ata`; a publicação exige `secretaria.publicar-ata`. Documentos aprovados ou publicados não podem ser editados diretamente pelo formulário.
+- **Versões**: cada criação/edição gera snapshot em `secretaria_documento_versoes`, preservando título, conteúdo, status e usuário responsável.
+- **Editor e anexos**: o formulário usa o mesmo editor Quill das páginas institucionais, com sanitização no backend. Arquivos PDF, DOC, DOCX, XLS e XLSX ficam em disco privado (`local`) e só são baixados via controller com permissão `secretaria.visualizar`, pois representam documentos de sessões passadas e podem conter informações restritas.
+- **Permissões atuais**: as permissões existentes no projeto usam o sufixo `-ata`; nesta fase elas foram aplicadas ao conjunto de documentos da Secretaria por falta de um catálogo mais detalhado para correspondências e documentos oficiais. Essa decisão pode ser refinada quando os perfis forem configuráveis pelo painel.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

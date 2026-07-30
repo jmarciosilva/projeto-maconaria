@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\NoticiaController;
 use App\Http\Controllers\Admin\NoticiaTagController;
 use App\Http\Controllers\Admin\PaginaInstitucionalController;
 use App\Http\Controllers\Admin\PerfilController;
+use App\Http\Controllers\Admin\SecretariaDocumentoController;
 use App\Http\Controllers\Admin\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -81,4 +82,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/eventos/{evento}/editar', [EventoController::class, 'edit'])->name('eventos.edit');
     Route::put('/eventos/{evento}', [EventoController::class, 'update'])->name('eventos.update');
     Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
+
+    Route::get('/secretaria/documentos', [SecretariaDocumentoController::class, 'index'])->name('secretaria.documentos.index');
+    Route::get('/secretaria/documentos/novo', [SecretariaDocumentoController::class, 'create'])->name('secretaria.documentos.create');
+    Route::post('/secretaria/documentos', [SecretariaDocumentoController::class, 'store'])->name('secretaria.documentos.store');
+    Route::get('/secretaria/documentos/{documento}/editar', [SecretariaDocumentoController::class, 'edit'])->name('secretaria.documentos.edit');
+    Route::put('/secretaria/documentos/{documento}', [SecretariaDocumentoController::class, 'update'])->name('secretaria.documentos.update');
+    Route::patch('/secretaria/documentos/{documento}/aprovar', [SecretariaDocumentoController::class, 'aprovar'])->name('secretaria.documentos.aprovar');
+    Route::patch('/secretaria/documentos/{documento}/publicar', [SecretariaDocumentoController::class, 'publicar'])->name('secretaria.documentos.publicar');
+    Route::get('/secretaria/documentos/{documento}/arquivos/{arquivo}', [SecretariaDocumentoController::class, 'baixarArquivo'])->name('secretaria.documentos.arquivos.baixar');
+    Route::delete('/secretaria/documentos/{documento}/arquivos/{arquivo}', [SecretariaDocumentoController::class, 'removerArquivo'])->name('secretaria.documentos.arquivos.destroy');
+    Route::delete('/secretaria/documentos/{documento}', [SecretariaDocumentoController::class, 'destroy'])->name('secretaria.documentos.destroy');
 });

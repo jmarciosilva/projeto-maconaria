@@ -85,12 +85,12 @@
 
 ## Fase 6 — Secretaria
 
-- [ ] Atas
-- [ ] Versões
-- [ ] Aprovação
-- [ ] Correspondências
-- [ ] Documentos oficiais
-- [ ] Numeração
+- [x] Atas
+- [x] Versões
+- [x] Aprovação
+- [x] Correspondências
+- [x] Documentos oficiais
+- [x] Numeração
 
 ## Fase 7 — Chancelaria
 
