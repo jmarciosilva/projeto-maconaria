@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             EventoSeeder::class,
             SecretariaSeeder::class,
             ChancelariaSeeder::class,
+            TesourariaSeeder::class,
         ]);
     }
 }

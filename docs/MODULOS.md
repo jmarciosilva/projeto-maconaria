@@ -89,6 +89,15 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Comunicados**: comunicados da Chancelaria usam editor Quill e sanitização no backend, como CMS, Notícias e Secretaria.
 - **Relatórios iniciais**: o painel da Chancelaria consolida totais recentes de presenças, ausências e justificativas, além de eventos e visitantes recentes. Relatórios analíticos por período/Irmão podem evoluir em fase futura.
 
+## Tesouraria (Fase 8)
+
+- **Valores monetários em centavos**: receitas, despesas e saldos iniciais são armazenados como inteiros (`*_centavos`). A conversão de entrada/saída fica centralizada em `ConversorMoeda`, evitando persistência com ponto flutuante.
+- **Categorias e contas simples**: categorias separam `receita` e `despesa`; contas separam `caixa` e `banco`. O desenho cobre o controle financeiro inicial sem impor um plano de contas contábil definitivo.
+- **Fluxo do lançamento financeiro**: lançamentos começam como `rascunho` ou `pendente`, podem ser aprovados por usuário com `tesouraria.aprovar` e baixados como pagamento/recebimento por usuário com `tesouraria.editar`.
+- **Mensalidades**: a geração de mensalidades cria lançamentos pendentes para todos os Irmãos cadastrados, inclusive quando o Irmão não possui usuário vinculado. Isso preserva o cadastro financeiro independente do acesso ao sistema.
+- **Fechamento de período**: `tesouraria_fechamentos` bloqueia novas alterações no mês/ano fechado por meio de `PeriodoFinanceiroFechadoException`. O bloqueio é aplicado dentro das transações para impedir gravação parcial de lançamento ou mensalidades.
+- **Transações e auditoria financeira**: criação/edição/aprovação/baixa de lançamentos, geração de mensalidades e fechamento de período registram auditoria e usam transações quando alteram dados financeiros junto com logs.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

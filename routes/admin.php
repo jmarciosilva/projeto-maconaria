@@ -14,6 +14,12 @@ use App\Http\Controllers\Admin\NoticiaTagController;
 use App\Http\Controllers\Admin\PaginaInstitucionalController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\SecretariaDocumentoController;
+use App\Http\Controllers\Admin\TesourariaCategoriaController;
+use App\Http\Controllers\Admin\TesourariaContaController;
+use App\Http\Controllers\Admin\TesourariaController;
+use App\Http\Controllers\Admin\TesourariaFechamentoController;
+use App\Http\Controllers\Admin\TesourariaLancamentoController;
+use App\Http\Controllers\Admin\TesourariaMensalidadeController;
 use App\Http\Controllers\Admin\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -108,4 +114,21 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('/chancelaria/comunicados', ChancelariaComunicadoController::class)
         ->except(['show'])
         ->names('chancelaria.comunicados');
+
+    Route::get('/tesouraria', [TesourariaController::class, 'index'])->name('tesouraria.index');
+    Route::get('/tesouraria/categorias', [TesourariaCategoriaController::class, 'index'])->name('tesouraria.categorias.index');
+    Route::post('/tesouraria/categorias', [TesourariaCategoriaController::class, 'store'])->name('tesouraria.categorias.store');
+    Route::get('/tesouraria/contas', [TesourariaContaController::class, 'index'])->name('tesouraria.contas.index');
+    Route::post('/tesouraria/contas', [TesourariaContaController::class, 'store'])->name('tesouraria.contas.store');
+    Route::get('/tesouraria/lancamentos', [TesourariaLancamentoController::class, 'index'])->name('tesouraria.lancamentos.index');
+    Route::get('/tesouraria/lancamentos/novo', [TesourariaLancamentoController::class, 'create'])->name('tesouraria.lancamentos.create');
+    Route::post('/tesouraria/lancamentos', [TesourariaLancamentoController::class, 'store'])->name('tesouraria.lancamentos.store');
+    Route::get('/tesouraria/lancamentos/{lancamento}/editar', [TesourariaLancamentoController::class, 'edit'])->name('tesouraria.lancamentos.edit');
+    Route::put('/tesouraria/lancamentos/{lancamento}', [TesourariaLancamentoController::class, 'update'])->name('tesouraria.lancamentos.update');
+    Route::patch('/tesouraria/lancamentos/{lancamento}/aprovar', [TesourariaLancamentoController::class, 'aprovar'])->name('tesouraria.lancamentos.aprovar');
+    Route::patch('/tesouraria/lancamentos/{lancamento}/baixar', [TesourariaLancamentoController::class, 'baixar'])->name('tesouraria.lancamentos.baixar');
+    Route::get('/tesouraria/mensalidades/nova', [TesourariaMensalidadeController::class, 'create'])->name('tesouraria.mensalidades.create');
+    Route::post('/tesouraria/mensalidades', [TesourariaMensalidadeController::class, 'store'])->name('tesouraria.mensalidades.store');
+    Route::get('/tesouraria/fechamentos', [TesourariaFechamentoController::class, 'index'])->name('tesouraria.fechamentos.index');
+    Route::post('/tesouraria/fechamentos', [TesourariaFechamentoController::class, 'store'])->name('tesouraria.fechamentos.store');
 });

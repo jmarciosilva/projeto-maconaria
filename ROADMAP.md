@@ -103,17 +103,17 @@
 
 ## Fase 8 — Tesouraria
 
-- [ ] Categorias
-- [ ] Contas
-- [ ] Receitas
-- [ ] Despesas
-- [ ] Mensalidades
-- [ ] Pagamentos
-- [ ] Recebimentos
-- [ ] Aprovações
-- [ ] Relatórios
-- [ ] Fechamento
-- [ ] Auditoria financeira
+- [x] Categorias
+- [x] Contas
+- [x] Receitas
+- [x] Despesas
+- [x] Mensalidades
+- [x] Pagamentos
+- [x] Recebimentos
+- [x] Aprovações
+- [x] Relatórios
+- [x] Fechamento
+- [x] Auditoria financeira
 
 ## Fase 9 — Documentos e trabalhos
 
