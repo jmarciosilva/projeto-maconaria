@@ -81,6 +81,14 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Editor e anexos**: o formulário usa o mesmo editor Quill das páginas institucionais, com sanitização no backend. Arquivos PDF, DOC, DOCX, XLS e XLSX ficam em disco privado (`local`) e só são baixados via controller com permissão `secretaria.visualizar`, pois representam documentos de sessões passadas e podem conter informações restritas.
 - **Permissões atuais**: as permissões existentes no projeto usam o sufixo `-ata`; nesta fase elas foram aplicadas ao conjunto de documentos da Secretaria por falta de um catálogo mais detalhado para correspondências e documentos oficiais. Essa decisão pode ser refinada quando os perfis forem configuráveis pelo painel.
 
+## Chancelaria (Fase 7)
+
+- **Frequência por evento/sessão**: a frequência é registrada contra `Evento`, reaproveitando a agenda da Fase 5. Cada Irmão pode ter uma única marcação por evento (`presente`, `ausente` ou `justificado`), com observação opcional.
+- **Ausências e justificativas**: ausências justificadas usam um status próprio (`justificado`) em vez de uma tabela separada. Isso mantém o relatório simples e evita duplicar registros para a mesma sessão.
+- **Visitantes**: visitantes podem ser vinculados a um evento ou registrados sem vínculo quando o registro vier de uma ocorrência avulsa.
+- **Comunicados**: comunicados da Chancelaria usam editor Quill e sanitização no backend, como CMS, Notícias e Secretaria.
+- **Relatórios iniciais**: o painel da Chancelaria consolida totais recentes de presenças, ausências e justificativas, além de eventos e visitantes recentes. Relatórios analíticos por período/Irmão podem evoluir em fase futura.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

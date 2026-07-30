@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\CarrosselItemController;
+use App\Http\Controllers\Admin\ChancelariaComunicadoController;
+use App\Http\Controllers\Admin\ChancelariaController;
+use App\Http\Controllers\Admin\ChancelariaFrequenciaController;
+use App\Http\Controllers\Admin\ChancelariaVisitanteController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
 use App\Http\Controllers\Admin\EventoController;
 use App\Http\Controllers\Admin\IrmaoController;
@@ -93,4 +97,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/secretaria/documentos/{documento}/arquivos/{arquivo}', [SecretariaDocumentoController::class, 'baixarArquivo'])->name('secretaria.documentos.arquivos.baixar');
     Route::delete('/secretaria/documentos/{documento}/arquivos/{arquivo}', [SecretariaDocumentoController::class, 'removerArquivo'])->name('secretaria.documentos.arquivos.destroy');
     Route::delete('/secretaria/documentos/{documento}', [SecretariaDocumentoController::class, 'destroy'])->name('secretaria.documentos.destroy');
+
+    Route::get('/chancelaria', [ChancelariaController::class, 'index'])->name('chancelaria.index');
+    Route::get('/chancelaria/frequencias', [ChancelariaFrequenciaController::class, 'selecionarEvento'])->name('chancelaria.frequencias.selecionar-evento');
+    Route::get('/chancelaria/frequencias/{evento}', [ChancelariaFrequenciaController::class, 'edit'])->name('chancelaria.frequencias.edit');
+    Route::put('/chancelaria/frequencias/{evento}', [ChancelariaFrequenciaController::class, 'update'])->name('chancelaria.frequencias.update');
+    Route::resource('/chancelaria/visitantes', ChancelariaVisitanteController::class)
+        ->except(['show'])
+        ->names('chancelaria.visitantes');
+    Route::resource('/chancelaria/comunicados', ChancelariaComunicadoController::class)
+        ->except(['show'])
+        ->names('chancelaria.comunicados');
 });

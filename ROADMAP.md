@@ -94,12 +94,12 @@
 
 ## Fase 7 — Chancelaria
 
-- [ ] Frequência
-- [ ] Presenças
-- [ ] Ausências
-- [ ] Visitantes
-- [ ] Comunicados
-- [ ] Relatórios
+- [x] Frequência
+- [x] Presenças
+- [x] Ausências
+- [x] Visitantes
+- [x] Comunicados
+- [x] Relatórios
 
 ## Fase 8 — Tesouraria
 

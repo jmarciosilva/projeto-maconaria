@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             NoticiaSeeder::class,
             EventoSeeder::class,
             SecretariaSeeder::class,
+            ChancelariaSeeder::class,
         ]);
     }
 }
