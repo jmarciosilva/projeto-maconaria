@@ -53,4 +53,14 @@
             Tags de Notícias
         </a>
     @endcan
+
+    @can('eventos.visualizar')
+        <a href="{{ route('admin.eventos.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.eventos.index', 'admin.eventos.create', 'admin.eventos.edit') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Eventos
+        </a>
+
+        <a href="{{ route('admin.eventos.calendario') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.eventos.calendario') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Calendário
+        </a>
+    @endcan
 </nav>

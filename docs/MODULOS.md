@@ -64,6 +64,14 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Transações**: criação e atualização de notícias usam `DB::transaction()` porque alteram a notícia, sincronizam tags, registram versão e gravam auditoria como uma operação atômica.
 - **Sanitização**: o conteúdo HTML das notícias usa o mesmo perfil seguro do conteúdo institucional (`mews/purifier`). Imagens coladas como base64 ainda não foram ativadas para notícias; por enquanto, esse suporte permanece restrito ao módulo de páginas institucionais.
 
+## Eventos e calendário (Fase 5)
+
+- **Eventos e sessões na mesma tabela**: `Evento` possui o enum `TipoEvento` (`evento` ou `sessao`). A regra permite separar visualmente eventos gerais de sessões maçônicas sem duplicar controllers, validações e calendário para duas estruturas quase idênticas.
+- **Visibilidade pública/restrita**: eventos públicos publicados aparecem no site e na home. Eventos restritos publicados aparecem somente na área restrita. Rascunhos e cancelados não são exibidos nas listagens públicas/restritas.
+- **Confirmação de presença**: cada usuário pode ter uma única confirmação por evento (`evento_id` + `usuario_id`). Cancelar presença muda o status para `cancelado`; confirmar novamente reativa o mesmo registro.
+- **Capacidade e prazo**: quando `capacidade` é informada, apenas confirmações ativas consomem vagas. `inscricoes_ate` bloqueia novas confirmações após o prazo.
+- **Transações**: criação/edição de eventos e confirmação de presença usam transação quando gravam dados do módulo junto com auditoria ou quando precisam validar vaga e persistir presença de forma atômica.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             AdministradorLocalSeeder::class,
             PaginaInstitucionalSeeder::class,
             NoticiaSeeder::class,
+            EventoSeeder::class,
         ]);
     }
 }

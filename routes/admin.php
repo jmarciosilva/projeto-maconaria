@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CarrosselItemController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
+use App\Http\Controllers\Admin\EventoController;
 use App\Http\Controllers\Admin\IrmaoController;
 use App\Http\Controllers\Admin\NoticiaCategoriaController;
 use App\Http\Controllers\Admin\NoticiaController;
@@ -72,4 +73,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/noticias/{noticia}/editar', [NoticiaController::class, 'edit'])->name('noticias.edit');
     Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update');
     Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
+
+    Route::get('/eventos/calendario', [EventoController::class, 'calendario'])->name('eventos.calendario');
+    Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
+    Route::get('/eventos/novo', [EventoController::class, 'create'])->name('eventos.create');
+    Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
+    Route::get('/eventos/{evento}/editar', [EventoController::class, 'edit'])->name('eventos.edit');
+    Route::put('/eventos/{evento}', [EventoController::class, 'update'])->name('eventos.update');
+    Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 });

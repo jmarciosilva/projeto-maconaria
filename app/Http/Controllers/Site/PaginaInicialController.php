@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\CarrosselItem;
+use App\Models\Evento;
 use App\Models\Noticia;
 use App\Models\PaginaInstitucional;
 use Illuminate\View\View;
@@ -40,6 +41,13 @@ final class PaginaInicialController extends Controller
             ->limit(3)
             ->get();
 
-        return view('site.home', compact('itensCarrossel', 'paginasInstitucionais', 'noticiasEmDestaque'));
+        $proximosEventos = Evento::query()
+            ->publicoNoSite()
+            ->futuro()
+            ->orderBy('inicio_em')
+            ->limit(3)
+            ->get();
+
+        return view('site.home', compact('itensCarrossel', 'paginasInstitucionais', 'noticiasEmDestaque', 'proximosEventos'));
     }
 }

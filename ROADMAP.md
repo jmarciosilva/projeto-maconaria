@@ -77,11 +77,11 @@
 
 ## Fase 5 — Eventos e calendário
 
-- [ ] Eventos
-- [ ] Sessões
-- [ ] Calendário
-- [ ] Confirmação de presença
-- [ ] Exibição pública e restrita
+- [x] Eventos
+- [x] Sessões
+- [x] Calendário
+- [x] Confirmação de presença
+- [x] Exibição pública e restrita
 
 ## Fase 6 — Secretaria
 
