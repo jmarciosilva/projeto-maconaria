@@ -31,6 +31,7 @@ Consulte [`ROADMAP.md`](ROADMAP.md) para o detalhamento por fase e [`docs/MODULO
 | Interatividade leve | Alpine.js |
 | Build de assets | Vite |
 | Autenticação | Laravel Breeze (stack Blade) |
+| Autenticação da API (mobile) | Laravel Sanctum (tokens) |
 | Papéis e permissões | spatie/laravel-permission |
 | Testes | PHPUnit (via `php artisan test`) |
 | Estilo de código | Laravel Pint |
@@ -43,6 +44,7 @@ Consulte [`ROADMAP.md`](ROADMAP.md) para o detalhamento por fase e [`docs/MODULO
 |---|---|
 | `spatie/laravel-permission` | Perfis (roles) e permissões granulares usados em todo o sistema |
 | `laravel/breeze` (dev) | Scaffolding de autenticação (login, recuperação de senha, verificação de e-mail) com Blade + Tailwind |
+| `laravel/sanctum` | Autenticação por token da API (`/api/v1/*`), consumida pelo futuro app Flutter — ver `docs/API-FUTURA.md` |
 | `laravel-lang/lang` + `laravel-lang/publisher` (dev) | Publicam as traduções pt_BR de validação, autenticação, paginação e senhas |
 | `larastan/larastan` (dev) | Análise estática de código (PHPStan com extensões para Laravel) |
 | `laravel/pint` (dev, já incluso no skeleton) | Formatação de código (PSR-12 / preset Laravel) |
@@ -168,15 +170,21 @@ app/
 │   │   ├── Admin/          # Painel administrativo
 │   │   ├── AreaRestrita/   # Área restrita a usuários autenticados
 │   │   ├── Auth/           # Autenticação (gerado pelo Breeze)
-│   │   ├── Api/V1/         # Reservado para a futura API do app Flutter
+│   │   ├── Api/V1/         # API consumida pelo app Flutter (Fase 12)
 │   │   └── Site/           # Páginas públicas
-│   └── Requests/
-│       ├── Admin/          # Form Requests do painel administrativo
-│       └── Auth/           # Form Requests de autenticação
+│   ├── Requests/
+│   │   ├── Admin/          # Form Requests do painel administrativo
+│   │   ├── Api/V1/         # Form Requests da API
+│   │   └── Auth/           # Form Requests de autenticação
+│   └── Resources/
+│       └── Api/V1/         # API Resources (serialização das respostas da API)
 ├── Models/
 ├── Policies/
 ├── Providers/
 ├── Support/                # Serviços transversais (ex.: RegistradorDeAuditoria)
+│   ├── Documentos/         # Reaproveitado pela web e pela API (ex.: EnviadorDeEntrega)
+│   ├── Eventos/            # Reaproveitado pela web e pela API (ex.: ConfirmadorPresencaEvento)
+│   └── Mural/              # Reaproveitado pela web e pela API (ex.: InteracaoMuralService)
 resources/views/
 ├── components/
 │   ├── layouts/            # x-layouts.site, x-layouts.admin, x-layouts.restrito

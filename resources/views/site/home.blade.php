@@ -187,9 +187,12 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
     @if ($publicacoesMural->isNotEmpty())
         <section class="bg-gray-50 py-16">
             <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="mb-8 max-w-3xl">
-                    <h2 class="text-2xl font-bold text-gray-900">Mural da Loja</h2>
-                    <p class="mt-2 text-gray-600">Publicações públicas da Loja, com comentários moderados e reações da comunidade.</p>
+                <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                    <div class="max-w-3xl">
+                        <h2 class="text-2xl font-bold text-gray-900">Mural da Loja</h2>
+                        <p class="mt-2 text-gray-600">Publicações públicas da Loja, com comentários moderados e reações da comunidade.</p>
+                    </div>
+                    <a href="{{ route('mural.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver mural completo</a>
                 </div>
 
                 <div class="grid gap-5 lg:grid-cols-3">
@@ -249,9 +252,12 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
 
     @if ($albunsGaleria->isNotEmpty())
         <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-            <div class="mb-8 max-w-3xl">
-                <h2 class="text-2xl font-bold text-gray-900">Galeria da Loja</h2>
-                <p class="mt-2 text-gray-600">Registros públicos de eventos, sessões e momentos institucionais.</p>
+            <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+                <div class="max-w-3xl">
+                    <h2 class="text-2xl font-bold text-gray-900">Galeria da Loja</h2>
+                    <p class="mt-2 text-gray-600">Registros públicos de eventos, sessões e momentos institucionais.</p>
+                </div>
+                <a href="{{ route('galeria.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver galeria completa</a>
             </div>
 
             <div class="grid gap-5 md:grid-cols-3">

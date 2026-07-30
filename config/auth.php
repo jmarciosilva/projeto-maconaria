@@ -42,6 +42,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Usado pelo middleware "auth:sanctum" nas rotas de /api/v1 (Fase 12)
+        // — autenticação mobile por token, sem sessão/cookies.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
     ],
 
     /*

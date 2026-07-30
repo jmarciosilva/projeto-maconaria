@@ -30,4 +30,23 @@ final class EventoController extends Controller
 
         return view('site.eventos.mostrar', compact('evento'));
     }
+
+    /**
+     * Calendário público de eventos e sessões: nunca exige login para
+     * visualizar — mostra apenas eventos públicos, mesma regra do index().
+     */
+    public function calendario(): View
+    {
+        $inicio = now()->startOfMonth();
+        $fim = now()->addMonths(2)->endOfMonth();
+
+        $eventos = Evento::query()
+            ->publicoNoSite()
+            ->whereBetween('inicio_em', [$inicio, $fim])
+            ->orderBy('inicio_em')
+            ->get()
+            ->groupBy(fn (Evento $evento): string => $evento->inicio_em->format('Y-m-d'));
+
+        return view('site.eventos.calendario', compact('eventos', 'inicio', 'fim'));
+    }
 }

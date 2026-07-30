@@ -4,6 +4,8 @@ use App\Http\Controllers\AreaRestrita\EventoController as AreaRestritaEventoCont
 use App\Http\Controllers\AreaRestrita\PainelController;
 use App\Http\Controllers\AreaRestrita\ProfileController;
 use App\Http\Controllers\Site\EventoController as SiteEventoController;
+use App\Http\Controllers\Site\GaleriaController;
+use App\Http\Controllers\Site\MuralController;
 use App\Http\Controllers\Site\MuralInteracaoController;
 use App\Http\Controllers\Site\NoticiaController;
 use App\Http\Controllers\Site\PaginaInicialController;
@@ -15,6 +17,14 @@ Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.ind
 Route::get('/noticias/{slug}', [NoticiaController::class, 'mostrar'])->name('noticias.mostrar');
 Route::get('/eventos', [SiteEventoController::class, 'index'])->name('eventos.index');
 Route::get('/eventos/{slug}', [SiteEventoController::class, 'mostrar'])->name('eventos.mostrar');
+Route::get('/calendario', [SiteEventoController::class, 'calendario'])->name('calendario');
+
+// Mural e Galeria são sempre públicos para visualização — só interagir
+// (comentar/curtir) exige login, ver o grupo "auth" abaixo.
+Route::get('/mural', [MuralController::class, 'index'])->name('mural.index');
+Route::get('/mural/{publicacao}', [MuralController::class, 'mostrar'])->name('mural.mostrar');
+Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index');
+Route::get('/galeria/{slug}', [GaleriaController::class, 'mostrar'])->name('galeria.mostrar');
 
 // Páginas institucionais com URL fixa (seção 5/7 do escopo). O slug de cada
 // uma corresponde ao registro em "paginas_institucionais" (ver

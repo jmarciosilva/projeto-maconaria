@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User;
 use App\Policies\UsuarioPolicy;
 use App\Support\Email\AplicadorConfiguracaoEmail;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -37,5 +38,11 @@ class AppServiceProvider extends ServiceProvider
         // Sobrepõe o mailer padrão do .env pela configuração de SMTP salva
         // pelo painel (Fase 11), quando ela existir e estiver ativa.
         AplicadorConfiguracaoEmail::aplicar();
+
+        // API (Fase 12): um único recurso (show/perfil) não vem embrulhado
+        // em {"data": ...} — apenas coleções paginadas mantêm data/links/meta
+        // (o Laravel força esse envelope nelas independentemente desta
+        // configuração), o que já é suficiente para o app Flutter paginar.
+        JsonResource::withoutWrapping();
     }
 }

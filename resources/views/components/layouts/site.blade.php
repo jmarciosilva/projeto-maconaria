@@ -68,6 +68,9 @@ $urlPaginaInstitucional = function (\App\Models\PaginaInstitucional $pagina): st
                 <a href="{{ route('home') }}" class="hover:text-blue-200">Início</a>
                 <a href="{{ route('noticias.index') }}" class="hover:text-blue-200">Notícias</a>
                 <a href="{{ route('eventos.index') }}" class="hover:text-blue-200">Eventos</a>
+                <a href="{{ route('calendario') }}" class="hover:text-blue-200">Calendário</a>
+                <a href="{{ route('mural.index') }}" class="hover:text-blue-200">Mural</a>
+                <a href="{{ route('galeria.index') }}" class="hover:text-blue-200">Galeria</a>
 
                 @if ($paginasInstitucionaisMenu->isNotEmpty())
                     <div x-data="{ institucionalAberto: false }" class="relative" @click.outside="institucionalAberto = false">
@@ -108,6 +111,9 @@ $urlPaginaInstitucional = function (\App\Models\PaginaInstitucional $pagina): st
             <a href="{{ route('home') }}" class="block py-2 text-sm font-medium">Início</a>
             <a href="{{ route('noticias.index') }}" class="block py-2 text-sm font-medium">Notícias</a>
             <a href="{{ route('eventos.index') }}" class="block py-2 text-sm font-medium">Eventos</a>
+            <a href="{{ route('calendario') }}" class="block py-2 text-sm font-medium">Calendário</a>
+            <a href="{{ route('mural.index') }}" class="block py-2 text-sm font-medium">Mural</a>
+            <a href="{{ route('galeria.index') }}" class="block py-2 text-sm font-medium">Galeria</a>
             @foreach ($paginasInstitucionaisMenu as $paginaMenu)
                 <a href="{{ $urlPaginaInstitucional($paginaMenu) }}" class="block py-2 text-sm font-medium">{{ $paginaMenu->titulo }}</a>
             @endforeach

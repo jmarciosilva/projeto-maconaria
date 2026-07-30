@@ -145,15 +145,15 @@
 
 ## Fase 12 — API e Flutter
 
-- [ ] Definir API V1
-- [ ] Configurar autenticação mobile
-- [ ] Criar documentação
-- [ ] Criar API Resources
-- [ ] Notícias
-- [ ] Eventos
-- [ ] Mural
-- [ ] Perfil
-- [ ] Documentos
+- [x] Definir API V1
+- [x] Configurar autenticação mobile
+- [x] Criar documentação
+- [x] Criar API Resources
+- [x] Notícias
+- [x] Eventos
+- [x] Mural
+- [x] Perfil
+- [x] Documentos
 
 ## Fase 13 — Produção
 

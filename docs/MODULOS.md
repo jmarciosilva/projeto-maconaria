@@ -71,6 +71,7 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Confirmação de presença**: cada usuário pode ter uma única confirmação por evento (`evento_id` + `usuario_id`). Cancelar presença muda o status para `cancelado`; confirmar novamente reativa o mesmo registro.
 - **Capacidade e prazo**: quando `capacidade` é informada, apenas confirmações ativas consomem vagas. `inscricoes_ate` bloqueia novas confirmações após o prazo.
 - **Transações**: criação/edição de eventos e confirmação de presença usam transação quando gravam dados do módulo junto com auditoria ou quando precisam validar vaga e persistir presença de forma atômica.
+- **Calendário público** (`/calendario`, `Site\EventoController::calendario()`): agrupa por dia apenas eventos com `publicoNoSite()` — mesma regra de visibilidade do `/eventos`. Nunca exige login; só a confirmação de presença (área restrita) exige. Adicionado após a Fase 12, quando ficou claro que o calendário só existia no painel administrativo — a suposição corrigida é que "Calendário" no escopo original também significava uma superfície pública, não só uma ferramenta interna de gestão.
 
 ## Secretaria (Fase 6)
 
@@ -114,6 +115,7 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Feed social na home**: a página inicial exibe somente publicações públicas/publicadas do Mural, com contagem de curtidas e comentários aprovados. Usuários autenticados podem curtir e comentar pela home; visitantes anônimos visualizam o feed e são direcionados ao login para interagir.
 - **Galeria na home**: a página inicial exibe apenas álbuns públicos/publicados, usando a primeira fotografia como capa quando houver imagem cadastrada.
 - **Reações únicas**: `mural_reacoes` tem chave única por publicação, usuário e tipo de reação para evitar duplicidade por recarregamento ou clique repetido.
+- **Páginas públicas dedicadas** (`/mural`, `/mural/{publicacao}`, `/galeria`, `/galeria/{slug}`, controllers `Site\MuralController` e `Site\GaleriaController`): adicionadas após a Fase 12, para que a navegação pública não dependesse só dos 3 itens mais recentes exibidos na home. Nenhuma delas exige login para visualizar — a mesma regra `publico()` da home é reaproveitada. Comentar/curtir continuam exigindo login, tratados por `MuralInteracaoController` (inalterado).
 - **Transações e auditoria**: criação/edição de álbuns, uploads de fotografias, publicações, comentários, aprovação de comentários e reações registram auditoria e usam transação quando envolvem múltiplas gravações.
 
 ## Configurações de e-mail (Fase 11)
@@ -127,6 +129,22 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Falha no envio de e-mail vira `FalhaEnvioEmailException`** (exceção de domínio), capturada no próprio Controller e apresentada como mensagem amigável via `session('erro')`. A mensagem original da exceção de transporte SMTP (Symfony Mailer) **nunca é logada nem repassada ao usuário**: transportes SMTP costumam incluir a própria credencial (usuário/senha) na mensagem de erro de conexão/autenticação, então o log (`Log::warning`) registra apenas dados de conexão não sensíveis (mailer, host, porta).
 - **Teste de envio** (`ConfiguracaoEmailController::enviarTeste`) usa a permissão `configuracoes.editar` (mesma da edição, já existente no catálogo desde a Fase 1) — não foi criada uma permissão nova só para o teste, por ser uma ação estreitamente ligada à edição da própria configuração.
 - **Reativação da verificação de e-mail (`verified`) não faz parte desta entrega**: o cadastro de SMTP agora existe, mas ativá-lo é uma decisão operacional do administrador (depende de credenciais reais). Reativar o middleware continua sendo um passo manual separado — ver Fase 1 no `ROADMAP.md`.
+
+## API e Flutter (Fase 12)
+
+- Todas as decisões e suposições desta fase (autenticação por token, escopo de
+  visibilidade de cada módulo exposto, extração de regras de negócio
+  compartilhadas entre web e API) estão documentadas em
+  [`docs/API-FUTURA.md`](API-FUTURA.md), que deixou de ser um documento de
+  planejamento e passou a descrever a API V1 implementada.
+- **Refatoração extraiu três serviços compartilhados** para evitar duplicar
+  regra de negócio entre a web e a API, seguindo a estratégia definida desde
+  o início do projeto: `ConfirmadorPresencaEvento` (eventos),
+  `InteracaoMuralService` (mural) e `EnviadorDeEntrega` (documentos). Os
+  Controllers web que já existiam (`AreaRestrita\EventoController`,
+  `Site\MuralInteracaoController`, `Admin\DocumentoEntregaController`) foram
+  atualizados para usar os mesmos serviços — comportamento coberto pelos
+  testes já existentes desses módulos, que continuam passando.
 
 ## Ferramentas de qualidade
 
