@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
 use App\Http\Controllers\Admin\DocumentoAtividadeController;
 use App\Http\Controllers\Admin\DocumentoEntregaController;
 use App\Http\Controllers\Admin\EventoController;
+use App\Http\Controllers\Admin\GaleriaAlbumController;
 use App\Http\Controllers\Admin\IrmaoController;
+use App\Http\Controllers\Admin\MuralPublicacaoController;
 use App\Http\Controllers\Admin\NoticiaCategoriaController;
 use App\Http\Controllers\Admin\NoticiaController;
 use App\Http\Controllers\Admin\NoticiaTagController;
@@ -145,4 +147,22 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/documentos/atividades/{atividade}/comentarios', [DocumentoEntregaController::class, 'comentar'])->name('documentos.comentarios.store');
     Route::patch('/documentos/entregas/{entrega}/avaliar', [DocumentoEntregaController::class, 'avaliar'])->name('documentos.entregas.avaliar');
     Route::get('/documentos/arquivos/{arquivo}', [DocumentoAtividadeController::class, 'baixarArquivo'])->name('documentos.arquivos.baixar');
+
+    Route::get('/galeria/albuns', [GaleriaAlbumController::class, 'index'])->name('galeria.albuns.index');
+    Route::get('/galeria/albuns/novo', [GaleriaAlbumController::class, 'create'])->name('galeria.albuns.create');
+    Route::post('/galeria/albuns', [GaleriaAlbumController::class, 'store'])->name('galeria.albuns.store');
+    Route::get('/galeria/albuns/{album}', [GaleriaAlbumController::class, 'show'])->name('galeria.albuns.show');
+    Route::get('/galeria/albuns/{album}/editar', [GaleriaAlbumController::class, 'edit'])->name('galeria.albuns.edit');
+    Route::put('/galeria/albuns/{album}', [GaleriaAlbumController::class, 'update'])->name('galeria.albuns.update');
+    Route::delete('/galeria/albuns/{album}', [GaleriaAlbumController::class, 'destroy'])->name('galeria.albuns.destroy');
+
+    Route::get('/mural/publicacoes', [MuralPublicacaoController::class, 'index'])->name('mural.publicacoes.index');
+    Route::get('/mural/publicacoes/nova', [MuralPublicacaoController::class, 'create'])->name('mural.publicacoes.create');
+    Route::post('/mural/publicacoes', [MuralPublicacaoController::class, 'store'])->name('mural.publicacoes.store');
+    Route::get('/mural/publicacoes/{publicacao}', [MuralPublicacaoController::class, 'show'])->name('mural.publicacoes.show');
+    Route::get('/mural/publicacoes/{publicacao}/editar', [MuralPublicacaoController::class, 'edit'])->name('mural.publicacoes.edit');
+    Route::put('/mural/publicacoes/{publicacao}', [MuralPublicacaoController::class, 'update'])->name('mural.publicacoes.update');
+    Route::post('/mural/publicacoes/{publicacao}/comentarios', [MuralPublicacaoController::class, 'comentar'])->name('mural.comentarios.store');
+    Route::post('/mural/publicacoes/{publicacao}/reacoes', [MuralPublicacaoController::class, 'reagir'])->name('mural.reacoes.store');
+    Route::patch('/mural/comentarios/{comentario}/aprovar', [MuralPublicacaoController::class, 'aprovarComentario'])->name('mural.comentarios.aprovar');
 });

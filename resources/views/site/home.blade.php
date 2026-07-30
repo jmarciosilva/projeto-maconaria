@@ -183,4 +183,96 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
             </div>
         </section>
     @endif
+
+    @if ($publicacoesMural->isNotEmpty())
+        <section class="bg-gray-50 py-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div class="mb-8 max-w-3xl">
+                    <h2 class="text-2xl font-bold text-gray-900">Mural da Loja</h2>
+                    <p class="mt-2 text-gray-600">Publicações públicas da Loja, com comentários moderados e reações da comunidade.</p>
+                </div>
+
+                <div class="grid gap-5 lg:grid-cols-3">
+                    @foreach ($publicacoesMural as $publicacao)
+                        <article class="rounded-md border border-gray-200 bg-white p-5 shadow-sm">
+                            <div class="mb-4 flex items-start gap-3">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-950 text-sm font-semibold text-white">
+                                    {{ mb_substr($publicacao->autor->name ?? config('app.name'), 0, 1) }}
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-semibold text-gray-900">{{ $publicacao->titulo }}</h3>
+                                    <p class="text-xs text-gray-500">{{ $publicacao->autor->name ?? 'Administração da Loja' }} · {{ $publicacao->publicado_em?->format('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+
+                            <p class="whitespace-pre-line text-sm text-gray-700">{{ $publicacao->conteudo }}</p>
+
+                            <div class="mt-4 flex items-center justify-between border-y border-gray-100 py-3 text-sm text-gray-600">
+                                <span>{{ $publicacao->reacoes_count }} curtida(s)</span>
+                                <span>{{ $publicacao->comentarios_aprovados_count }} comentário(s)</span>
+                            </div>
+
+                            @auth
+                                <form method="POST" action="{{ route('mural.reacoes.store', $publicacao) }}" class="mt-3">
+                                    @csrf
+                                    <input type="hidden" name="tipo" value="curtir">
+                                    <button type="submit" class="w-full rounded-md border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50">Curtir</button>
+                                </form>
+                            @else
+                                <a href="{{ route('login') }}" class="mt-3 block rounded-md border border-blue-200 px-3 py-2 text-center text-sm font-semibold text-blue-800 hover:bg-blue-50">Entrar para curtir</a>
+                            @endauth
+
+                            @if ($publicacao->comentarios->isNotEmpty())
+                                <div class="mt-4 space-y-3">
+                                    @foreach ($publicacao->comentarios->take(2) as $comentario)
+                                        <div class="rounded-md bg-gray-50 p-3 text-sm">
+                                            <p class="font-medium text-gray-900">{{ $comentario->usuario->name ?? 'Usuário' }}</p>
+                                            <p class="mt-1 text-gray-700">{{ $comentario->comentario }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            @auth
+                                <form method="POST" action="{{ route('mural.comentarios.store', $publicacao) }}" class="mt-4 space-y-2">
+                                    @csrf
+                                    <textarea name="comentario" rows="2" class="block w-full rounded-md border-gray-300 text-sm shadow-sm" placeholder="Escreva um comentário" required></textarea>
+                                    <button type="submit" class="text-sm font-semibold text-blue-800 hover:underline">Comentar</button>
+                                </form>
+                            @endauth
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    @if ($albunsGaleria->isNotEmpty())
+        <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+            <div class="mb-8 max-w-3xl">
+                <h2 class="text-2xl font-bold text-gray-900">Galeria da Loja</h2>
+                <p class="mt-2 text-gray-600">Registros públicos de eventos, sessões e momentos institucionais.</p>
+            </div>
+
+            <div class="grid gap-5 md:grid-cols-3">
+                @foreach ($albunsGaleria as $album)
+                    @php($fotoPrincipal = $album->fotografias->first())
+                    <article class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
+                        @if ($fotoPrincipal)
+                            <img src="{{ Storage::url($fotoPrincipal->caminho) }}" alt="{{ $fotoPrincipal->texto_alternativo }}" class="aspect-video w-full object-cover">
+                        @else
+                            <div class="flex aspect-video w-full items-center justify-center bg-blue-950 text-sm font-semibold text-white">Galeria</div>
+                        @endif
+                        <div class="p-5">
+                            <h3 class="text-base font-semibold text-gray-900">{{ $album->titulo }}</h3>
+                            @if ($album->descricao)
+                                <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ $album->descricao }}</p>
+                            @endif
+                            <p class="mt-3 text-sm text-gray-500">{{ $album->fotografias_count }} fotografia(s)</p>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </section>
+    @endif
 </x-layouts.site>

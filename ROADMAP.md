@@ -126,13 +126,13 @@
 
 ## Fase 10 — Galeria e Mural da Loja
 
-- [ ] Álbuns
-- [ ] Fotografias
-- [ ] Publicações
-- [ ] Comentários
-- [ ] Reações
-- [ ] Moderação
-- [ ] Visibilidade
+- [x] Álbuns
+- [x] Fotografias
+- [x] Publicações
+- [x] Comentários
+- [x] Reações
+- [x] Moderação
+- [x] Visibilidade
 
 ## Fase 11 — Configurações de e-mail
 

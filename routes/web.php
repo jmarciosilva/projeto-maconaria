@@ -4,6 +4,7 @@ use App\Http\Controllers\AreaRestrita\EventoController as AreaRestritaEventoCont
 use App\Http\Controllers\AreaRestrita\PainelController;
 use App\Http\Controllers\AreaRestrita\ProfileController;
 use App\Http\Controllers\Site\EventoController as SiteEventoController;
+use App\Http\Controllers\Site\MuralInteracaoController;
 use App\Http\Controllers\Site\NoticiaController;
 use App\Http\Controllers\Site\PaginaInicialController;
 use App\Http\Controllers\Site\PaginaInstitucionalController;
@@ -45,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/area-restrita/eventos/{evento}', [AreaRestritaEventoController::class, 'mostrar'])->name('area-restrita.eventos.mostrar');
     Route::post('/area-restrita/eventos/{evento}/confirmar', [AreaRestritaEventoController::class, 'confirmar'])->name('area-restrita.eventos.confirmar');
     Route::delete('/area-restrita/eventos/{evento}/confirmar', [AreaRestritaEventoController::class, 'cancelarConfirmacao'])->name('area-restrita.eventos.cancelar-confirmacao');
+    Route::post('/mural/{publicacao}/comentarios', [MuralInteracaoController::class, 'comentar'])->name('mural.comentarios.store');
+    Route::post('/mural/{publicacao}/reacoes', [MuralInteracaoController::class, 'reagir'])->name('mural.reacoes.store');
 
     Route::get('/area-restrita/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/area-restrita/perfil', [ProfileController::class, 'update'])->name('profile.update');

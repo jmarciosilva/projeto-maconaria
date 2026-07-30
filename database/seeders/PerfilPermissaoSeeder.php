@@ -31,6 +31,8 @@ final class PerfilPermissaoSeeder extends Seeder
         'secretaria.visualizar', 'secretaria.criar-ata', 'secretaria.editar-ata', 'secretaria.aprovar-ata', 'secretaria.publicar-ata',
         'chancelaria.visualizar', 'chancelaria.criar', 'chancelaria.editar',
         'documentos.visualizar', 'documentos.enviar', 'documentos.avaliar', 'documentos.excluir',
+        'galeria.visualizar', 'galeria.criar', 'galeria.editar', 'galeria.excluir',
+        'mural.visualizar', 'mural.criar', 'mural.editar', 'mural.moderar', 'mural.excluir',
         'configuracoes.visualizar', 'configuracoes.editar',
         'auditoria.visualizar',
     ];
@@ -45,7 +47,7 @@ final class PerfilPermissaoSeeder extends Seeder
             'usuarios.visualizar', 'irmaos.visualizar', 'cms.visualizar', 'noticias.visualizar',
             'eventos.visualizar', 'tesouraria.visualizar', 'tesouraria.aprovar',
             'secretaria.visualizar', 'secretaria.aprovar-ata', 'chancelaria.visualizar',
-            'documentos.visualizar', 'auditoria.visualizar',
+            'documentos.visualizar', 'galeria.visualizar', 'mural.visualizar', 'mural.moderar', 'auditoria.visualizar',
         ],
         'Secretário' => [
             'irmaos.visualizar', 'irmaos.criar', 'irmaos.editar', 'secretaria.visualizar', 'secretaria.criar-ata',
@@ -56,12 +58,14 @@ final class PerfilPermissaoSeeder extends Seeder
         ],
         'Chanceler' => [
             'chancelaria.visualizar', 'chancelaria.criar', 'chancelaria.editar', 'irmaos.visualizar',
+            'galeria.visualizar', 'galeria.criar', 'mural.visualizar', 'mural.criar', 'mural.moderar',
         ],
         'Bibliotecário' => [
             'documentos.visualizar', 'documentos.enviar', 'documentos.avaliar',
         ],
         'Editor de Conteúdo' => [
             'cms.visualizar', 'cms.editar', 'noticias.visualizar', 'noticias.criar', 'noticias.editar',
+            'galeria.visualizar', 'galeria.criar', 'galeria.editar', 'mural.visualizar', 'mural.criar', 'mural.editar',
         ],
         'Instrutor' => [
             'documentos.visualizar', 'documentos.avaliar',

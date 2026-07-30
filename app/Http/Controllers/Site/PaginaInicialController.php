@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Site;
 use App\Http\Controllers\Controller;
 use App\Models\CarrosselItem;
 use App\Models\Evento;
+use App\Models\GaleriaAlbum;
+use App\Models\MuralPublicacao;
 use App\Models\Noticia;
 use App\Models\PaginaInstitucional;
 use Illuminate\View\View;
@@ -48,6 +50,35 @@ final class PaginaInicialController extends Controller
             ->limit(3)
             ->get();
 
-        return view('site.home', compact('itensCarrossel', 'paginasInstitucionais', 'noticiasEmDestaque', 'proximosEventos'));
+        $publicacoesMural = MuralPublicacao::query()
+            ->with([
+                'autor',
+                'comentarios' => fn ($query) => $query->where('aprovado', true)->with('usuario')->latest('created_at'),
+            ])
+            ->withCount([
+                'reacoes',
+                'comentarios as comentarios_aprovados_count' => fn ($query) => $query->where('aprovado', true),
+            ])
+            ->publico()
+            ->latest('publicado_em')
+            ->limit(3)
+            ->get();
+
+        $albunsGaleria = GaleriaAlbum::query()
+            ->with('fotografias')
+            ->withCount('fotografias')
+            ->publico()
+            ->latest('publicado_em')
+            ->limit(3)
+            ->get();
+
+        return view('site.home', compact(
+            'itensCarrossel',
+            'paginasInstitucionais',
+            'noticiasEmDestaque',
+            'proximosEventos',
+            'publicacoesMural',
+            'albunsGaleria',
+        ));
     }
 }

@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ChancelariaSeeder::class,
             TesourariaSeeder::class,
             DocumentoTrabalhoSeeder::class,
+            GaleriaMuralSeeder::class,
         ]);
     }
 }

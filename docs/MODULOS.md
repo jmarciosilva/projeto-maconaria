@@ -106,6 +106,16 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - **Avaliações e comentários**: avaliações ficam em `DocumentoAvaliacao` e exigem `documentos.avaliar`; comentários ficam vinculados à atividade e, opcionalmente, à entrega.
 - **Transações e auditoria**: criação/edição de atividades, entregas, avaliações e comentários usam transação quando gravam mais de uma tabela e registram auditoria no módulo `documentos`.
 
+## Galeria e Mural da Loja (Fase 10)
+
+- **Galeria por álbuns**: fotografias pertencem a `GaleriaAlbum`, com upload no disco `public` porque são imagens destinadas à exibição controlada pelo próprio módulo.
+- **Visibilidade pública/restrita**: álbuns e publicações possuem status e visibilidade separados. Os scopes `publico()` retornam apenas registros publicados e públicos, preservando conteúdo restrito para áreas autenticadas.
+- **Mural com moderação**: publicações usam `MuralPublicacao`; comentários enviados por usuários sem `mural.moderar` entram pendentes e precisam de aprovação antes de serem considerados moderados.
+- **Feed social na home**: a página inicial exibe somente publicações públicas/publicadas do Mural, com contagem de curtidas e comentários aprovados. Usuários autenticados podem curtir e comentar pela home; visitantes anônimos visualizam o feed e são direcionados ao login para interagir.
+- **Galeria na home**: a página inicial exibe apenas álbuns públicos/publicados, usando a primeira fotografia como capa quando houver imagem cadastrada.
+- **Reações únicas**: `mural_reacoes` tem chave única por publicação, usuário e tipo de reação para evitar duplicidade por recarregamento ou clique repetido.
+- **Transações e auditoria**: criação/edição de álbuns, uploads de fotografias, publicações, comentários, aprovação de comentários e reações registram auditoria e usam transação quando envolvem múltiplas gravações.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.
