@@ -28,7 +28,7 @@
 - [x] Recuperação de senha
 - [x] Alteração de senha
 - [ ] Alteração de e-mail (com confirmação e auditoria — pendente, ver `docs/MODULOS.md`)
-- [ ] ⚠️ Verificação de e-mail (scaffolding pronta, mas **temporariamente desativada** — não há SMTP configurado ainda; ver `docs/MODULOS.md`)
+- [ ] ⚠️ Verificação de e-mail (scaffolding pronta, mas **temporariamente desativada** — o cadastro de SMTP já existe desde a Fase 11, mas a reativação do middleware `verified` depende de um administrador configurar e ativar o SMTP em produção; ver `docs/MODULOS.md`)
 - [x] Usuários (CRUD básico, ativar/desativar/bloquear/desbloquear)
 - [x] Perfis (seed inicial; CRUD pelo painel pendente)
 - [x] Permissões
@@ -136,12 +136,12 @@
 
 ## Fase 11 — Configurações de e-mail
 
-- [ ] Cadastro SMTP
-- [ ] Criptografia
-- [ ] Aplicação dinâmica
-- [ ] Teste de envio
-- [ ] Auditoria
-- [ ] Tratamento de falhas
+- [x] Cadastro SMTP
+- [x] Criptografia
+- [x] Aplicação dinâmica
+- [x] Teste de envio
+- [x] Auditoria
+- [x] Tratamento de falhas
 
 ## Fase 12 — API e Flutter
 

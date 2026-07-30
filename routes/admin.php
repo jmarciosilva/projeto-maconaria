@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ChancelariaComunicadoController;
 use App\Http\Controllers\Admin\ChancelariaController;
 use App\Http\Controllers\Admin\ChancelariaFrequenciaController;
 use App\Http\Controllers\Admin\ChancelariaVisitanteController;
+use App\Http\Controllers\Admin\ConfiguracaoEmailController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
 use App\Http\Controllers\Admin\DocumentoAtividadeController;
 use App\Http\Controllers\Admin\DocumentoEntregaController;
@@ -57,6 +58,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::get('/configuracoes/institucional', [ConfiguracaoInstitucionalController::class, 'edit'])->name('configuracoes.institucional.edit');
     Route::put('/configuracoes/institucional', [ConfiguracaoInstitucionalController::class, 'update'])->name('configuracoes.institucional.update');
+
+    Route::get('/configuracoes/email', [ConfiguracaoEmailController::class, 'edit'])->name('configuracoes.email.edit');
+    Route::put('/configuracoes/email', [ConfiguracaoEmailController::class, 'update'])->name('configuracoes.email.update');
+    Route::post('/configuracoes/email/teste', [ConfiguracaoEmailController::class, 'enviarTeste'])->name('configuracoes.email.teste');
 
     Route::get('/carrossel', [CarrosselItemController::class, 'index'])->name('carrossel.index');
     Route::get('/carrossel/novo', [CarrosselItemController::class, 'create'])->name('carrossel.create');

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Policies\UsuarioPolicy;
+use App\Support\Email\AplicadorConfiguracaoEmail;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -32,5 +33,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function (User $user, string $ability) {
             return $user->hasRole('Superadministrador') ? true : null;
         });
+
+        // Sobrepõe o mailer padrão do .env pela configuração de SMTP salva
+        // pelo painel (Fase 11), quando ela existir e estiver ativa.
+        AplicadorConfiguracaoEmail::aplicar();
     }
 }
