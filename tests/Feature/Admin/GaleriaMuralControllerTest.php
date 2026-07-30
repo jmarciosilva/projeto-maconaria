@@ -109,6 +109,62 @@ final class GaleriaMuralControllerTest extends TestCase
         $this->assertDatabaseHas('auditorias', ['modulo' => 'mural', 'acao' => 'criar']);
     }
 
+    public function test_user_can_upload_a_cover_image_when_creating_a_mural_publication(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('mural.criar');
+
+        $this->actingAs($usuario)->post(route('admin.mural.publicacoes.store'), [
+            'titulo' => 'Publicação com capa',
+            'conteudo' => 'Conteúdo com capa.',
+            'status' => StatusMuralGaleria::PUBLICADO->value,
+            'visibilidade' => VisibilidadeMuralGaleria::PUBLICA->value,
+            'imagem_capa' => UploadedFile::fake()->image('capa.jpg'),
+        ])->assertRedirect();
+
+        $publicacao = MuralPublicacao::where('titulo', 'Publicação com capa')->firstOrFail();
+
+        $this->assertNotNull($publicacao->imagem_capa);
+        Storage::disk('public')->assertExists($publicacao->imagem_capa);
+    }
+
+    public function test_replacing_the_mural_cover_image_deletes_the_previous_file(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('mural.criar', 'mural.editar');
+
+        $this->actingAs($usuario)->post(route('admin.mural.publicacoes.store'), [
+            'titulo' => 'Publicação para substituir capa',
+            'conteudo' => 'Conteúdo.',
+            'status' => StatusMuralGaleria::PUBLICADO->value,
+            'visibilidade' => VisibilidadeMuralGaleria::PUBLICA->value,
+            'imagem_capa' => UploadedFile::fake()->image('original.jpg'),
+        ]);
+
+        $publicacao = MuralPublicacao::where('titulo', 'Publicação para substituir capa')->firstOrFail();
+        $caminhoOriginal = $publicacao->imagem_capa;
+
+        $this->actingAs($usuario)->put(route('admin.mural.publicacoes.update', $publicacao), [
+            'titulo' => $publicacao->titulo,
+            'conteudo' => $publicacao->conteudo,
+            'status' => StatusMuralGaleria::PUBLICADO->value,
+            'visibilidade' => VisibilidadeMuralGaleria::PUBLICA->value,
+            'imagem_capa' => UploadedFile::fake()->image('nova.jpg'),
+        ])->assertRedirect();
+
+        $publicacao->refresh();
+
+        $this->assertNotSame($caminhoOriginal, $publicacao->imagem_capa);
+        Storage::disk('public')->assertMissing($caminhoOriginal);
+        Storage::disk('public')->assertExists($publicacao->imagem_capa);
+    }
+
     public function test_comment_requires_moderation_and_can_be_approved(): void
     {
         $this->seed(PerfilPermissaoSeeder::class);

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'titulo',
     'resumo',
     'conteudo',
+    'imagem_capa',
     'status',
     'visibilidade',
     'destaque',

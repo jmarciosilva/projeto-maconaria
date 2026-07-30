@@ -104,24 +104,19 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
     @endif
 
     @if ($paginasInstitucionais->isNotEmpty())
-        <section class="py-14 lg:py-16">
+        <section class="bg-brand-paperSoft py-14 lg:py-16">
             <div class="mx-auto max-w-6xl px-5 lg:px-8">
                 <div class="mb-7 max-w-2xl">
                     <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Conheça a Loja e a Maçonaria</h2>
                     <p class="mt-1 text-brand-inkSoft">Acesse os conteúdos institucionais preparados pela administração da Loja.</p>
                 </div>
 
-                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="flex flex-wrap gap-4">
                     @foreach ($paginasInstitucionais as $pagina)
-                        <a href="{{ route('paginas.mostrar', $pagina->slug) }}" class="rounded-lg border border-brand-navy/10 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                            <h3 class="font-siteDisplay text-lg font-bold text-brand-navy">{{ $pagina->titulo }}</h3>
-
-                            @if ($pagina->meta_descricao)
-                                <p class="mt-2 line-clamp-3 text-[0.95rem] text-brand-inkSoft">{{ $pagina->meta_descricao }}</p>
-                            @endif
-
-                            <span class="mt-4 inline-flex font-bold text-brand-navy">Ler conteúdo →</span>
-                        </a>
+                        <a
+                            href="{{ $pagina->urlPublica() }}"
+                            class="rounded-full border-2 border-brand-navy bg-white px-6 py-3 font-bold text-brand-navy transition hover:bg-brand-navy hover:text-white"
+                        >{{ $pagina->titulo }}</a>
                     @endforeach
                 </div>
             </div>
@@ -143,10 +138,14 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                 <div class="grid gap-10 {{ $noticiasSecundarias->isNotEmpty() ? 'lg:grid-cols-[1.7fr_1fr]' : '' }}">
                     <article>
                         <a href="{{ route('noticias.mostrar', $noticiaPrincipal->slug) }}" class="mb-5 flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-brand-navy to-brand-navyDeep">
-                            <svg class="h-24 w-24 opacity-50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path d="M100 25 L158 122 H42 Z" stroke="#dcecf2" stroke-width="3" stroke-linejoin="round" />
-                                <path d="M52 140 A50 50 0 0 1 148 140" stroke="#dcecf2" stroke-width="3" />
-                            </svg>
+                            @if ($noticiaPrincipal->imagem_capa)
+                                <img src="{{ Storage::url($noticiaPrincipal->imagem_capa) }}" alt="{{ $noticiaPrincipal->titulo }}" class="h-full w-full object-cover">
+                            @else
+                                <svg class="h-24 w-24 opacity-50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M100 25 L158 122 H42 Z" stroke="#dcecf2" stroke-width="3" stroke-linejoin="round" />
+                                    <path d="M52 140 A50 50 0 0 1 148 140" stroke="#dcecf2" stroke-width="3" />
+                                </svg>
+                            @endif
                         </a>
 
                         @if ($noticiaPrincipal->categoria)
@@ -174,14 +173,20 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                     @if ($noticiasSecundarias->isNotEmpty())
                         <aside class="flex flex-col" aria-label="Mais notícias">
                             @foreach ($noticiasSecundarias as $noticia)
-                                <a href="{{ route('noticias.mostrar', $noticia->slug) }}" class="block border-t border-brand-navy/12 py-5 first:border-t-0 first:pt-0">
-                                    @if ($noticia->categoria)
-                                        <span class="text-sm font-bold uppercase tracking-wide text-brand-navy">{{ $noticia->categoria->nome }}</span>
+                                <a href="{{ route('noticias.mostrar', $noticia->slug) }}" class="flex items-start gap-4 border-t border-brand-navy/12 py-5 first:border-t-0 first:pt-0">
+                                    @if ($noticia->imagem_capa)
+                                        <img src="{{ Storage::url($noticia->imagem_capa) }}" alt="{{ $noticia->titulo }}" class="aspect-[4/3] w-24 shrink-0 rounded-md object-cover">
                                     @endif
-                                    <p class="mt-2 font-bold leading-snug text-brand-ink hover:underline">{{ $noticia->titulo }}</p>
-                                    @if ($noticia->publicado_em)
-                                        <p class="mt-2 text-sm text-brand-inkSoft">{{ $noticia->publicado_em->diffForHumans() }}</p>
-                                    @endif
+
+                                    <div class="min-w-0 flex-1">
+                                        @if ($noticia->categoria)
+                                            <span class="text-sm font-bold uppercase tracking-wide text-brand-navy">{{ $noticia->categoria->nome }}</span>
+                                        @endif
+                                        <p class="mt-2 font-bold leading-snug text-brand-ink hover:underline">{{ $noticia->titulo }}</p>
+                                        @if ($noticia->publicado_em)
+                                            <p class="mt-2 text-sm text-brand-inkSoft">{{ $noticia->publicado_em->diffForHumans() }}</p>
+                                        @endif
+                                    </div>
                                 </a>
                             @endforeach
                         </aside>
@@ -210,6 +215,11 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                                 <span class="font-siteDisplay text-3xl font-bold leading-none">{{ $evento->inicio_em->format('d') }}</span>
                                 <span class="mt-1 text-xs font-bold uppercase tracking-wide text-brand-sky">{{ Illuminate\Support\Str::upper($evento->inicio_em->translatedFormat('M')) }}</span>
                             </div>
+
+                            @if ($evento->imagem_capa)
+                                <img src="{{ Storage::url($evento->imagem_capa) }}" alt="{{ $evento->titulo }}" class="w-20 shrink-0 object-cover">
+                            @endif
+
                             <div class="flex flex-col justify-center px-4 py-3">
                                 <p class="font-bold leading-snug text-brand-ink">{{ $evento->titulo }}</p>
                                 <p class="mt-1.5 text-sm text-brand-inkSoft">
@@ -239,7 +249,12 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
 
                 <div class="grid gap-6 lg:grid-cols-3">
                     @foreach ($publicacoesMural as $publicacao)
-                        <article class="flex flex-col gap-3.5 rounded-lg border border-brand-navy/10 bg-white p-6 shadow-sm">
+                        <article class="flex flex-col overflow-hidden rounded-lg border border-brand-navy/10 bg-white shadow-sm">
+                            @if ($publicacao->imagem_capa)
+                                <img src="{{ Storage::url($publicacao->imagem_capa) }}" alt="{{ $publicacao->titulo }}" class="aspect-video w-full object-cover">
+                            @endif
+
+                            <div class="flex flex-col gap-3.5 p-6">
                             <div class="flex items-center gap-3">
                                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-navy font-siteDisplay text-lg font-bold text-white">
                                     {{ mb_substr($publicacao->autor->name ?? config('app.name'), 0, 1) }}
@@ -283,6 +298,7 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                             @else
                                 <a href="{{ route('login') }}" class="block rounded-md border-2 border-brand-skyDeep py-2.5 text-center font-bold text-brand-navy hover:bg-brand-sky">Entrar para curtir</a>
                             @endauth
+                            </div>
                         </article>
                     @endforeach
                 </div>

@@ -9,6 +9,8 @@ use App\Models\NoticiaCategoria;
 use App\Models\User;
 use Database\Seeders\PerfilPermissaoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class NoticiaControllerTest extends TestCase
@@ -98,5 +100,62 @@ class NoticiaControllerTest extends TestCase
             'status' => StatusNoticia::RASCUNHO->value,
             'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
         ])->assertSessionHasErrors('slug');
+    }
+
+    public function test_user_can_upload_a_cover_image_when_creating_a_news(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia com capa',
+            'slug' => 'noticia-com-capa',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'imagem_capa' => UploadedFile::fake()->image('capa.jpg'),
+        ])->assertRedirect();
+
+        $noticia = Noticia::where('slug', 'noticia-com-capa')->firstOrFail();
+
+        $this->assertNotNull($noticia->imagem_capa);
+        Storage::disk('public')->assertExists($noticia->imagem_capa);
+        $this->assertDatabaseHas('noticia_versoes', ['noticia_id' => $noticia->id, 'imagem_capa' => $noticia->imagem_capa]);
+    }
+
+    public function test_replacing_the_cover_image_deletes_the_previous_file(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar', 'noticias.editar');
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia para substituir capa',
+            'slug' => 'noticia-substituir-capa',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'imagem_capa' => UploadedFile::fake()->image('original.jpg'),
+        ]);
+
+        $noticia = Noticia::where('slug', 'noticia-substituir-capa')->firstOrFail();
+        $caminhoOriginal = $noticia->imagem_capa;
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'imagem_capa' => UploadedFile::fake()->image('nova.jpg'),
+        ])->assertRedirect();
+
+        $noticia->refresh();
+
+        $this->assertNotSame($caminhoOriginal, $noticia->imagem_capa);
+        Storage::disk('public')->assertMissing($caminhoOriginal);
+        Storage::disk('public')->assertExists($noticia->imagem_capa);
     }
 }

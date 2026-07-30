@@ -42,6 +42,7 @@ final class CriarNoticiaRequest extends FormRequest
             'slug' => ['required', 'string', 'max:140', 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/', Rule::unique('noticias', 'slug')],
             'resumo' => ['nullable', 'string', 'max:500'],
             'conteudo' => ['nullable', 'string'],
+            'imagem_capa' => ['nullable', 'image', 'max:4096'],
             'status' => ['required', Rule::enum(StatusNoticia::class)],
             'visibilidade' => ['required', Rule::enum(VisibilidadeNoticia::class)],
             'destaque' => ['boolean'],

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'titulo',
     'slug',
     'descricao',
+    'imagem_capa',
     'tipo',
     'status',
     'visibilidade',

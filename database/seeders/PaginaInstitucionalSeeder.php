@@ -24,15 +24,19 @@ final class PaginaInstitucionalSeeder extends Seeder
             'titulo' => 'Sobre Nós',
         ],
         [
-            'slug' => 'maconaria',
+            'slug' => 'nossa-historia',
+            'titulo' => 'Nossa História',
+        ],
+        [
+            'slug' => 'o-que-e-maconaria',
             'titulo' => 'O que é Maçonaria',
         ],
         [
-            'slug' => 'maconaria-jovens',
+            'slug' => 'maconaria-para-jovens',
             'titulo' => 'Maçonaria para Jovens',
         ],
         [
-            'slug' => 'mudar-cidadao',
+            'slug' => 'mudando-o-cidadao',
             'titulo' => 'Como a Maçonaria pode mudar um cidadão',
         ],
         [

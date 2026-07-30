@@ -1,5 +1,5 @@
 <x-layouts.admin titulo="Editar Notícia">
-    <form method="POST" action="{{ route('admin.noticias.update', $noticia) }}" class="max-w-4xl space-y-6">
+    <form method="POST" action="{{ route('admin.noticias.update', $noticia) }}" enctype="multipart/form-data" class="max-w-4xl space-y-6">
         @csrf
         @method('PUT')
 

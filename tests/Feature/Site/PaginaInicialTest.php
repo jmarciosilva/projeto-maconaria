@@ -56,7 +56,7 @@ class PaginaInicialTest extends TestCase
     public function test_home_page_shows_published_institutional_pages(): void
     {
         PaginaInstitucional::factory()->create([
-            'slug' => 'mudar-cidadao',
+            'slug' => 'mudando-o-cidadao',
             'titulo' => 'Como a Maçonaria pode mudar um cidadão',
             'meta_descricao' => 'Uma chamada institucional para a home.',
             'publicado' => true,
@@ -71,7 +71,7 @@ class PaginaInicialTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('Como a Maçonaria pode mudar um cidadão')
-            ->assertSee('Uma chamada institucional para a home.')
+            ->assertSee(route('paginas.mudar-cidadao'), false)
             ->assertDontSee('Página em rascunho');
     }
 

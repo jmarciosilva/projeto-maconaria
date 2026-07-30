@@ -14,13 +14,19 @@ use Illuminate\View\View;
 final class PaginaInicialController extends Controller
 {
     /**
+     * Slugs realmente usados pela administração da Loja ao cadastrar cada
+     * página pelo painel — nem sempre idênticos ao valor original do
+     * PaginaInstitucionalSeeder, por isso mantidos como constante única,
+     * também referenciada pelas rotas fixas em routes/web.php.
+     *
      * @var array<int, string>
      */
     private const SLUGS_INSTITUCIONAIS_DA_HOME = [
         'sobre-nos',
-        'maconaria',
-        'maconaria-jovens',
-        'mudar-cidadao',
+        'nossa-historia',
+        'o-que-e-maconaria',
+        'maconaria-para-jovens',
+        'mudando-o-cidadao',
     ];
 
     public function index(): View

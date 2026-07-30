@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['autor_id', 'titulo', 'conteudo', 'status', 'visibilidade', 'publicado_em'])]
+#[Fillable(['autor_id', 'titulo', 'conteudo', 'imagem_capa', 'status', 'visibilidade', 'publicado_em'])]
 final class MuralPublicacao extends Model
 {
     /** @use HasFactory<MuralPublicacaoFactory> */

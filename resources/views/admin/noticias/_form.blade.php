@@ -35,6 +35,22 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
     <x-ui.input rotulo="Agendado para" nome="agendado_para" tipo="datetime-local" :valor="old('agendado_para', isset($noticia?->agendado_para) ? $noticia->agendado_para->format('Y-m-d\TH:i') : null)" :erro="$errors->first('agendado_para')" />
 
     <div>
+        <label for="imagem_capa" class="block text-sm font-medium text-gray-700">Imagem de capa (exibida em destaque na página inicial)</label>
+
+        @isset($noticia)
+            @if ($noticia->imagem_capa)
+                <img src="{{ asset('storage/'.$noticia->imagem_capa) }}" alt="Capa atual da notícia" class="mt-2 aspect-[16/10] w-full max-w-sm rounded-md object-cover">
+            @endif
+        @endisset
+
+        <input type="file" id="imagem_capa" name="imagem_capa" accept="image/*" class="mt-1 block w-full text-sm text-gray-700">
+        <p class="mt-1 text-xs text-gray-500">Imagem JPG, PNG ou WebP, na horizontal (ideal: proporção 16:9 ou 16:10). Máximo de 4 MB. A foto é recortada automaticamente para preencher o espaço reservado na página inicial.</p>
+        @error('imagem_capa')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div>
         <label for="resumo" class="block text-sm font-medium text-gray-700">Resumo</label>
         <textarea id="resumo" name="resumo" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">{{ old('resumo', $noticia->resumo ?? '') }}</textarea>
         @error('resumo')

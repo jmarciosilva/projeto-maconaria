@@ -1,5 +1,5 @@
 <x-layouts.admin titulo="Editar Publicação">
-    <form method="POST" action="{{ route('admin.mural.publicacoes.update', $publicacao) }}" class="max-w-4xl space-y-6">
+    <form method="POST" action="{{ route('admin.mural.publicacoes.update', $publicacao) }}" enctype="multipart/form-data" class="max-w-4xl space-y-6">
         @csrf
         @method('PUT')
         @include('admin.mural.publicacoes._form')

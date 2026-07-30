@@ -1,5 +1,5 @@
 <x-layouts.admin titulo="Novo Evento">
-    <form method="POST" action="{{ route('admin.eventos.store') }}" class="max-w-4xl space-y-6">
+    <form method="POST" action="{{ route('admin.eventos.store') }}" enctype="multipart/form-data" class="max-w-4xl space-y-6">
         @csrf
 
         @include('admin.eventos._form')

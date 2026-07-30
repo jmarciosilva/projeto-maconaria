@@ -194,11 +194,11 @@ class PaginaInstitucionalControllerTest extends TestCase
         $usuario = User::factory()->create();
         $usuario->givePermissionTo('cms.editar');
 
-        $pagina = PaginaInstitucional::where('slug', 'mudar-cidadao')->firstOrFail();
+        $pagina = PaginaInstitucional::where('slug', 'mudando-o-cidadao')->firstOrFail();
 
         $this->actingAs($usuario)->put(route('admin.paginas-institucionais.update', $pagina), [
             'titulo' => 'Como a Maçonaria pode mudar um cidadão',
-            'slug' => 'mudar-cidadao',
+            'slug' => 'mudando-o-cidadao',
             'conteudo' => '<p>Conteúdo atualizado pelo painel.</p>',
             'meta_descricao' => 'Texto de chamada atualizado.',
             'publicado' => '1',
@@ -206,7 +206,7 @@ class PaginaInstitucionalControllerTest extends TestCase
 
         $this->assertDatabaseHas('paginas_institucionais', [
             'id' => $pagina->id,
-            'slug' => 'mudar-cidadao',
+            'slug' => 'mudando-o-cidadao',
             'conteudo' => '<p>Conteúdo atualizado pelo painel.</p>',
             'meta_descricao' => 'Texto de chamada atualizado.',
             'publicado' => true,

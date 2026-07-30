@@ -13,6 +13,10 @@
                 </div>
             </div>
 
+            @if ($publicacao->imagem_capa)
+                <img src="{{ Storage::url($publicacao->imagem_capa) }}" alt="{{ $publicacao->titulo }}" class="mb-4 aspect-video w-full rounded-lg object-cover">
+            @endif
+
             <p class="whitespace-pre-line text-sm text-gray-700">{{ $publicacao->conteudo }}</p>
 
             <div class="mt-4 flex items-center justify-between border-y border-gray-100 py-3 text-sm text-gray-600">

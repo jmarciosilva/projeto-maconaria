@@ -47,6 +47,7 @@ final class SalvarEventoRequest extends FormRequest
             'titulo' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:140', 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/', Rule::unique('eventos', 'slug')->ignore($evento)],
             'descricao' => ['nullable', 'string'],
+            'imagem_capa' => ['nullable', 'image', 'max:4096'],
             'tipo' => ['required', Rule::enum(TipoEvento::class)],
             'status' => ['required', Rule::enum(StatusEvento::class)],
             'visibilidade' => ['required', Rule::enum(VisibilidadeEvento::class)],

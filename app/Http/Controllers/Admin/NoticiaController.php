@@ -15,6 +15,7 @@ use App\Support\ProcessadorConteudoNoticia;
 use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 final class NoticiaController extends Controller
@@ -41,10 +42,14 @@ final class NoticiaController extends Controller
     public function store(CriarNoticiaRequest $request): RedirectResponse
     {
         $noticia = DB::transaction(function () use ($request): Noticia {
-            $dados = $request->safe()->except('tags', 'conteudo');
+            $dados = $request->safe()->except('tags', 'conteudo', 'imagem_capa');
             $dados['autor_id'] = $request->user()->id;
             $dados['conteudo'] = ProcessadorConteudoNoticia::prepararParaSalvar($request->input('conteudo'));
             $dados['destaque'] = $request->boolean('destaque');
+
+            if ($request->hasFile('imagem_capa')) {
+                $dados['imagem_capa'] = $request->file('imagem_capa')->store('noticias', 'public');
+            }
 
             if ($dados['status'] === StatusNoticia::PUBLICADA->value && empty($dados['publicado_em'])) {
                 $dados['publicado_em'] = now();
@@ -80,9 +85,17 @@ final class NoticiaController extends Controller
     {
         DB::transaction(function () use ($request, $noticia): void {
             $dadosAnteriores = $noticia->only(['titulo', 'slug', 'status', 'visibilidade', 'destaque']);
-            $dados = $request->safe()->except('tags', 'conteudo');
+            $dados = $request->safe()->except('tags', 'conteudo', 'imagem_capa');
             $dados['conteudo'] = ProcessadorConteudoNoticia::prepararParaSalvar($request->input('conteudo'));
             $dados['destaque'] = $request->boolean('destaque');
+
+            if ($request->hasFile('imagem_capa')) {
+                if ($noticia->imagem_capa) {
+                    Storage::disk('public')->delete($noticia->imagem_capa);
+                }
+
+                $dados['imagem_capa'] = $request->file('imagem_capa')->store('noticias', 'public');
+            }
 
             if ($dados['status'] === StatusNoticia::PUBLICADA->value && empty($dados['publicado_em'])) {
                 $dados['publicado_em'] = now();
@@ -139,6 +152,7 @@ final class NoticiaController extends Controller
             'titulo' => $noticia->titulo,
             'resumo' => $noticia->resumo,
             'conteudo' => $noticia->conteudo,
+            'imagem_capa' => $noticia->imagem_capa,
             'status' => $noticia->status,
             'visibilidade' => $noticia->visibilidade,
             'destaque' => $noticia->destaque,

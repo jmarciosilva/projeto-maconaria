@@ -21,6 +21,7 @@ final class SalvarMuralPublicacaoRequest extends FormRequest
         return [
             'titulo' => ['required', 'string', 'max:255'],
             'conteudo' => ['required', 'string', 'max:5000'],
+            'imagem_capa' => ['nullable', 'image', 'max:4096'],
             'status' => ['required', Rule::enum(StatusMuralGaleria::class)],
             'visibilidade' => ['required', Rule::enum(VisibilidadeMuralGaleria::class)],
         ];

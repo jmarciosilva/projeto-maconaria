@@ -3,6 +3,10 @@
         <p class="text-sm font-semibold uppercase tracking-wide text-blue-800">{{ $evento->tipo->rotulo() }}</p>
         <h1 class="mt-2 text-3xl font-bold text-gray-900">{{ $evento->titulo }}</h1>
 
+        @if ($evento->imagem_capa)
+            <img src="{{ Storage::url($evento->imagem_capa) }}" alt="{{ $evento->titulo }}" class="mt-6 aspect-video w-full rounded-lg object-cover">
+        @endif
+
         <dl class="mt-6 grid gap-4 rounded-md border border-gray-200 bg-gray-50 p-4 sm:grid-cols-2">
             <div>
                 <dt class="text-xs font-semibold uppercase text-gray-500">Início</dt>

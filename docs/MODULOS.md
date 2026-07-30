@@ -146,6 +146,23 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
   atualizados para usar os mesmos serviços — comportamento coberto pelos
   testes já existentes desses módulos, que continuam passando.
 
+## Imagem de capa em Notícias, Eventos e Mural
+
+- **Campo `imagem_capa`** adicionado a `noticias`, `eventos` e `mural_publicacoes` (e replicado em `noticia_versoes`, para o histórico de versões acompanhar a capa vigente em cada versão). Upload opcional no cadastro/edição de cada um dos três módulos, seguindo o mesmo padrão já usado pelo Carrossel: disco `public`, `image`/`max:4096` (4 MB), arquivo antigo apagado (`Storage::disk('public')->delete(...)`) sempre que uma nova imagem substitui a anterior.
+- **Galeria não recebeu este campo**: um álbum já usa a primeira fotografia (por `ordem`) como capa nas listagens (`GaleriaAlbum::fotografias->first()`), então adicionar um `imagem_capa` próprio duplicaria essa fonte de verdade sem necessidade — o administrador já controla qual foto aparece como capa reordenando as fotografias do álbum.
+- **Exibição pública**: a notícia em destaque (matéria principal da home) e os cards do Mural mostram a imagem real quando cadastrada, com um fallback decorativo (gradiente + símbolo) quando não há imagem — nunca um espaço vazio. Eventos mostram uma miniatura ao lado do bloco de data na home; as páginas de leitura completa (`noticias/mostrar`, `eventos/mostrar`, `mural/mostrar`) também exibem a capa quando presente.
+- **Exclusão de notícia/evento/publicação usa soft delete**: o arquivo de imagem não é removido do disco na exclusão (registro pode ser restaurado), mesmo comportamento já adotado para os demais anexos do sistema.
+
+## Página de Contato
+
+- **Formulário público** (`GET`/`POST /contato`) sem persistência em banco: a mensagem é apenas encaminhada por e-mail via `Mail::to(...)->send(new MensagemDeContato(...))`, para `ConfiguracaoInstitucional::atual()->email_institucional` — o destinatário é sempre lido dessa configuração (nunca hardcoded), então basta o administrador atualizar o e-mail institucional pelo painel para o formulário passar a apontar para outro endereço.
+- **`replyTo` do e-mail** aponta para o remetente do formulário, para quem recebe a mensagem poder simplesmente clicar em "Responder" sem copiar o endereço manualmente.
+- **Anti-spam por honeypot**: campo oculto `site`, invisível a uma pessoa real (`class="hidden"` + `tabindex="-1"`) mas visível a robôs de formulário. Se vier preenchido, a submissão retorna a mesma resposta de sucesso, sem de fato enviar e-mail — para não revelar ao robô que foi identificado.
+- **Rate limiting**: `throttle:5,1` na rota `POST /contato`, mesmo padrão já usado nas rotas de autenticação.
+- **Falha de envio** (ex.: SMTP fora do ar) é registrada em log e retorna mensagem amigável ao usuário — nunca expõe stack trace nem detalhes técnicos.
+- **Confirmação automática ao remetente** (`ConfirmacaoContatoRecebido`): assim que a mensagem chega à Loja com sucesso, o sistema envia um segundo e-mail — desta vez para quem preencheu o formulário — com layout em HTML (logotipo da Loja, saudação pelo nome, aviso de que em breve entraremos em contato). Uma falha nesse segundo envio é só registrada em log e não afeta a resposta ao usuário, pois o que importa (a mensagem chegar à Loja) já aconteceu.
+- **Ícones de redes sociais no rodapé**: os links de Facebook/Instagram/X/TikTok (já configuráveis pelo painel desde a Fase 3) passaram a ser exibidos como ícones (SVG inline, glifos oficiais da simple-icons) em vez de texto, mantendo `possuiRedesSociais()` como guarda para não renderizar a lista quando nenhuma rede está configurada.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

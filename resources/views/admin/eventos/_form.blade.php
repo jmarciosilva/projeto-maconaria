@@ -28,6 +28,22 @@ $evento ??= null;
         @enderror
     </div>
 
+    <div>
+        <label for="imagem_capa" class="block text-sm font-medium text-gray-700">Imagem de capa (exibida em destaque na página inicial)</label>
+
+        @isset($evento)
+            @if ($evento->imagem_capa)
+                <img src="{{ asset('storage/'.$evento->imagem_capa) }}" alt="Capa atual do evento" class="mt-2 aspect-video w-full max-w-sm rounded-md object-cover">
+            @endif
+        @endisset
+
+        <input type="file" id="imagem_capa" name="imagem_capa" accept="image/*" class="mt-1 block w-full text-sm text-gray-700">
+        <p class="mt-1 text-xs text-gray-500">Imagem JPG, PNG ou WebP, na horizontal (ideal: proporção 16:9). Máximo de 4 MB. A foto é recortada automaticamente para preencher o espaço reservado na página inicial.</p>
+        @error('imagem_capa')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
+    </div>
+
     <fieldset class="space-y-4 rounded-md border border-gray-200 p-4">
         <legend class="px-1 text-sm font-semibold text-gray-900">Confirmação de presença</legend>
 

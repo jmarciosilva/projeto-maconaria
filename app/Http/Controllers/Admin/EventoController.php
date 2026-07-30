@@ -13,6 +13,7 @@ use App\Models\Evento;
 use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 final class EventoController extends Controller
@@ -55,8 +56,12 @@ final class EventoController extends Controller
     public function store(SalvarEventoRequest $request): RedirectResponse
     {
         $evento = DB::transaction(function () use ($request): Evento {
-            $dados = $request->validated();
+            $dados = $request->safe()->except('imagem_capa');
             $dados['autor_id'] = $request->user()->id;
+
+            if ($request->hasFile('imagem_capa')) {
+                $dados['imagem_capa'] = $request->file('imagem_capa')->store('eventos', 'public');
+            }
 
             $evento = Evento::create($dados);
 
@@ -86,8 +91,17 @@ final class EventoController extends Controller
     {
         DB::transaction(function () use ($request, $evento): void {
             $dadosAnteriores = $evento->only(['titulo', 'slug', 'tipo', 'status', 'visibilidade', 'inicio_em']);
+            $dados = $request->safe()->except('imagem_capa');
 
-            $evento->fill($request->validated())->save();
+            if ($request->hasFile('imagem_capa')) {
+                if ($evento->imagem_capa) {
+                    Storage::disk('public')->delete($evento->imagem_capa);
+                }
+
+                $dados['imagem_capa'] = $request->file('imagem_capa')->store('eventos', 'public');
+            }
+
+            $evento->fill($dados)->save();
 
             RegistradorDeAuditoria::registrar(
                 acao: 'editar',

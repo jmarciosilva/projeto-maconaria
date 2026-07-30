@@ -10,6 +10,10 @@
             Publicado em {{ optional($noticia->publicado_em)->format('d/m/Y H:i') }}
         </p>
 
+        @if ($noticia->imagem_capa)
+            <img src="{{ Storage::url($noticia->imagem_capa) }}" alt="{{ $noticia->titulo }}" class="mt-6 aspect-video w-full rounded-lg object-cover">
+        @endif
+
         @if ($noticia->resumo)
             <p class="mt-6 text-lg text-gray-700">{{ $noticia->resumo }}</p>
         @endif

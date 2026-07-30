@@ -16,6 +16,7 @@ use App\Models\MuralPublicacao;
 use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 final class MuralPublicacaoController extends Controller
@@ -146,8 +147,16 @@ final class MuralPublicacaoController extends Controller
 
     private function dadosPersistencia(SalvarMuralPublicacaoRequest $request, ?MuralPublicacao $publicacao = null): array
     {
-        $dados = $request->validated();
+        $dados = $request->safe()->except('imagem_capa');
         $dados['publicado_em'] = $dados['status'] === StatusMuralGaleria::PUBLICADO->value ? ($publicacao?->publicado_em ?? now()) : null;
+
+        if ($request->hasFile('imagem_capa')) {
+            if ($publicacao?->imagem_capa) {
+                Storage::disk('public')->delete($publicacao->imagem_capa);
+            }
+
+            $dados['imagem_capa'] = $request->file('imagem_capa')->store('mural', 'public');
+        }
 
         return $dados;
     }

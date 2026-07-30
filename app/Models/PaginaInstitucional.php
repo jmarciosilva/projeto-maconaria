@@ -41,4 +41,24 @@ final class PaginaInstitucional extends Model
     {
         return $this->meta_titulo ?: $this->titulo;
     }
+
+    /**
+     * As seis páginas com slug fixo (ver routes/web.php) têm uma URL "bonita"
+     * própria; qualquer outra página cadastrada livremente pelo painel cai
+     * na rota genérica /institucional/{slug}. Centralizado aqui para não
+     * duplicar esse mapeamento entre o layout público e a página inicial.
+     */
+    public function urlPublica(): string
+    {
+        return match ($this->slug) {
+            'sobre-nos' => route('paginas.sobre-nos'),
+            'nossa-historia' => route('paginas.nossa-historia'),
+            'o-que-e-maconaria' => route('paginas.maconaria'),
+            'maconaria-para-jovens' => route('paginas.maconaria-jovens'),
+            'mudando-o-cidadao' => route('paginas.mudar-cidadao'),
+            'politica-privacidade' => route('paginas.politica-privacidade'),
+            'termos-de-uso' => route('paginas.termos-de-uso'),
+            default => route('paginas.mostrar', $this->slug),
+        };
+    }
 }

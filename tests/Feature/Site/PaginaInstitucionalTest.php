@@ -38,7 +38,7 @@ class PaginaInstitucionalTest extends TestCase
     public function test_meta_description_is_rendered_when_present(): void
     {
         PaginaInstitucional::factory()->create([
-            'slug' => 'maconaria',
+            'slug' => 'o-que-e-maconaria',
             'titulo' => 'O que é Maçonaria',
             'meta_descricao' => 'Descrição de SEO para teste',
             'publicado' => true,
@@ -71,7 +71,7 @@ class PaginaInstitucionalTest extends TestCase
         ]);
 
         PaginaInstitucional::factory()->create([
-            'slug' => 'mudar-cidadao',
+            'slug' => 'mudando-o-cidadao',
             'titulo' => 'Como a Maçonaria pode mudar um cidadão',
             'publicado' => false,
         ]);
