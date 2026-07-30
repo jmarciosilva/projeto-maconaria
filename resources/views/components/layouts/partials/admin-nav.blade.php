@@ -39,4 +39,18 @@
             Páginas Institucionais
         </a>
     @endcan
+
+    @can('noticias.visualizar')
+        <a href="{{ route('admin.noticias.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.noticias.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Notícias
+        </a>
+
+        <a href="{{ route('admin.noticia-categorias.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.noticia-categorias.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Categorias de Notícias
+        </a>
+
+        <a href="{{ route('admin.noticia-tags.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.noticia-tags.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+            Tags de Notícias
+        </a>
+    @endcan
 </nav>

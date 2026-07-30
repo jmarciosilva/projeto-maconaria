@@ -56,6 +56,14 @@ Este documento registra decisões e suposições tomadas quando o escopo origina
 - Componentes criados nesta entrega: `x-ui.alert`, `x-ui.button`, `x-ui.badge`, `x-ui.empty-state`, `x-ui.table`, `x-ui.confirmation`, `x-ui.input`, `x-ui.select`. O componente `x-ui.modal` já vem do Breeze (`components/modal.blade.php`) e foi reaproveitado.
 - **Paginação**: não foi criado um `x-ui.pagination` próprio — a view de paginação padrão do Laravel já é estilizada com Tailwind e foi usada diretamente (`{{ $usuarios->links() }}`). Um wrapper dedicado pode ser criado depois se for necessário customizar o visual.
 
+## Notícias e conteúdo (Fase 4)
+
+- **Fluxo editorial inicial**: `StatusNoticia` possui `rascunho`, `agendada`, `publicada` e `arquivada`. Criar/editar rascunhos exige `noticias.criar`/`noticias.editar`; publicar ou agendar exige `noticias.publicar`. O perfil "Editor de Conteúdo" foi mantido sem `noticias.publicar` para permitir a separação entre produção editorial e aprovação.
+- **Visibilidade pública/restrita**: notícias restritas podem existir no painel, mas não aparecem na landing page, na listagem pública nem na rota pública de leitura. A consulta pública usa `Noticia::publicaNoSite()`, que também respeita `publicado_em`.
+- **Histórico de versões**: cada criação/atualização de notícia registra um snapshot em `noticia_versoes`. A versão guarda título, resumo, conteúdo, status, visibilidade, destaque e datas editoriais.
+- **Transações**: criação e atualização de notícias usam `DB::transaction()` porque alteram a notícia, sincronizam tags, registram versão e gravam auditoria como uma operação atômica.
+- **Sanitização**: o conteúdo HTML das notícias usa o mesmo perfil seguro do conteúdo institucional (`mews/purifier`). Imagens coladas como base64 ainda não foram ativadas para notícias; por enquanto, esse suporte permanece restrito ao módulo de páginas institucionais.
+
 ## Ferramentas de qualidade
 
 - **Larastan/PHPStan**: instalado e configurado (`phpstan.neon.dist`, script `composer analyse`), porém **não foi possível executar `composer analyse` com sucesso dentro do ambiente sandbox desta sessão** — o processo `analyse` encerra silenciosamente (sem saída, código de saída 1) mesmo em um único arquivo trivial, enquanto `phpstan --version` funciona normalmente. Isso indica uma limitação do ambiente de execução da sessão (não um problema de configuração do projeto). **Recomendação**: executar `composer analyse` localmente no Laragon para validar antes de confiar no resultado.

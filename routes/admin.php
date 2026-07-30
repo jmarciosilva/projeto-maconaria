@@ -3,6 +3,9 @@
 use App\Http\Controllers\Admin\CarrosselItemController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
 use App\Http\Controllers\Admin\IrmaoController;
+use App\Http\Controllers\Admin\NoticiaCategoriaController;
+use App\Http\Controllers\Admin\NoticiaController;
+use App\Http\Controllers\Admin\NoticiaTagController;
 use App\Http\Controllers\Admin\PaginaInstitucionalController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\UsuarioController;
@@ -52,4 +55,21 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/paginas-institucionais/{pagina}/editar', [PaginaInstitucionalController::class, 'edit'])->name('paginas-institucionais.edit');
     Route::put('/paginas-institucionais/{pagina}', [PaginaInstitucionalController::class, 'update'])->name('paginas-institucionais.update');
     Route::delete('/paginas-institucionais/{pagina}', [PaginaInstitucionalController::class, 'destroy'])->name('paginas-institucionais.destroy');
+
+    Route::get('/noticias/categorias', [NoticiaCategoriaController::class, 'index'])->name('noticia-categorias.index');
+    Route::post('/noticias/categorias', [NoticiaCategoriaController::class, 'store'])->name('noticia-categorias.store');
+    Route::put('/noticias/categorias/{categoria}', [NoticiaCategoriaController::class, 'update'])->name('noticia-categorias.update');
+    Route::delete('/noticias/categorias/{categoria}', [NoticiaCategoriaController::class, 'destroy'])->name('noticia-categorias.destroy');
+
+    Route::get('/noticias/tags', [NoticiaTagController::class, 'index'])->name('noticia-tags.index');
+    Route::post('/noticias/tags', [NoticiaTagController::class, 'store'])->name('noticia-tags.store');
+    Route::put('/noticias/tags/{tag}', [NoticiaTagController::class, 'update'])->name('noticia-tags.update');
+    Route::delete('/noticias/tags/{tag}', [NoticiaTagController::class, 'destroy'])->name('noticia-tags.destroy');
+
+    Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');
+    Route::get('/noticias/nova', [NoticiaController::class, 'create'])->name('noticias.create');
+    Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');
+    Route::get('/noticias/{noticia}/editar', [NoticiaController::class, 'edit'])->name('noticias.edit');
+    Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update');
+    Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
 });

@@ -67,13 +67,13 @@
 
 ## Fase 4 — Notícias e conteúdo
 
-- [ ] Categorias
-- [ ] Tags
-- [ ] Notícias
-- [ ] Fluxo editorial
-- [ ] Agendamento
-- [ ] Destaques
-- [ ] Histórico de versões
+- [x] Categorias
+- [x] Tags
+- [x] Notícias
+- [x] Fluxo editorial
+- [x] Agendamento
+- [x] Destaques
+- [x] Histórico de versões
 
 ## Fase 5 — Eventos e calendário
 

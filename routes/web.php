@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\AreaRestrita\PainelController;
 use App\Http\Controllers\AreaRestrita\ProfileController;
+use App\Http\Controllers\Site\NoticiaController;
 use App\Http\Controllers\Site\PaginaInicialController;
 use App\Http\Controllers\Site\PaginaInstitucionalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PaginaInicialController::class, 'index'])->name('home');
+Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');
+Route::get('/noticias/{slug}', [NoticiaController::class, 'mostrar'])->name('noticias.mostrar');
 
 // Páginas institucionais com URL fixa (seção 5/7 do escopo). O slug de cada
 // uma corresponde ao registro em "paginas_institucionais" (ver

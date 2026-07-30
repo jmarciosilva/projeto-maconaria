@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\CarrosselItem;
+use App\Models\Noticia;
 use App\Models\PaginaInstitucional;
 use Illuminate\View\View;
 
@@ -31,6 +32,14 @@ final class PaginaInicialController extends Controller
             ->sortBy(fn (PaginaInstitucional $pagina): int => $ordem[$pagina->slug] ?? PHP_INT_MAX)
             ->values();
 
-        return view('site.home', compact('itensCarrossel', 'paginasInstitucionais'));
+        $noticiasEmDestaque = Noticia::query()
+            ->with('categoria')
+            ->publicaNoSite()
+            ->destaque()
+            ->latest('publicado_em')
+            ->limit(3)
+            ->get();
+
+        return view('site.home', compact('itensCarrossel', 'paginasInstitucionais', 'noticiasEmDestaque'));
     }
 }

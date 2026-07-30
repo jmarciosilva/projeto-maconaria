@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PerfilPermissaoSeeder::class,
             AdministradorLocalSeeder::class,
             PaginaInstitucionalSeeder::class,
+            NoticiaSeeder::class,
         ]);
     }
 }

@@ -123,4 +123,37 @@ $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
             </div>
         </section>
     @endif
+
+    @if ($noticiasEmDestaque->isNotEmpty())
+        <section class="bg-gray-50 py-16">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Notícias em destaque</h2>
+                        <p class="mt-2 text-gray-600">Comunicados e conteúdos públicos recentes.</p>
+                    </div>
+
+                    <a href="{{ route('noticias.index') }}" class="text-sm font-semibold text-blue-800 hover:underline">Ver todas</a>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-3">
+                    @foreach ($noticiasEmDestaque as $noticia)
+                        <a href="{{ route('noticias.mostrar', $noticia->slug) }}" class="rounded-md border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
+                            @if ($noticia->categoria)
+                                <p class="text-xs font-semibold uppercase tracking-wide text-blue-800">{{ $noticia->categoria->nome }}</p>
+                            @endif
+
+                            <h3 class="mt-2 text-lg font-semibold text-gray-900">{{ $noticia->titulo }}</h3>
+
+                            @if ($noticia->resumo)
+                                <p class="mt-2 line-clamp-3 text-sm text-gray-600">{{ $noticia->resumo }}</p>
+                            @endif
+
+                            <span class="mt-4 inline-flex text-sm font-semibold text-blue-800">Ler notícia</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 </x-layouts.site>

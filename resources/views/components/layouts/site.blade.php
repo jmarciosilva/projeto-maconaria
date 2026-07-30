@@ -66,6 +66,7 @@ $urlPaginaInstitucional = function (\App\Models\PaginaInstitucional $pagina): st
 
             <nav class="hidden items-center gap-6 text-sm font-medium sm:flex">
                 <a href="{{ route('home') }}" class="hover:text-blue-200">Início</a>
+                <a href="{{ route('noticias.index') }}" class="hover:text-blue-200">Notícias</a>
 
                 @if ($paginasInstitucionaisMenu->isNotEmpty())
                     <div x-data="{ institucionalAberto: false }" class="relative" @click.outside="institucionalAberto = false">
@@ -104,6 +105,7 @@ $urlPaginaInstitucional = function (\App\Models\PaginaInstitucional $pagina): st
 
         <nav x-show="menuAberto" x-cloak class="border-t border-blue-900 px-4 py-3 sm:hidden">
             <a href="{{ route('home') }}" class="block py-2 text-sm font-medium">Início</a>
+            <a href="{{ route('noticias.index') }}" class="block py-2 text-sm font-medium">Notícias</a>
             @foreach ($paginasInstitucionaisMenu as $paginaMenu)
                 <a href="{{ $urlPaginaInstitucional($paginaMenu) }}" class="block py-2 text-sm font-medium">{{ $paginaMenu->titulo }}</a>
             @endforeach

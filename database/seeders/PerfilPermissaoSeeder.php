@@ -61,7 +61,7 @@ final class PerfilPermissaoSeeder extends Seeder
             'documentos.visualizar', 'documentos.enviar', 'documentos.avaliar',
         ],
         'Editor de Conteúdo' => [
-            'cms.visualizar', 'cms.editar', 'noticias.visualizar', 'noticias.criar', 'noticias.editar', 'noticias.publicar',
+            'cms.visualizar', 'cms.editar', 'noticias.visualizar', 'noticias.criar', 'noticias.editar',
         ],
         'Instrutor' => [
             'documentos.visualizar', 'documentos.avaliar',
