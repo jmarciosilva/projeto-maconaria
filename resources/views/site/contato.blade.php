@@ -1,5 +1,6 @@
 <x-layouts.site titulo="Contato" meta-descricao="Entre em contato com a ARLS Ferraz de Vasconcelos nº 2516.">
-    <section class="mx-auto max-w-3xl px-5 py-14 lg:px-8 lg:py-16">
+    <section class="bg-brand-paperSoft py-14 lg:py-16">
+      <div class="mx-auto max-w-3xl px-5 lg:px-8">
         <div class="text-center">
             <h1 class="font-siteDisplay text-3xl font-bold text-brand-navy sm:text-4xl">Fale com a Loja</h1>
             <p class="mt-3 text-lg text-brand-inkSoft">Tem alguma dúvida, sugestão ou deseja saber mais sobre a Loja? Envie sua mensagem abaixo.</p>
@@ -77,5 +78,6 @@
                 Enviar mensagem
             </button>
         </form>
+      </div>
     </section>
 </x-layouts.site>
