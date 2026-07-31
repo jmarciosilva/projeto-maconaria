@@ -71,7 +71,7 @@ $ajuda = \App\Support\Ajuda\ConteudoAjuda::paraRota(request()->route()?->getName
                 <h1 class="text-lg font-semibold text-gray-800">{{ $titulo ?? 'Painel Administrativo' }}</h1>
 
                 <div class="flex items-center gap-2 sm:gap-4">
-                    <x-ui.ajuda-modal :titulo="$ajuda['titulo']" :itens="$ajuda['itens']" />
+                    <x-ui.ajuda-modal :titulo="$ajuda['titulo']" :resumo="$ajuda['resumo'] ?? null" :itens="$ajuda['itens']" :exemplos="$ajuda['exemplos'] ?? []" />
 
                     <span class="hidden text-sm text-gray-600 sm:inline">{{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('logout') }}">
