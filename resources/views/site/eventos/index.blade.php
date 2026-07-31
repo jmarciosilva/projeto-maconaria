@@ -19,7 +19,7 @@
                 <article class="mb-10 border-b border-brand-navy/12 pb-10">
                     <a href="{{ route('eventos.mostrar', $eventoDestaque->slug) }}" class="mb-5 flex aspect-[16/7] items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-brand-navy to-brand-navyDeep">
                         @if ($eventoDestaque->imagem_capa)
-                            <img src="{{ Storage::url($eventoDestaque->imagem_capa) }}" alt="{{ $eventoDestaque->titulo }}" class="h-full w-full object-cover">
+                            <img src="{{ Storage::url($eventoDestaque->imagem_capa) }}" alt="{{ $eventoDestaque->titulo }}" class="h-full w-full object-contain">
                         @else
                             <svg class="h-24 w-24 opacity-50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                 <path d="M100 25 L158 122 H42 Z" stroke="#dcecf2" stroke-width="3" stroke-linejoin="round" />
@@ -53,7 +53,7 @@
                         <a href="{{ route('eventos.mostrar', $evento->slug) }}" class="flex items-start gap-5 border-t border-brand-navy/12 py-6 first:border-t-0 first:pt-0">
                             <span class="flex aspect-[4/3] w-32 shrink-0 items-center justify-center overflow-hidden rounded-md bg-gradient-to-br from-brand-navy to-brand-navyDeep sm:w-44">
                                 @if ($evento->imagem_capa)
-                                    <img src="{{ Storage::url($evento->imagem_capa) }}" alt="{{ $evento->titulo }}" class="h-full w-full object-cover">
+                                    <img src="{{ Storage::url($evento->imagem_capa) }}" alt="{{ $evento->titulo }}" class="h-full w-full object-contain">
                                 @else
                                     <svg class="h-10 w-10 opacity-50" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path d="M100 25 L158 122 H42 Z" stroke="#dcecf2" stroke-width="3" stroke-linejoin="round" />

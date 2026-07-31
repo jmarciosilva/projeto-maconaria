@@ -29,6 +29,12 @@ $paginasInstitucionaisMenu = $paginasInstitucionaisPublicadas
 $paginaPoliticaPrivacidade = $paginasInstitucionaisPublicadas->firstWhere('slug', 'politica-privacidade');
 $paginaTermosUso = $paginasInstitucionaisPublicadas->firstWhere('slug', 'termos-de-uso');
 
+// Endereço em uma única linha, usado para montar os links de rota do
+// rodapé (Waze e Google Maps abrem já buscando por este texto).
+$enderecoMapa = $configuracaoInstitucional->endereco_rodape
+    ? trim(preg_replace('/\s+/', ' ', $configuracaoInstitucional->endereco_rodape))
+    : null;
+
 // Cada link recebe um destaque visual (sublinhado navy) quando a rota atual
 // corresponde a ele — mesma convenção já usada no menu do painel admin.
 $linksNav = [
@@ -157,10 +163,36 @@ $linksNav = [
         <div class="mx-auto max-w-6xl px-5 py-12 lg:px-8">
             <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="lg:col-span-1">
-                    <p class="font-siteDisplay text-lg font-bold text-white">{{ $configuracaoInstitucional->nome() }}</p>
+                    <a href="{{ route('home') }}" class="flex items-center gap-3">
+                        <img src="{{ $logotipoSite }}" alt="Selo da {{ $configuracaoInstitucional->nome() }}" class="h-11 w-11 shrink-0 object-contain">
+                        <span class="font-siteDisplay text-lg font-bold leading-tight text-white">{{ $configuracaoInstitucional->nome() }}</span>
+                    </a>
 
                     @if ($configuracaoInstitucional->endereco_rodape)
                         <p class="mt-3 max-w-xs whitespace-pre-line text-[0.95rem] leading-relaxed text-white/60">{{ $configuracaoInstitucional->endereco_rodape }}</p>
+
+                        <div class="mt-3 flex flex-wrap items-center gap-3">
+                            <a
+                                href="https://waze.com/ul?q={{ urlencode($enderecoMapa) }}&navigate=yes"
+                                target="_blank" rel="noopener noreferrer"
+                                class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/20 hover:text-white"
+                            >
+                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7.03 2 3 5.5 3 9.83c0 3.29 2.34 6.13 5.61 7.27.3.1.5.4.46.72l-.3 2.2a.75.75 0 0 0 1.09.77l2.6-1.42c.2-.11.44-.14.66-.09.28.06.57.09.88.09 4.97 0 9-3.5 9-7.83S16.97 2 12 2Zm-3.5 6.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm7 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm-6.68 4.62a.75.75 0 0 1 1.05.14 3.63 3.63 0 0 0 5.86 0 .75.75 0 1 1 1.2.9 5.13 5.13 0 0 1-8.26 0 .75.75 0 0 1 .15-1.04Z" /></svg>
+                                Waze
+                            </a>
+
+                            <a
+                                href="https://www.google.com/maps/search/?api=1&query={{ urlencode($enderecoMapa) }}"
+                                target="_blank" rel="noopener noreferrer"
+                                class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/20 hover:text-white"
+                            >
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                </svg>
+                                Google Maps
+                            </a>
+                        </div>
                     @endif
                 </div>
 
