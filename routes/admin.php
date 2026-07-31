@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ChancelariaFrequenciaController;
 use App\Http\Controllers\Admin\ChancelariaVisitanteController;
 use App\Http\Controllers\Admin\ConfiguracaoEmailController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DocumentoAtividadeController;
 use App\Http\Controllers\Admin\DocumentoEntregaController;
 use App\Http\Controllers\Admin\EventoController;
@@ -35,6 +36,8 @@ use Illuminate\Support\Facades\Route;
 // desativada aqui pelo mesmo motivo de routes/web.php: sem SMTP configurado
 // (Fase 11), o usuário nunca receberia o link de verificação.
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
     Route::get('/usuarios/novo', [UsuarioController::class, 'create'])->name('usuarios.create');
     Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');

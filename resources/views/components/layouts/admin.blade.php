@@ -1,5 +1,9 @@
 @props(['titulo' => null])
 
+@php
+$ajuda = \App\Support\Ajuda\ConteudoAjuda::paraRota(request()->route()?->getName());
+@endphp
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -66,7 +70,9 @@
 
                 <h1 class="text-lg font-semibold text-gray-800">{{ $titulo ?? 'Painel Administrativo' }}</h1>
 
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <x-ui.ajuda-modal :titulo="$ajuda['titulo']" :itens="$ajuda['itens']" />
+
                     <span class="hidden text-sm text-gray-600 sm:inline">{{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

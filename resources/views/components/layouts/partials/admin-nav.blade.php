@@ -4,6 +4,10 @@
 </div>
 
 <nav class="space-y-1 px-3 py-4 text-sm">
+    <a href="{{ route('admin.dashboard') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+        Painel
+    </a>
+
     <a href="{{ route('area-restrita') }}" class="block rounded-md px-3 py-2 font-medium text-blue-100 hover:bg-[#1B2A4A]">
         Voltar à Área Restrita
     </a>

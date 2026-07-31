@@ -10,8 +10,8 @@
                 <td class="px-4 py-3 font-medium text-gray-900">{{ $comunicado->titulo }}</td>
                 <td class="px-4 py-3"><x-ui.badge :tipo="$comunicado->status->value === 'publicado' ? 'sucesso' : 'neutro'">{{ $comunicado->status->rotulo() }}</x-ui.badge></td>
                 <td class="px-4 py-3 text-gray-600">{{ optional($comunicado->publicado_em)->format('d/m/Y H:i') ?? '—' }}</td>
-                <td class="px-4 py-3 text-sm">
-                    <a href="{{ route('admin.chancelaria.comunicados.edit', $comunicado) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
+                <td class="px-4 py-3">
+                    <x-ui.acao-botao :href="route('admin.chancelaria.comunicados.edit', $comunicado)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
                 </td>
             </tr>
         @endforeach

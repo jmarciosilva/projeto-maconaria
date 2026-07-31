@@ -8,7 +8,7 @@
                 <td class="px-4 py-3">R$ {{ \App\Support\Tesouraria\ConversorMoeda::formatar($lancamento->valor_centavos) }}</td>
                 <td class="px-4 py-3"><x-ui.badge :tipo="$lancamento->status->value === 'baixado' ? 'sucesso' : 'neutro'">{{ $lancamento->status->rotulo() }}</x-ui.badge></td>
                 <td class="px-4 py-3">{{ $lancamento->data_competencia->format('d/m/Y') }}</td>
-                <td class="px-4 py-3 text-sm"><a href="{{ route('admin.tesouraria.lancamentos.edit', $lancamento) }}" class="font-medium text-blue-800 hover:underline">Editar</a></td>
+                <td class="px-4 py-3"><x-ui.acao-botao :href="route('admin.tesouraria.lancamentos.edit', $lancamento)" icone="editar" cor="azul">Editar</x-ui.acao-botao></td>
             </tr>
         @endforeach
     </x-ui.table>

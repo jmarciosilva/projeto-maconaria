@@ -6,9 +6,19 @@
                 <p class="mt-1 text-sm text-gray-600">{{ $album->descricao }}</p>
                 <p class="mt-2 text-sm text-gray-500">{{ $album->status->rotulo() }} · {{ $album->visibilidade->rotulo() }}</p>
             </div>
-            @can('galeria.editar')
-                <a href="{{ route('admin.galeria.albuns.edit', $album) }}"><x-ui.button variante="secundario">Editar</x-ui.button></a>
-            @endcan
+            <div class="flex flex-wrap items-center gap-2">
+                @can('galeria.editar')
+                    <a href="{{ route('admin.galeria.albuns.edit', $album) }}"><x-ui.button variante="secundario">Editar</x-ui.button></a>
+                @endcan
+
+                @can('galeria.excluir')
+                    <x-ui.confirmation :acao="route('admin.galeria.albuns.destroy', $album)" metodo="DELETE" titulo="Remover álbum" :mensagem="'Tem certeza que deseja remover o álbum \''.$album->titulo.'\'? As fotografias também serão removidas.'" rotulo="Remover">
+                        <x-slot:gatilho>
+                            <x-ui.button variante="perigo" tipo="button">Remover</x-ui.button>
+                        </x-slot:gatilho>
+                    </x-ui.confirmation>
+                @endcan
+            </div>
         </div>
     </div>
 

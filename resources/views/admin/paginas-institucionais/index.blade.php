@@ -20,22 +20,24 @@
                     <td class="px-4 py-3">
                         <x-ui.badge :tipo="$pagina->publicado ? 'sucesso' : 'neutro'">{{ $pagina->publicado ? 'Publicado' : 'Rascunho' }}</x-ui.badge>
                     </td>
-                    <td class="px-4 py-3 text-sm">
-                        @can('cms.editar')
-                            <a href="{{ route('admin.paginas-institucionais.edit', $pagina) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            @can('cms.editar')
+                                <x-ui.acao-botao :href="route('admin.paginas-institucionais.edit', $pagina)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
 
-                            <x-ui.confirmation
-                                :acao="route('admin.paginas-institucionais.destroy', $pagina)"
-                                metodo="DELETE"
-                                titulo="Remover página"
-                                mensagem="Tem certeza que deseja remover esta página institucional?"
-                                rotulo="Remover"
-                            >
-                                <x-slot:gatilho>
-                                    <button type="button" class="ml-3 font-medium text-red-700 hover:underline">Remover</button>
-                                </x-slot:gatilho>
-                            </x-ui.confirmation>
-                        @endcan
+                                <x-ui.confirmation
+                                    :acao="route('admin.paginas-institucionais.destroy', $pagina)"
+                                    metodo="DELETE"
+                                    titulo="Remover página"
+                                    mensagem="Tem certeza que deseja remover esta página institucional?"
+                                    rotulo="Remover"
+                                >
+                                    <x-slot:gatilho>
+                                        <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
+                                    </x-slot:gatilho>
+                                </x-ui.confirmation>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
             @endforeach

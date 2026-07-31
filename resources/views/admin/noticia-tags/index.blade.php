@@ -16,11 +16,11 @@
                 <td class="px-4 py-3 font-medium text-gray-900">{{ $tag->nome }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $tag->slug }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $tag->noticias_count }}</td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-4 py-3">
                     @can('noticias.excluir')
                         <x-ui.confirmation :acao="route('admin.noticia-tags.destroy', $tag)" metodo="DELETE" titulo="Remover tag" mensagem="Tem certeza que deseja remover esta tag?" rotulo="Remover">
                             <x-slot:gatilho>
-                                <button type="button" class="font-medium text-red-700 hover:underline">Remover</button>
+                                <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
                             </x-slot:gatilho>
                         </x-ui.confirmation>
                     @endcan

@@ -13,7 +13,19 @@
                 <td class="px-4 py-3"><x-ui.badge>{{ $album->status->rotulo() }}</x-ui.badge></td>
                 <td class="px-4 py-3 text-gray-600">{{ $album->visibilidade->rotulo() }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $album->fotografias_count }}</td>
-                <td class="px-4 py-3 text-sm"><a href="{{ route('admin.galeria.albuns.show', $album) }}" class="font-medium text-blue-800 hover:underline">Abrir</a></td>
+                <td class="px-4 py-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <x-ui.acao-botao :href="route('admin.galeria.albuns.show', $album)" icone="ver" cor="cinza">Abrir</x-ui.acao-botao>
+
+                        @can('galeria.excluir')
+                            <x-ui.confirmation :acao="route('admin.galeria.albuns.destroy', $album)" metodo="DELETE" titulo="Remover álbum" :mensagem="'Tem certeza que deseja remover o álbum \''.$album->titulo.'\'? As fotografias também serão removidas.'" rotulo="Remover">
+                                <x-slot:gatilho>
+                                    <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
+                                </x-slot:gatilho>
+                            </x-ui.confirmation>
+                        @endcan
+                    </div>
+                </td>
             </tr>
         @endforeach
     </x-ui.table>

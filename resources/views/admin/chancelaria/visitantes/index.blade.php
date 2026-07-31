@@ -11,8 +11,8 @@
                 <td class="px-4 py-3 text-gray-600">{{ $visitante->loja_origem ?? '—' }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $visitante->potencia ?? '—' }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $visitante->evento->titulo ?? '—' }}</td>
-                <td class="px-4 py-3 text-sm">
-                    <a href="{{ route('admin.chancelaria.visitantes.edit', $visitante) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
+                <td class="px-4 py-3">
+                    <x-ui.acao-botao :href="route('admin.chancelaria.visitantes.edit', $visitante)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
                 </td>
             </tr>
         @endforeach

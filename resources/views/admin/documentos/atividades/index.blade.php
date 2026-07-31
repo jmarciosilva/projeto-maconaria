@@ -16,8 +16,8 @@
                 <td class="px-4 py-3"><x-ui.badge>{{ $atividade->status->rotulo() }}</x-ui.badge></td>
                 <td class="px-4 py-3 text-gray-600">{{ $atividade->prazo_entrega_em?->format('d/m/Y H:i') ?? 'Sem prazo' }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $atividade->entregas_count }}</td>
-                <td class="px-4 py-3 text-sm">
-                    <a href="{{ route('admin.documentos.atividades.show', $atividade) }}" class="font-medium text-blue-800 hover:underline">Abrir</a>
+                <td class="px-4 py-3">
+                    <x-ui.acao-botao :href="route('admin.documentos.atividades.show', $atividade)" icone="ver" cor="cinza">Abrir</x-ui.acao-botao>
                 </td>
             </tr>
         @endforeach

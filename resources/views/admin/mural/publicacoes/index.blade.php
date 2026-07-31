@@ -13,7 +13,7 @@
                 <td class="px-4 py-3 text-gray-600">{{ $publicacao->visibilidade->rotulo() }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $publicacao->comentarios_count }}</td>
                 <td class="px-4 py-3 text-gray-600">{{ $publicacao->reacoes_count }}</td>
-                <td class="px-4 py-3 text-sm"><a href="{{ route('admin.mural.publicacoes.show', $publicacao) }}" class="font-medium text-blue-800 hover:underline">Abrir</a></td>
+                <td class="px-4 py-3"><x-ui.acao-botao :href="route('admin.mural.publicacoes.show', $publicacao)" icone="ver" cor="cinza">Abrir</x-ui.acao-botao></td>
             </tr>
         @endforeach
     </x-ui.table>

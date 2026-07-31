@@ -22,9 +22,9 @@
                         <x-ui.badge :tipo="$documento->status->value === 'publicado' ? 'sucesso' : ($documento->status->value === 'aprovado' ? 'aviso' : 'neutro')">{{ $documento->status->rotulo() }}</x-ui.badge>
                     </td>
                     <td class="px-4 py-3 text-gray-600">{{ optional($documento->data_documento)->format('d/m/Y') ?? '—' }}</td>
-                    <td class="px-4 py-3 text-sm">
+                    <td class="px-4 py-3">
                         @can('secretaria.editar-ata')
-                            <a href="{{ route('admin.secretaria.documentos.edit', $documento) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
+                            <x-ui.acao-botao :href="route('admin.secretaria.documentos.edit', $documento)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
                         @endcan
                     </td>
                 </tr>

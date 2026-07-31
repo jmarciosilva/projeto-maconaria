@@ -25,24 +25,26 @@
                     </td>
                     <td class="px-4 py-3 text-gray-600">{{ $noticia->visibilidade->rotulo() }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ optional($noticia->publicado_em)->format('d/m/Y H:i') ?? '—' }}</td>
-                    <td class="px-4 py-3 text-sm">
-                        @can('noticias.editar')
-                            <a href="{{ route('admin.noticias.edit', $noticia) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
-                        @endcan
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            @can('noticias.editar')
+                                <x-ui.acao-botao :href="route('admin.noticias.edit', $noticia)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
+                            @endcan
 
-                        @can('noticias.excluir')
-                            <x-ui.confirmation
-                                :acao="route('admin.noticias.destroy', $noticia)"
-                                metodo="DELETE"
-                                titulo="Remover notícia"
-                                mensagem="Tem certeza que deseja remover esta notícia?"
-                                rotulo="Remover"
-                            >
-                                <x-slot:gatilho>
-                                    <button type="button" class="ml-3 font-medium text-red-700 hover:underline">Remover</button>
-                                </x-slot:gatilho>
-                            </x-ui.confirmation>
-                        @endcan
+                            @can('noticias.excluir')
+                                <x-ui.confirmation
+                                    :acao="route('admin.noticias.destroy', $noticia)"
+                                    metodo="DELETE"
+                                    titulo="Remover notícia"
+                                    mensagem="Tem certeza que deseja remover esta notícia?"
+                                    rotulo="Remover"
+                                >
+                                    <x-slot:gatilho>
+                                        <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
+                                    </x-slot:gatilho>
+                                </x-ui.confirmation>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
             @endforeach

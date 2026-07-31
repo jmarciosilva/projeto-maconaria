@@ -42,15 +42,15 @@
                         </x-ui.badge>
                     </td>
                     <td class="px-4 py-3 text-gray-600">{{ $irmao->cargo_atual ?? '—' }}</td>
-                    <td class="px-4 py-3 text-sm">
-                        <a href="{{ route('admin.irmaos.show', $irmao) }}" class="font-medium text-blue-800 hover:underline">Ver</a>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <x-ui.acao-botao :href="route('admin.irmaos.show', $irmao)" icone="ver" cor="cinza">Ver</x-ui.acao-botao>
 
-                        @can('irmaos.editar')
-                            <a href="{{ route('admin.irmaos.edit', $irmao) }}" class="ml-3 font-medium text-blue-800 hover:underline">Editar</a>
-                        @endcan
+                            @can('irmaos.editar')
+                                <x-ui.acao-botao :href="route('admin.irmaos.edit', $irmao)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
+                            @endcan
 
-                        @can('irmaos.excluir')
-                            <span class="ml-3 inline">
+                            @can('irmaos.excluir')
                                 <x-ui.confirmation
                                     :acao="route('admin.irmaos.destroy', $irmao)"
                                     metodo="DELETE"
@@ -59,11 +59,11 @@
                                     rotulo="Remover"
                                 >
                                     <x-slot:gatilho>
-                                        <button type="button" class="font-medium text-red-700 hover:underline">Remover</button>
+                                        <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
                                     </x-slot:gatilho>
                                 </x-ui.confirmation>
-                            </span>
-                        @endcan
+                            @endcan
+                        </div>
                     </td>
                 </tr>
             @endforeach

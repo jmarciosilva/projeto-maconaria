@@ -1,11 +1,11 @@
 <x-layouts.admin titulo="Editar Evento">
-    <form method="POST" action="{{ route('admin.eventos.update', $evento) }}" enctype="multipart/form-data" class="max-w-4xl space-y-6">
+    <form method="POST" action="{{ route('admin.eventos.update', $evento) }}" enctype="multipart/form-data" class="max-w-4xl">
         @csrf
         @method('PUT')
 
         @include('admin.eventos._form')
 
-        <div class="flex gap-3">
+        <div class="mt-6 flex gap-3">
             <x-ui.button tipo="submit">Salvar alterações</x-ui.button>
             <a href="{{ route('admin.eventos.index') }}">
                 <x-ui.button variante="secundario">Voltar</x-ui.button>

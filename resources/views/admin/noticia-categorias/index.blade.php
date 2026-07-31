@@ -24,11 +24,11 @@
                 <td class="px-4 py-3">
                     <x-ui.badge :tipo="$categoria->ativa ? 'sucesso' : 'neutro'">{{ $categoria->ativa ? 'Ativa' : 'Inativa' }}</x-ui.badge>
                 </td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-4 py-3">
                     @can('noticias.excluir')
                         <x-ui.confirmation :acao="route('admin.noticia-categorias.destroy', $categoria)" metodo="DELETE" titulo="Remover categoria" mensagem="Tem certeza que deseja remover esta categoria?" rotulo="Remover">
                             <x-slot:gatilho>
-                                <button type="button" class="font-medium text-red-700 hover:underline">Remover</button>
+                                <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
                             </x-slot:gatilho>
                         </x-ui.confirmation>
                     @endcan

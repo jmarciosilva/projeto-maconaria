@@ -26,18 +26,20 @@
                     </td>
                     <td class="px-4 py-3 text-gray-600">{{ $evento->visibilidade->rotulo() }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $evento->confirmacoes_ativas_count }}{{ $evento->capacidade ? ' / '.$evento->capacidade : '' }}</td>
-                    <td class="px-4 py-3 text-sm">
-                        @can('eventos.editar')
-                            <a href="{{ route('admin.eventos.edit', $evento) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
-                        @endcan
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            @can('eventos.editar')
+                                <x-ui.acao-botao :href="route('admin.eventos.edit', $evento)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
+                            @endcan
 
-                        @can('eventos.excluir')
-                            <x-ui.confirmation :acao="route('admin.eventos.destroy', $evento)" metodo="DELETE" titulo="Remover evento" mensagem="Tem certeza que deseja remover este evento?" rotulo="Remover">
-                                <x-slot:gatilho>
-                                    <button type="button" class="ml-3 font-medium text-red-700 hover:underline">Remover</button>
-                                </x-slot:gatilho>
-                            </x-ui.confirmation>
-                        @endcan
+                            @can('eventos.excluir')
+                                <x-ui.confirmation :acao="route('admin.eventos.destroy', $evento)" metodo="DELETE" titulo="Remover evento" mensagem="Tem certeza que deseja remover este evento?" rotulo="Remover">
+                                    <x-slot:gatilho>
+                                        <x-ui.acao-botao icone="remover" cor="vermelho" tipo="button">Remover</x-ui.acao-botao>
+                                    </x-slot:gatilho>
+                                </x-ui.confirmation>
+                            @endcan
+                        </div>
                     </td>
                 </tr>
             @endforeach

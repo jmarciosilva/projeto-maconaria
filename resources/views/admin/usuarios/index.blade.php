@@ -31,9 +31,9 @@
                         {{ $usuario->ultimo_acesso_em?->format('d/m/Y H:i') ?? 'Nunca acessou' }}
                     </td>
                     <td class="px-4 py-3">
-                        <div class="flex flex-wrap items-center gap-3 text-sm">
+                        <div class="flex flex-wrap items-center gap-2">
                             @can('usuarios.editar')
-                                <a href="{{ route('admin.usuarios.edit', $usuario) }}" class="font-medium text-blue-800 hover:underline">Editar</a>
+                                <x-ui.acao-botao :href="route('admin.usuarios.edit', $usuario)" icone="editar" cor="azul">Editar</x-ui.acao-botao>
                             @endcan
 
                             @can('usuarios.excluir')
@@ -47,14 +47,14 @@
                                             rotulo="Desativar"
                                         >
                                             <x-slot:gatilho>
-                                                <button type="button" class="font-medium text-red-700 hover:underline">Desativar</button>
+                                                <x-ui.acao-botao icone="desativar" cor="ambar" tipo="button">Desativar</x-ui.acao-botao>
                                             </x-slot:gatilho>
                                         </x-ui.confirmation>
                                     @else
                                         <form method="POST" action="{{ route('admin.usuarios.ativar', $usuario) }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="font-medium text-green-700 hover:underline">Ativar</button>
+                                            <x-ui.acao-botao icone="ativar" cor="verde" tipo="submit">Ativar</x-ui.acao-botao>
                                         </form>
                                     @endif
 
@@ -62,7 +62,7 @@
                                         <form method="POST" action="{{ route('admin.usuarios.desbloquear', $usuario) }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="font-medium text-green-700 hover:underline">Desbloquear</button>
+                                            <x-ui.acao-botao icone="desbloquear" cor="verde" tipo="submit">Desbloquear</x-ui.acao-botao>
                                         </form>
                                     @else
                                         <x-ui.confirmation
@@ -73,7 +73,7 @@
                                             rotulo="Bloquear"
                                         >
                                             <x-slot:gatilho>
-                                                <button type="button" class="font-medium text-red-700 hover:underline">Bloquear</button>
+                                                <x-ui.acao-botao icone="bloquear" cor="ambar" tipo="button">Bloquear</x-ui.acao-botao>
                                             </x-slot:gatilho>
                                         </x-ui.confirmation>
                                     @endif
