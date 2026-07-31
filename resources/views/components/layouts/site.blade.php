@@ -255,7 +255,10 @@ $linksNav = [
             </div>
 
             <div class="mt-10 flex flex-col gap-3 border-t border-white/15 pt-6 text-[0.9rem] text-white/50 sm:flex-row sm:items-center sm:justify-between">
-                <p>&copy; {{ now()->year }} {{ $configuracaoInstitucional->nome() }}. Todos os direitos reservados.</p>
+                <div class="flex flex-col gap-1">
+                    <p>&copy; {{ now()->year }} {{ $configuracaoInstitucional->nome() }}. Todos os direitos reservados.</p>
+                    <p>Desenvolvido por <a href="https://jmfsystem.com/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white hover:underline">José Marcio Ferreira da Silva</a></p>
+                </div>
 
                 @if ($paginaPoliticaPrivacidade || $paginaTermosUso)
                     <div class="flex gap-5">
