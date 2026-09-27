@@ -59,7 +59,8 @@ final class PerfilPermissaoSeeder extends Seeder
             'recados.visualizar', 'recados.criar', 'recados.editar',
         ],
         'Chanceler' => [
-            'chancelaria.visualizar', 'chancelaria.criar', 'chancelaria.editar', 'irmaos.visualizar',
+            'chancelaria.visualizar', 'chancelaria.criar', 'chancelaria.editar',
+            'irmaos.visualizar', 'irmaos.criar', 'irmaos.editar',
             'galeria.visualizar', 'galeria.criar', 'mural.visualizar', 'mural.criar', 'mural.moderar',
             'recados.visualizar', 'recados.criar', 'recados.editar',
         ],

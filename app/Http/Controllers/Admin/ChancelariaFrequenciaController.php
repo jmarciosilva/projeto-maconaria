@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\StatusEvento;
 use App\Enums\StatusFrequencia;
+use App\Enums\TipoEvento;
+use App\Enums\VisibilidadeEvento;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SalvarFrequenciaChancelariaRequest;
+use App\Http\Requests\Admin\SalvarSessaoChancelariaRequest;
 use App\Models\ChancelariaFrequencia;
 use App\Models\Evento;
 use App\Models\Irmao;
 use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 final class ChancelariaFrequenciaController extends Controller
@@ -27,6 +33,36 @@ final class ChancelariaFrequenciaController extends Controller
             ->get();
 
         return view('admin.chancelaria.frequencias.selecionar-evento', compact('eventos'));
+    }
+
+    /**
+     * Registro rápido de uma sessão (geralmente passada), só com o
+     * necessário para já cair na tela de lançar a frequência dos Irmãos —
+     * ver SalvarSessaoChancelariaRequest.
+     */
+    public function armazenarSessao(SalvarSessaoChancelariaRequest $request): RedirectResponse
+    {
+        $dados = $request->validated();
+        $titulo = filled($dados['titulo'] ?? null)
+            ? $dados['titulo']
+            : 'Sessão de '.Carbon::parse($dados['inicio_em'])->translatedFormat('d/m/Y');
+
+        $evento = Evento::create([
+            'autor_id' => $request->user()->id,
+            'titulo' => $titulo,
+            'slug' => Str::slug($titulo).'-'.now()->format('Ymd-His'),
+            'tipo' => TipoEvento::SESSAO,
+            'status' => StatusEvento::PUBLICADO,
+            'visibilidade' => VisibilidadeEvento::RESTRITA,
+            'local' => $dados['local'] ?? null,
+            'inicio_em' => $dados['inicio_em'],
+        ]);
+
+        RegistradorDeAuditoria::registrar('criar-sessao', 'chancelaria', 'Evento', $evento->id);
+
+        return redirect()
+            ->route('admin.chancelaria.frequencias.edit', $evento)
+            ->with('sucesso', 'Sessão registrada. Agora lance a presença dos Irmãos.');
     }
 
     public function edit(Evento $evento): View

@@ -154,9 +154,11 @@ final class ConteudoAjuda
                 'titulo' => 'Frequências',
                 'resumo' => 'Registra a presença dos Irmãos em cada sessão ou evento da Loja.',
                 'itens' => [
-                    'Primeiro escolha o evento na lista — os mais recentes aparecem primeiro.',
-                    'Em seguida, marque para cada Irmão o status: Presente, Ausente ou Justificado, com uma observação opcional.',
+                    'Não tem a sessão cadastrada ainda? Use o formulário "Registrar sessão passada" no topo desta tela — só título (opcional), data e local. Ele já leva direto para a tela de lançar presença.',
+                    'Se a sessão já existir na lista (ou for um evento cadastrado pela Secretaria), escolha ela na lista — as mais recentes aparecem primeiro.',
+                    'Em seguida, marque para cada Irmão o status: Presente, Ausente ou Justificado, com uma observação opcional. O botão "Marcar todos como Presente" agiliza quando quase todos compareceram.',
                     'Deixar o status de um Irmão em branco remove a marcação dele para aquele evento, caso já exista uma.',
+                    'Se um Irmão ainda não está cadastrado, cadastre-o primeiro em Irmãos → Novo Irmão — ele só aparece nesta lista depois de cadastrado.',
                 ],
                 'exemplos' => [
                     'Na sessão do dia 06/08, marcar 18 Irmãos como Presente e 2 como Justificado, com a observação "viagem a trabalho".',

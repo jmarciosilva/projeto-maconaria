@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PerfilPermissaoSeeder::class,
             AdministradorLocalSeeder::class,
             PaginaInstitucionalSeeder::class,
+            NoticiaCategoriaSeeder::class,
             NoticiaSeeder::class,
             EventoSeeder::class,
             SecretariaSeeder::class,
