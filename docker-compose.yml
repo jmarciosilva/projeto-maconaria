@@ -1,0 +1,71 @@
+# Ambiente Docker para uso local (ex.: máquina de casa).
+# É apenas uma facilidade: as versões seguem "Requisitos do ambiente" do
+# README.md (PHP 8.3.30, Composer 2.9+, Node.js 22+/npm 10+, MySQL 8).
+#
+# O comando `docker compose` já lê o arquivo `.env` da raiz do projeto (o
+# mesmo usado pelo Laravel) para preencher DB_DATABASE, APP_PORT etc.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        WWW_UID: ${WWW_UID:-1000}
+        WWW_GID: ${WWW_GID:-1000}
+    container_name: maconaria_app
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
+      - node_modules:/var/www/html/node_modules
+    environment:
+      DB_HOST: mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  webserver:
+    image: nginx:alpine
+    container_name: maconaria_webserver
+    ports:
+      - "${APP_PORT:-8000}:80"
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  node:
+    image: node:22-alpine
+    container_name: maconaria_node
+    working_dir: /var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    ports:
+      - "5173:5173"
+
+  mysql:
+    image: mysql:8.0
+    container_name: maconaria_mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-projeto_maconaria}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
+  vendor:
+  node_modules:

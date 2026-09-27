@@ -26,3 +26,4 @@ Todas as alterações relevantes deste projeto são documentadas neste arquivo.
 - **Fase 8 — Tesouraria**: adicionados categorias, contas, lançamentos de receitas/despesas, geração de mensalidades, aprovação, baixa de pagamentos/recebimentos, fechamento de período, auditoria financeira e painel de resumo.
 - **Fase 9 — Documentos e trabalhos**: adicionados atividades, entregas com arquivos privados, avaliações, comentários, auditoria e download protegido por Policy.
 - **Fase 10 — Galeria e Mural da Loja**: adicionados álbuns, fotografias, publicações do mural, comentários moderados, reações, visibilidade pública/restrita e auditoria.
+- Ambiente Docker opcional para uso local (`Dockerfile`, `docker-compose.yml`, `docker/php`, `docker/nginx`), com as mesmas versões dos "Requisitos do ambiente" (PHP 8.3.30, Composer 2.9+, Node.js 22, MySQL 8) — não substitui o fluxo de instalação com Laragon, apenas oferece uma alternativa em containers.

@@ -60,6 +60,8 @@ Consulte [`ROADMAP.md`](ROADMAP.md) para o detalhamento por fase e [`docs/MODULO
 - Node.js 22+ e npm 10+
 - MySQL 8
 
+Alternativa para outras máquinas locais (ex.: Linux/Mac em casa): [ambiente com Docker](#alternativa-ambiente-com-docker-uso-local), que sobe essas mesmas versões em containers. É apenas uma facilidade de execução local — não substitui os requisitos acima nem altera o restante deste guia.
+
 ## Instalação no Windows com Laragon
 
 ```powershell
@@ -159,6 +161,62 @@ composer format
 ```
 
 Executa o Laravel Pint (preset `laravel`) sobre `app/`, `database/`, `routes/` e `tests/`.
+
+## Alternativa: ambiente com Docker (uso local)
+
+Facilidade para rodar o projeto localmente sem instalar PHP/Composer/Node/MySQL diretamente na máquina (útil fora do Windows/Laragon, ex.: em casa no Linux/Mac). Os containers usam as mesmas versões descritas em "Requisitos do ambiente": PHP 8.3.30, Composer 2.9+, Node.js 22 e MySQL 8. É só uma conveniência de execução — os comandos (`composer`, `npm`, `php artisan`) e o fluxo são os mesmos do restante deste README, apenas executados dentro dos containers.
+
+Pré-requisito: Docker Engine 24+ e Docker Compose v2 (`docker compose version`).
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```
+
+No `.env`, use `DB_HOST=mysql` (o `docker-compose.yml` já força esse valor para o container `app`; ajuste apenas se for acessar o MySQL de fora dos containers, onde o host continua sendo `127.0.0.1`).
+
+O código é montado por bind mount no container `app` (edição ao vivo), e o PHP-FPM roda com o mesmo UID/GID do seu usuário para poder escrever em `storage/` e `bootstrap/cache/`. O padrão é `1000:1000` (comum em máquinas Linux de usuário único); se o seu `id -u`/`id -g` for diferente, defina `WWW_UID`/`WWW_GID` no `.env` antes do `docker compose up --build`. Se a porta 3306 já estiver em uso por outro MySQL local, defina `FORWARD_DB_PORT` (ex.: `FORWARD_DB_PORT=3307`) no `.env`.
+
+Instalação das dependências PHP (já feita na build da imagem `app`; rode de novo se alterar `composer.json`):
+
+```bash
+docker compose exec app composer install
+```
+
+Gerar a chave da aplicação:
+
+```bash
+docker compose exec app php artisan key:generate
+```
+
+Migrations e seeders:
+
+```bash
+docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
+```
+
+Assets front-end: o serviço `node` já roda `npm install` e `npm run dev` automaticamente (Vite com hot reload, exposto em `http://localhost:5173`). Para gerar o build de produção:
+
+```bash
+docker compose exec node npm run build
+```
+
+Testes, análise estática e formatação:
+
+```bash
+docker compose exec app php artisan test
+docker compose exec app composer analyse
+docker compose exec app composer format
+```
+
+Aplicação disponível em `http://localhost:8000` (porta configurável via `APP_PORT` no `.env`). MySQL exposto em `127.0.0.1:3306` (porta configurável via `FORWARD_DB_PORT`), com o mesmo usuário `root` sem senha usado no `.env.example`.
+
+Para encerrar os containers:
+
+```bash
+docker compose down
+```
 
 ## Estrutura do projeto
 
