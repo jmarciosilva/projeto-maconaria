@@ -5,131 +5,79 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
 @endphp
 
 <x-layouts.site :meta-descricao="$configuracaoInstitucional->subtitulo_institucional">
-    @if ($itensCarrossel->isEmpty())
-        <section class="bg-gradient-to-b from-brand-navy to-brand-navyDeep py-20 text-white">
-            <div class="mx-auto max-w-5xl px-5 text-center lg:px-8">
-                <h1 class="font-siteDisplay text-3xl font-bold sm:text-4xl">{{ $configuracaoInstitucional->titulo_institucional ?: $configuracaoInstitucional->nome() }}</h1>
-                <p class="mx-auto mt-4 max-w-2xl text-lg text-white/85">
-                    {{ $configuracaoInstitucional->subtitulo_institucional ?: 'Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem.' }}
-                </p>
-            </div>
-        </section>
-    @else
-        <section
-            x-data="{ indice: 0, total: {{ $itensCarrossel->count() }} }"
-            x-init="setInterval(() => indice = (indice + 1) % total, 6000)"
-            class="relative overflow-hidden bg-brand-navyDeep"
-            role="region"
-            aria-label="Carrossel de destaques"
-        >
-            <div class="relative h-[420px] sm:h-[480px]">
-                @foreach ($itensCarrossel as $posicao => $item)
-                    <div
-                        x-show="indice === {{ $posicao }}"
-                        x-transition:enter="transition ease-out duration-500"
-                        x-transition:enter-start="opacity-0"
-                        x-transition:enter-end="opacity-100"
-                        class="absolute inset-0"
-                    >
-                        <img
-                            src="{{ asset('storage/'.$item->imagem_desktop) }}"
-                            alt="{{ $item->texto_alternativo }}"
-                            class="hidden h-full w-full object-cover sm:block"
-                        >
-                        <img
-                            src="{{ asset('storage/'.($item->imagem_mobile ?? $item->imagem_desktop)) }}"
-                            alt="{{ $item->texto_alternativo }}"
-                            class="block h-full w-full object-cover sm:hidden"
-                        >
+    <section class="border-b border-brand-navy/10 bg-brand-navy text-white">
+        <div class="mx-auto max-w-6xl px-5 py-9 lg:px-8 lg:py-11">
+            <p class="text-xs font-bold uppercase tracking-widest text-brand-sky">Portal oficial da Loja</p>
+            <h1 class="mt-2 font-siteDisplay text-2xl font-bold leading-tight sm:text-3xl">
+                {{ $configuracaoInstitucional->titulo_institucional ?: $configuracaoInstitucional->nome() }}
+            </h1>
+            <p class="mt-2 max-w-2xl text-white/75">
+                {{ $configuracaoInstitucional->subtitulo_institucional ?: 'Augusta e Respeitável Loja Simbólica Ferraz de Vasconcelos nº 2516 — Benfeitora da Ordem.' }}
+            </p>
 
-                        @if ($item->titulo || $item->subtitulo || $item->link)
-                            <div class="absolute inset-0 flex items-end bg-gradient-to-t from-brand-navyDeep/90 via-brand-navyDeep/30 to-transparent">
-                                <div class="mx-auto w-full max-w-6xl px-5 pb-11 text-white lg:px-8">
-                                    @if ($item->titulo)
-                                        <h2 class="font-siteDisplay text-2xl font-bold leading-tight sm:text-3xl">{{ $item->titulo }}</h2>
-                                    @endif
-
-                                    @if ($item->subtitulo)
-                                        <p class="mt-2.5 max-w-2xl text-lg text-white/85">{{ $item->subtitulo }}</p>
-                                    @endif
-
-                                    @if ($item->link && $item->texto_botao)
-                                        <a
-                                            href="{{ $item->link }}"
-                                            @if ($item->abrir_em_nova_aba) target="_blank" rel="noopener noreferrer" @endif
-                                            class="mt-5 inline-block rounded-md bg-white px-6 py-2.5 font-bold text-brand-navy hover:bg-brand-sky"
-                                        >
-                                            {{ $item->texto_botao }}
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-
-            @if ($itensCarrossel->count() > 1)
-                <button
-                    type="button"
-                    @click="indice = (indice - 1 + total) % total"
-                    class="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-navyDeep/50 text-white hover:bg-brand-navyDeep/75"
-                    aria-label="Slide anterior"
-                >
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-                </button>
-
-                <button
-                    type="button"
-                    @click="indice = (indice + 1) % total"
-                    class="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-navyDeep/50 text-white hover:bg-brand-navyDeep/75"
-                    aria-label="Próximo slide"
-                >
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-                </button>
-
-                <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2.5">
-                    @foreach ($itensCarrossel as $posicao => $item)
-                        <button
-                            type="button"
-                            @click="indice = {{ $posicao }}"
-                            class="h-2.5 w-2.5 rounded-full"
-                            :class="indice === {{ $posicao }} ? 'bg-white' : 'bg-white/40'"
-                            aria-label="Ir para o slide {{ $posicao + 1 }}"
-                        ></button>
-                    @endforeach
-                </div>
-            @endif
-        </section>
-    @endif
-
-    @if ($paginasInstitucionais->isNotEmpty())
-        <section class="bg-brand-paperSoft py-14 lg:py-16">
-            <div class="mx-auto max-w-6xl px-5 lg:px-8">
-                <div class="mb-7 max-w-2xl">
-                    <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Conheça a Loja e a Maçonaria</h2>
-                    <p class="mt-1 text-brand-inkSoft">Acesse os conteúdos institucionais preparados pela administração da Loja.</p>
-                </div>
-
-                <div class="flex flex-wrap gap-4">
+            @if ($paginasInstitucionais->isNotEmpty())
+                <nav class="mt-5 flex flex-wrap gap-2" aria-label="Institucional">
                     @foreach ($paginasInstitucionais as $pagina)
                         <a
                             href="{{ $pagina->urlPublica() }}"
-                            class="rounded-full border-2 border-brand-navy bg-white px-6 py-3 font-bold text-brand-navy transition hover:bg-brand-navy hover:text-white"
+                            class="rounded-full border border-white/25 px-4 py-1.5 text-sm font-semibold text-white/85 transition hover:border-white hover:bg-white/10 hover:text-white"
                         >{{ $pagina->titulo }}</a>
+                    @endforeach
+                </nav>
+            @endif
+        </div>
+
+        @if ($itensCarrossel->isNotEmpty())
+            <div
+                x-data="{ indice: 0, total: {{ $itensCarrossel->count() }} }"
+                @if ($itensCarrossel->count() > 1) x-init="setInterval(() => indice = (indice + 1) % total, 6000)" @endif
+                class="border-t border-white/10 bg-brand-navyDeep"
+                role="region"
+                aria-label="Destaques da Loja"
+            >
+                <div class="mx-auto max-w-6xl px-5 lg:px-8">
+                    @foreach ($itensCarrossel as $posicao => $item)
+                        <div x-show="indice === {{ $posicao }}" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                            @if ($item->link)
+                                <a
+                                    href="{{ $item->link }}"
+                                    @if ($item->abrir_em_nova_aba) target="_blank" rel="noopener noreferrer" @endif
+                                    class="flex items-center gap-4 py-3 hover:opacity-90"
+                                >
+                                    <img src="{{ asset('storage/'.$item->imagem_desktop) }}" alt="{{ $item->texto_alternativo }}" class="h-12 w-12 shrink-0 rounded-md object-cover sm:h-14 sm:w-14">
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block truncate font-bold text-white">{{ $item->titulo ?: $item->texto_alternativo }}</span>
+                                        @if ($item->subtitulo)
+                                            <span class="block truncate text-sm text-white/70">{{ $item->subtitulo }}</span>
+                                        @endif
+                                    </span>
+                                    <span class="hidden shrink-0 text-sm font-bold text-brand-sky sm:inline">{{ $item->texto_botao ?: 'Ver mais' }} →</span>
+                                </a>
+                            @else
+                                <div class="flex items-center gap-4 py-3">
+                                    <img src="{{ asset('storage/'.$item->imagem_desktop) }}" alt="{{ $item->texto_alternativo }}" class="h-12 w-12 shrink-0 rounded-md object-cover sm:h-14 sm:w-14">
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block truncate font-bold text-white">{{ $item->titulo ?: $item->texto_alternativo }}</span>
+                                        @if ($item->subtitulo)
+                                            <span class="block truncate text-sm text-white/70">{{ $item->subtitulo }}</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             </div>
-        </section>
-    @endif
+        @endif
+    </section>
 
     @if ($noticiasEmDestaque->isNotEmpty())
         <section class="py-14 lg:py-16">
             <div class="mx-auto max-w-6xl px-5 lg:px-8">
                 <div class="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-brand-navy/15 pb-4">
                     <div>
-                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Notícias</h2>
-                        <p class="mt-1 text-brand-inkSoft">Comunicados e conteúdos públicos recentes.</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-brand-skyDeep">Últimas notícias</p>
+                        <h2 class="mt-1 font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Notícias</h2>
                     </div>
 
                     <a href="{{ route('noticias.index') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Todas as notícias →</a>
@@ -201,8 +149,8 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
             <div class="mx-auto max-w-6xl px-5 lg:px-8">
                 <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
                     <div>
-                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Próximos encontros</h2>
-                        <p class="mt-1 text-brand-inkSoft">Agenda pública de sessões e atividades.</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-brand-skyDeep">Agenda</p>
+                        <h2 class="mt-1 font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Próximos encontros</h2>
                     </div>
 
                     <a href="{{ route('calendario') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Ver calendário completo →</a>
@@ -241,7 +189,8 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
             <div class="mx-auto max-w-6xl px-5 lg:px-8">
                 <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
                     <div class="max-w-2xl">
-                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Mural da Loja</h2>
+                        <p class="text-xs font-bold uppercase tracking-widest text-brand-skyDeep">Comunidade</p>
+                        <h2 class="mt-1 font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Mural da Loja</h2>
                         <p class="mt-1 text-brand-inkSoft">Publicações públicas da Loja, com comentários moderados e reações da comunidade.</p>
                     </div>
                     <a href="{{ route('mural.index') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Ver mural completo →</a>
@@ -311,7 +260,8 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
             <div class="mx-auto max-w-6xl px-5 lg:px-8">
                 <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
                     <div class="max-w-2xl">
-                        <h2 class="font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Galeria da Loja</h2>
+                        <p class="text-xs font-bold uppercase tracking-widest text-brand-skyDeep">Registros</p>
+                        <h2 class="mt-1 font-siteDisplay text-2xl font-bold text-brand-navy sm:text-3xl">Galeria da Loja</h2>
                         <p class="mt-1 text-brand-inkSoft">Registros públicos de eventos, sessões e momentos institucionais.</p>
                     </div>
                     <a href="{{ route('galeria.index') }}" class="border-b-2 border-brand-skyDeep font-bold text-brand-navy hover:border-brand-navy">Ver galeria completa →</a>
