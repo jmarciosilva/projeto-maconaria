@@ -2,7 +2,7 @@
 
 @php
 $estilos = [
-    'primario' => 'bg-blue-900 text-white hover:bg-blue-800 focus-visible:outline-blue-900',
+    'primario' => 'bg-[#14213D] text-white hover:bg-[#1B2A4A] focus-visible:outline-[#14213D]',
     'secundario' => 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus-visible:outline-gray-400',
     'perigo' => 'bg-red-700 text-white hover:bg-red-800 focus-visible:outline-red-700',
 ];

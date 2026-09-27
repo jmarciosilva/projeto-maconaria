@@ -28,20 +28,22 @@ final class AdministradorLocalSeeder extends Seeder
 
         $nome = (string) config('app.admin_seed.name', 'Administrador Local');
         $email = (string) config('app.admin_seed.email', 'admin@localhost.test');
+        $codigoCim = (string) config('app.admin_seed.cim', '000001');
         $senha = (string) config('app.admin_seed.password', 'alterar-senha');
 
         $usuario = User::query()->updateOrCreate(
             ['email' => $email],
             [
                 'name' => $nome,
+                'codigo_cim' => $codigoCim,
                 'password' => Hash::make($senha),
                 'status' => StatusUsuario::ATIVO,
                 'email_verified_at' => now(),
             ]
         );
 
-        $usuario->syncRoles(['Superadministrador']);
+        $usuario->syncRoles(['Administrador']);
 
-        $this->command?->info("Administrador local pronto: {$email}");
+        $this->command?->info("Administrador local pronto: CIM {$codigoCim} ({$email})");
     }
 }

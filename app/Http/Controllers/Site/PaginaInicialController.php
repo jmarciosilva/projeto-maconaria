@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
-use App\Models\CarrosselItem;
 use App\Models\Evento;
 use App\Models\GaleriaAlbum;
 use App\Models\MuralPublicacao;
@@ -31,7 +30,6 @@ final class PaginaInicialController extends Controller
 
     public function index(): View
     {
-        $itensCarrossel = CarrosselItem::query()->ativo()->vigente()->ordenado()->get();
         $ordem = array_flip(self::SLUGS_INSTITUCIONAIS_DA_HOME);
 
         $paginasInstitucionais = PaginaInstitucional::query()
@@ -81,7 +79,6 @@ final class PaginaInicialController extends Controller
             ->get();
 
         return view('site.home', compact(
-            'itensCarrossel',
             'paginasInstitucionais',
             'noticiasEmDestaque',
             'proximosEventos',

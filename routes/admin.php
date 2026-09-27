@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\CarrosselItemController;
 use App\Http\Controllers\Admin\ChancelariaComunicadoController;
 use App\Http\Controllers\Admin\ChancelariaController;
 use App\Http\Controllers\Admin\ChancelariaFrequenciaController;
@@ -71,14 +70,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/configuracoes/email', [ConfiguracaoEmailController::class, 'update'])->name('configuracoes.email.update');
     Route::post('/configuracoes/email/teste', [ConfiguracaoEmailController::class, 'enviarTeste'])->name('configuracoes.email.teste');
 
-    Route::get('/carrossel', [CarrosselItemController::class, 'index'])->name('carrossel.index');
-    Route::get('/carrossel/novo', [CarrosselItemController::class, 'create'])->name('carrossel.create');
-    Route::post('/carrossel', [CarrosselItemController::class, 'store'])->name('carrossel.store');
-    Route::get('/carrossel/{carrossel}/editar', [CarrosselItemController::class, 'edit'])->name('carrossel.edit');
-    Route::put('/carrossel/{carrossel}', [CarrosselItemController::class, 'update'])->name('carrossel.update');
-    Route::delete('/carrossel/{carrossel}', [CarrosselItemController::class, 'destroy'])->name('carrossel.destroy');
-
-    Route::get('/paginas-institucionais', [PaginaInstitucionalController::class, 'index'])->name('paginas-institucionais.index');
+Route::get('/paginas-institucionais', [PaginaInstitucionalController::class, 'index'])->name('paginas-institucionais.index');
     Route::get('/paginas-institucionais/nova', [PaginaInstitucionalController::class, 'create'])->name('paginas-institucionais.create');
     Route::post('/paginas-institucionais', [PaginaInstitucionalController::class, 'store'])->name('paginas-institucionais.store');
     Route::get('/paginas-institucionais/{pagina}/editar', [PaginaInstitucionalController::class, 'edit'])->name('paginas-institucionais.edit');

@@ -136,6 +136,7 @@ return [
     'admin_seed' => [
         'name' => env('ADMIN_NAME', 'Administrador Local'),
         'email' => env('ADMIN_EMAIL', 'admin@localhost.test'),
+        'cim' => env('ADMIN_CIM', '000001'),
         'password' => env('ADMIN_PASSWORD', 'alterar-senha'),
     ],
 

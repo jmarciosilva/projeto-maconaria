@@ -28,8 +28,19 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'codigo_cim' => ['required', 'string', 'regex:/^\d{6}$/'],
             'password' => ['required', 'string'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'codigo_cim.required' => 'Informe o código CIM.',
+            'codigo_cim.regex' => 'O código CIM deve ter exatamente 6 dígitos numéricos.',
         ];
     }
 
@@ -42,11 +53,11 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt($this->only('codigo_cim', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'codigo_cim' => trans('auth.failed'),
             ]);
         }
 
@@ -60,7 +71,7 @@ class LoginRequest extends FormRequest
             Auth::logout();
 
             throw ValidationException::withMessages([
-                'email' => 'Este usuário está inativo ou bloqueado. Procure um administrador.',
+                'codigo_cim' => 'Este usuário está inativo ou bloqueado. Procure um administrador.',
             ]);
         }
 
@@ -83,7 +94,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'codigo_cim' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -95,6 +106,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('codigo_cim')).'|'.$this->ip());
     }
 }

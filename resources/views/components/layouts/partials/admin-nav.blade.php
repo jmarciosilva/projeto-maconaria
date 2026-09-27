@@ -4,114 +4,129 @@
 </div>
 
 <nav class="space-y-1 px-3 py-4 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-        Painel
-    </a>
+    <x-ui.nav-link :href="route('admin.dashboard')" :ativo="request()->routeIs('admin.dashboard')">
+        Dashboard
+    </x-ui.nav-link>
 
-    <a href="{{ route('area-restrita') }}" class="block rounded-md px-3 py-2 font-medium text-blue-100 hover:bg-[#1B2A4A]">
-        Voltar à Área Restrita
-    </a>
+    <x-ui.nav-link :href="route('area-restrita')">
+        Voltar para Mural da Loja
+    </x-ui.nav-link>
 
-    @can('usuarios.visualizar')
-        <a href="{{ route('admin.usuarios.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.usuarios.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Usuários
-        </a>
-    @endcan
+    @canany(['usuarios.visualizar', 'perfis.visualizar', 'irmaos.visualizar'])
+        <x-ui.nav-grupo titulo="Gestão de acesso" />
 
-    @can('perfis.visualizar')
-        <a href="{{ route('admin.perfis.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.perfis.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Perfis e Permissões
-        </a>
-    @endcan
+        @can('usuarios.visualizar')
+            <x-ui.nav-link :href="route('admin.usuarios.index')" :ativo="request()->routeIs('admin.usuarios.*')">
+                Usuários
+            </x-ui.nav-link>
+        @endcan
 
-    @can('recados.visualizar')
-        <a href="{{ route('admin.recados.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.recados.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Recados do Painel
-        </a>
-    @endcan
+        @can('perfis.visualizar')
+            <x-ui.nav-link :href="route('admin.perfis.index')" :ativo="request()->routeIs('admin.perfis.*')">
+                Perfis e Permissões
+            </x-ui.nav-link>
+        @endcan
 
-    @can('irmaos.visualizar')
-        <a href="{{ route('admin.irmaos.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.irmaos.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Irmãos
-        </a>
-    @endcan
+        @can('irmaos.visualizar')
+            <x-ui.nav-link :href="route('admin.irmaos.index')" :ativo="request()->routeIs('admin.irmaos.*')">
+                Irmãos
+            </x-ui.nav-link>
+        @endcan
+    @endcanany
 
-    @can('cms.visualizar')
-        <a href="{{ route('admin.configuracoes.institucional.edit') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.configuracoes.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Configurações do Site
-        </a>
+    @canany(['recados.visualizar', 'eventos.visualizar', 'mural.visualizar'])
+        <x-ui.nav-grupo titulo="Mural e comunicação" />
 
-        <a href="{{ route('admin.carrossel.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.carrossel.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Carrossel
-        </a>
+        @can('recados.visualizar')
+            <x-ui.nav-link :href="route('admin.recados.index')" :ativo="request()->routeIs('admin.recados.*')">
+                Recados do Painel
+            </x-ui.nav-link>
+        @endcan
 
-        <a href="{{ route('admin.paginas-institucionais.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.paginas-institucionais.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Páginas Institucionais
-        </a>
-    @endcan
+        @can('mural.visualizar')
+            <x-ui.nav-link :href="route('admin.mural.publicacoes.index')" :ativo="request()->routeIs('admin.mural.*')">
+                Mural
+            </x-ui.nav-link>
+        @endcan
 
-    @can('noticias.visualizar')
-        <a href="{{ route('admin.noticias.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.noticias.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Notícias
-        </a>
+        @can('eventos.visualizar')
+            <x-ui.nav-link :href="route('admin.eventos.index')" :ativo="request()->routeIs('admin.eventos.index', 'admin.eventos.create', 'admin.eventos.edit')">
+                Eventos
+            </x-ui.nav-link>
 
-        <a href="{{ route('admin.noticia-categorias.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.noticia-categorias.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Categorias de Notícias
-        </a>
+            <x-ui.nav-link :href="route('admin.eventos.calendario')" :ativo="request()->routeIs('admin.eventos.calendario')">
+                Calendário
+            </x-ui.nav-link>
+        @endcan
+    @endcanany
 
-        <a href="{{ route('admin.noticia-tags.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.noticia-tags.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Tags de Notícias
-        </a>
-    @endcan
+    @canany(['cms.visualizar', 'noticias.visualizar', 'galeria.visualizar'])
+        <x-ui.nav-grupo titulo="Site público" />
 
-    @can('eventos.visualizar')
-        <a href="{{ route('admin.eventos.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.eventos.index', 'admin.eventos.create', 'admin.eventos.edit') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Eventos
-        </a>
+        @can('cms.visualizar')
+            <x-ui.nav-link :href="route('admin.configuracoes.institucional.edit')" :ativo="request()->routeIs('admin.configuracoes.institucional.*')">
+                Configurações do Site
+            </x-ui.nav-link>
 
-        <a href="{{ route('admin.eventos.calendario') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.eventos.calendario') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Calendário
-        </a>
-    @endcan
-    @can('secretaria.visualizar')
-        <a href="{{ route('admin.secretaria.documentos.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.secretaria.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Secretaria
-        </a>
-    @endcan
+<x-ui.nav-link :href="route('admin.paginas-institucionais.index')" :ativo="request()->routeIs('admin.paginas-institucionais.*')">
+                Páginas Institucionais
+            </x-ui.nav-link>
+        @endcan
 
-    @can('chancelaria.visualizar')
-        <a href="{{ route('admin.chancelaria.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.chancelaria.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Chancelaria
-        </a>
-    @endcan
+        @can('noticias.visualizar')
+            <x-ui.nav-link :href="route('admin.noticias.index')" :ativo="request()->routeIs('admin.noticias.*')">
+                Notícias
+            </x-ui.nav-link>
 
-    @can('tesouraria.visualizar')
-        <a href="{{ route('admin.tesouraria.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.tesouraria.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Tesouraria
-        </a>
-    @endcan
+            <x-ui.nav-link :href="route('admin.noticia-categorias.index')" :ativo="request()->routeIs('admin.noticia-categorias.*')">
+                Categorias de Notícias
+            </x-ui.nav-link>
 
-    @can('documentos.visualizar')
-        <a href="{{ route('admin.documentos.atividades.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.documentos.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Documentos e Trabalhos
-        </a>
-    @endcan
+            <x-ui.nav-link :href="route('admin.noticia-tags.index')" :ativo="request()->routeIs('admin.noticia-tags.*')">
+                Tags de Notícias
+            </x-ui.nav-link>
+        @endcan
 
-    @can('galeria.visualizar')
-        <a href="{{ route('admin.galeria.albuns.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.galeria.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Galeria
-        </a>
-    @endcan
+        @can('galeria.visualizar')
+            <x-ui.nav-link :href="route('admin.galeria.albuns.index')" :ativo="request()->routeIs('admin.galeria.*')">
+                Galeria
+            </x-ui.nav-link>
+        @endcan
+    @endcanany
 
-    @can('mural.visualizar')
-        <a href="{{ route('admin.mural.publicacoes.index') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.mural.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
-            Mural
-        </a>
-    @endcan
+    @canany(['secretaria.visualizar', 'chancelaria.visualizar', 'tesouraria.visualizar', 'documentos.visualizar'])
+        <x-ui.nav-grupo titulo="Administração da Loja" />
+
+        @can('secretaria.visualizar')
+            <x-ui.nav-link :href="route('admin.secretaria.documentos.index')" :ativo="request()->routeIs('admin.secretaria.*')">
+                Secretaria
+            </x-ui.nav-link>
+        @endcan
+
+        @can('chancelaria.visualizar')
+            <x-ui.nav-link :href="route('admin.chancelaria.index')" :ativo="request()->routeIs('admin.chancelaria.*')">
+                Chancelaria
+            </x-ui.nav-link>
+        @endcan
+
+        @can('tesouraria.visualizar')
+            <x-ui.nav-link :href="route('admin.tesouraria.index')" :ativo="request()->routeIs('admin.tesouraria.*')">
+                Tesouraria
+            </x-ui.nav-link>
+        @endcan
+
+        @can('documentos.visualizar')
+            <x-ui.nav-link :href="route('admin.documentos.atividades.index')" :ativo="request()->routeIs('admin.documentos.*')">
+                Documentos e Trabalhos
+            </x-ui.nav-link>
+        @endcan
+    @endcanany
 
     @can('configuracoes.visualizar')
-        <a href="{{ route('admin.configuracoes.email.edit') }}" class="block rounded-md px-3 py-2 font-medium {{ request()->routeIs('admin.configuracoes.email.*') ? 'bg-[#C9A227] text-[#14213D]' : 'text-blue-100 hover:bg-[#1B2A4A]' }}">
+        <x-ui.nav-grupo titulo="Sistema" />
+
+        <x-ui.nav-link :href="route('admin.configuracoes.email.edit')" :ativo="request()->routeIs('admin.configuracoes.email.*')">
             Configurações de E-mail
-        </a>
+        </x-ui.nav-link>
     @endcan
 </nav>

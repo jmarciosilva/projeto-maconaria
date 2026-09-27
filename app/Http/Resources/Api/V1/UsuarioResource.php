@@ -22,6 +22,7 @@ final class UsuarioResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'codigo_cim' => $this->codigo_cim,
             'telefone' => $this->telefone,
             'perfis' => $this->getRoleNames(),
             'irmao' => $this->relationLoaded('irmao') && $this->irmao

@@ -28,11 +28,12 @@ class AppServiceProvider extends ServiceProvider
         // descoberta do Laravel para o model User, por isso o registro é manual.
         Gate::policy(User::class, UsuarioPolicy::class);
 
-        // O perfil de Superadministrador sempre tem acesso total, independente
-        // das permissões atribuídas a ele, para que nunca fique acidentalmente
-        // sem acesso caso uma permissão seja removida do perfil.
+        // O perfil de Administrador sempre tem acesso total, independente das
+        // permissões atribuídas a ele, para que nunca fique acidentalmente sem
+        // acesso caso uma permissão seja removida do perfil ou esquecida ao
+        // adicionar um módulo novo.
         Gate::before(function (User $user, string $ability) {
-            return $user->hasRole('Superadministrador') ? true : null;
+            return $user->hasRole('Administrador') ? true : null;
         });
 
         // Sobrepõe o mailer padrão do .env pela configuração de SMTP salva

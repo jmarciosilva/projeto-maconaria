@@ -13,10 +13,58 @@ use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class UsuarioController extends Controller
 {
+    /**
+     * Rótulo amigável de cada módulo (prefixo da permissão, antes do ponto),
+     * usado para agrupar as permissões individuais na tela de edição.
+     *
+     * @var array<string, string>
+     */
+    private const MODULOS = [
+        'usuarios' => 'Usuários',
+        'perfis' => 'Perfis e Permissões',
+        'recados' => 'Recados do Painel',
+        'irmaos' => 'Irmãos',
+        'cms' => 'Site institucional',
+        'noticias' => 'Notícias',
+        'eventos' => 'Eventos',
+        'tesouraria' => 'Tesouraria',
+        'secretaria' => 'Secretaria',
+        'chancelaria' => 'Chancelaria',
+        'documentos' => 'Documentos e Trabalhos',
+        'galeria' => 'Galeria',
+        'mural' => 'Mural',
+        'configuracoes' => 'Configurações do sistema',
+        'auditoria' => 'Auditoria',
+    ];
+
+    /**
+     * Agrupa todas as permissões cadastradas por módulo, na ordem de
+     * self::MODULOS, para a tela de permissões individuais do usuário.
+     *
+     * @return array<string, \Illuminate\Support\Collection<int, Permission>>
+     */
+    private function permissoesAgrupadas(): array
+    {
+        $porModulo = Permission::orderBy('name')->get()->groupBy(
+            fn (Permission $permissao) => str($permissao->name)->before('.')->value()
+        );
+
+        $grupos = [];
+
+        foreach (self::MODULOS as $modulo => $rotulo) {
+            if ($porModulo->has($modulo)) {
+                $grupos[$rotulo] = $porModulo->get($modulo);
+            }
+        }
+
+        return $grupos;
+    }
+
     public function index(): View
     {
         $this->authorize('viewAny', User::class);
@@ -45,6 +93,7 @@ final class UsuarioController extends Controller
         $usuario = User::create([
             'name' => $dados['name'],
             'email' => $dados['email'],
+            'codigo_cim' => $dados['codigo_cim'],
             'telefone' => $dados['telefone'] ?? null,
             'password' => Hash::make($dados['password']),
             'status' => StatusUsuario::ATIVO,
@@ -58,7 +107,7 @@ final class UsuarioController extends Controller
             modulo: 'usuarios',
             entidade: 'User',
             entidadeId: $usuario->id,
-            dadosNovos: ['name' => $usuario->name, 'email' => $usuario->email, 'perfis' => $dados['perfis'] ?? []],
+            dadosNovos: ['name' => $usuario->name, 'email' => $usuario->email, 'codigo_cim' => $usuario->codigo_cim, 'perfis' => $dados['perfis'] ?? []],
         );
 
         return redirect()
@@ -72,24 +121,46 @@ final class UsuarioController extends Controller
 
         $perfis = Role::orderBy('name')->pluck('name', 'name');
         $perfisDoUsuario = $usuario->roles->pluck('name')->all();
+        $podeAtribuirPermissoes = auth()->user()->can('atribuirPerfis', $usuario);
+        $permissoesAgrupadas = $podeAtribuirPermissoes ? $this->permissoesAgrupadas() : [];
+        $permissoesDoUsuario = $usuario->getDirectPermissions()->pluck('name')->all();
 
-        return view('admin.usuarios.edit', compact('usuario', 'perfis', 'perfisDoUsuario'));
+        return view('admin.usuarios.edit', compact(
+            'usuario',
+            'perfis',
+            'perfisDoUsuario',
+            'podeAtribuirPermissoes',
+            'permissoesAgrupadas',
+            'permissoesDoUsuario',
+        ));
     }
 
     public function update(AtualizarUsuarioRequest $request, User $usuario): RedirectResponse
     {
         $dados = $request->validated();
 
-        $anterior = ['name' => $usuario->name, 'email' => $usuario->email];
+        $anterior = ['name' => $usuario->name, 'email' => $usuario->email, 'codigo_cim' => $usuario->codigo_cim];
 
         $usuario->fill([
             'name' => $dados['name'],
             'email' => $dados['email'],
+            'codigo_cim' => $dados['codigo_cim'],
             'telefone' => $dados['telefone'] ?? null,
             'deve_alterar_senha' => $dados['deve_alterar_senha'] ?? false,
         ])->save();
 
         $usuario->syncRoles($dados['perfis'] ?? []);
+
+        $dadosNovos = ['name' => $usuario->name, 'email' => $usuario->email, 'codigo_cim' => $usuario->codigo_cim, 'perfis' => $dados['perfis'] ?? []];
+
+        // Só quem tem a permissão de atribuir perfis pode alterar as
+        // permissões individuais — sem essa permissão, o campo nem chega a
+        // ser exibido no formulário, mas a checagem aqui evita que alguém
+        // forje a requisição para se autoconceder acesso extra.
+        if (auth()->user()->can('atribuirPerfis', $usuario)) {
+            $usuario->syncPermissions($dados['permissoes'] ?? []);
+            $dadosNovos['permissoes'] = $dados['permissoes'] ?? [];
+        }
 
         RegistradorDeAuditoria::registrar(
             acao: 'editar',
@@ -97,7 +168,7 @@ final class UsuarioController extends Controller
             entidade: 'User',
             entidadeId: $usuario->id,
             dadosAnteriores: $anterior,
-            dadosNovos: ['name' => $usuario->name, 'email' => $usuario->email, 'perfis' => $dados['perfis'] ?? []],
+            dadosNovos: $dadosNovos,
         );
 
         return redirect()

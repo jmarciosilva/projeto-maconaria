@@ -1,4 +1,4 @@
-<x-layouts.admin titulo="Painel">
+<x-layouts.admin titulo="Dashboard">
     <div class="mb-6">
         <p class="text-sm text-gray-600">Bem-vindo, {{ auth()->user()->name }}. Aqui está um resumo geral do sistema.</p>
     </div>

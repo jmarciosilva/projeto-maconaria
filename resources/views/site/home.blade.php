@@ -26,49 +26,6 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                 </nav>
             @endif
         </div>
-
-        @if ($itensCarrossel->isNotEmpty())
-            <div
-                x-data="{ indice: 0, total: {{ $itensCarrossel->count() }} }"
-                @if ($itensCarrossel->count() > 1) x-init="setInterval(() => indice = (indice + 1) % total, 6000)" @endif
-                class="border-t border-white/10 bg-brand-navyDeep"
-                role="region"
-                aria-label="Destaques da Loja"
-            >
-                <div class="mx-auto max-w-6xl px-5 lg:px-8">
-                    @foreach ($itensCarrossel as $posicao => $item)
-                        <div x-show="indice === {{ $posicao }}" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                            @if ($item->link)
-                                <a
-                                    href="{{ $item->link }}"
-                                    @if ($item->abrir_em_nova_aba) target="_blank" rel="noopener noreferrer" @endif
-                                    class="flex items-center gap-4 py-3 hover:opacity-90"
-                                >
-                                    <img src="{{ asset('storage/'.$item->imagem_desktop) }}" alt="{{ $item->texto_alternativo }}" class="h-12 w-12 shrink-0 rounded-md object-cover sm:h-14 sm:w-14">
-                                    <span class="min-w-0 flex-1">
-                                        <span class="block truncate font-bold text-white">{{ $item->titulo ?: $item->texto_alternativo }}</span>
-                                        @if ($item->subtitulo)
-                                            <span class="block truncate text-sm text-white/70">{{ $item->subtitulo }}</span>
-                                        @endif
-                                    </span>
-                                    <span class="hidden shrink-0 text-sm font-bold text-brand-sky sm:inline">{{ $item->texto_botao ?: 'Ver mais' }} →</span>
-                                </a>
-                            @else
-                                <div class="flex items-center gap-4 py-3">
-                                    <img src="{{ asset('storage/'.$item->imagem_desktop) }}" alt="{{ $item->texto_alternativo }}" class="h-12 w-12 shrink-0 rounded-md object-cover sm:h-14 sm:w-14">
-                                    <span class="min-w-0 flex-1">
-                                        <span class="block truncate font-bold text-white">{{ $item->titulo ?: $item->texto_alternativo }}</span>
-                                        @if ($item->subtitulo)
-                                            <span class="block truncate text-sm text-white/70">{{ $item->subtitulo }}</span>
-                                        @endif
-                                    </span>
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
     </section>
 
     @if ($noticiasEmDestaque->isNotEmpty())

@@ -5,11 +5,24 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Código CIM -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <x-input-label for="codigo_cim" value="Código CIM" />
+            <x-text-input
+                id="codigo_cim"
+                class="block mt-1 w-full"
+                type="text"
+                inputmode="numeric"
+                pattern="\d{6}"
+                maxlength="6"
+                placeholder="000000"
+                name="codigo_cim"
+                :value="old('codigo_cim')"
+                required
+                autofocus
+                autocomplete="username"
+            />
+            <x-input-error :messages="$errors->get('codigo_cim')" class="mt-2" />
         </div>
 
         <!-- Password -->

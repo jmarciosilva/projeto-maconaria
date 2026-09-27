@@ -17,10 +17,22 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-ui.input rotulo="Nome" nome="name" :erro="$errors->first('name')" obrigatorio />
-                <x-ui.input rotulo="E-mail de acesso" nome="email" tipo="email" :erro="$errors->first('email')" obrigatorio />
+                <x-ui.input rotulo="E-mail" nome="email" tipo="email" :erro="$errors->first('email')" obrigatorio />
+                <x-ui.input
+                    rotulo="Código CIM"
+                    nome="codigo_cim"
+                    :erro="$errors->first('codigo_cim')"
+                    obrigatorio
+                    inputmode="numeric"
+                    pattern="\d{6}"
+                    maxlength="6"
+                    placeholder="000000"
+                />
                 <x-ui.input rotulo="Telefone" nome="telefone" :erro="$errors->first('telefone')" data-mascara="telefone" maxlength="15" placeholder="(00) 00000-0000" />
                 <x-ui.input rotulo="Senha inicial" nome="password" tipo="password" :erro="$errors->first('password')" obrigatorio />
             </div>
+
+            <p class="mt-3 text-xs text-gray-500">O Código CIM (Código Irmão Maçom) tem 6 dígitos e é o que o usuário usa para entrar no sistema — o e-mail não serve mais para login.</p>
         </section>
 
         <section class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

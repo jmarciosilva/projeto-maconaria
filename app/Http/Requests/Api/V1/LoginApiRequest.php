@@ -31,7 +31,7 @@ final class LoginApiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'codigo_cim' => ['required', 'string', 'regex:/^\d{6}$/'],
             'password' => ['required', 'string'],
             // Identifica o dispositivo/instalação do app — vira o "nome" do
             // token Sanctum, para o usuário reconhecer e revogar sessões
@@ -47,13 +47,13 @@ final class LoginApiRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $usuario = User::query()->where('email', $this->string('email')->value())->first();
+        $usuario = User::query()->where('codigo_cim', $this->string('codigo_cim')->value())->first();
 
         if (! $usuario || ! Hash::check($this->string('password')->value(), $usuario->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'codigo_cim' => trans('auth.failed'),
             ]);
         }
 
@@ -63,7 +63,7 @@ final class LoginApiRequest extends FormRequest
         // credenciais corretas — mesma regra do login web.
         if (! $usuario->estaAtivo()) {
             throw ValidationException::withMessages([
-                'email' => 'Este usuário está inativo ou bloqueado. Procure um administrador.',
+                'codigo_cim' => 'Este usuário está inativo ou bloqueado. Procure um administrador.',
             ]);
         }
 
@@ -86,7 +86,7 @@ final class LoginApiRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'codigo_cim' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -95,6 +95,6 @@ final class LoginApiRequest extends FormRequest
 
     public function throttleKey(): string
     {
-        return 'api|'.Str::transliterate(Str::lower($this->string('email')->value())).'|'.$this->ip();
+        return 'api|'.Str::transliterate(Str::lower($this->string('codigo_cim')->value())).'|'.$this->ip();
     }
 }

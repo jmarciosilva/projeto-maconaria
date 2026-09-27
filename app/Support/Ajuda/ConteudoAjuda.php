@@ -56,13 +56,15 @@ final class ConteudoAjuda
                 'titulo' => 'Usuários',
                 'resumo' => 'Controla quem pode acessar o painel administrativo e a Área Restrita do site, e com quais perfis de permissão.',
                 'itens' => [
-                    'Lista as contas com acesso ao sistema: nome, e-mail, status, perfis e último acesso.',
-                    '"Novo usuário" cria uma conta e define os perfis de acesso dela.',
-                    '"Editar" altera dados cadastrais e perfis. "Ativar/Desativar" controla se o usuário consegue fazer login. "Bloquear/Desbloquear" é usado em caso de suspeita de uso indevido da conta.',
+                    'Lista as contas com acesso ao sistema: nome, código CIM, e-mail, status, perfis e último acesso.',
+                    '"Novo usuário" cria uma conta com nome, e-mail, código CIM, telefone e senha inicial, além dos perfis de acesso dela.',
+                    'O login no sistema é feito com o código CIM (6 dígitos) e a senha — o e-mail cadastrado não serve para acessar o sistema, é só um dado de contato.',
+                    '"Editar" altera dados cadastrais e perfis. Quem tem a permissão de atribuir perfis também vê a seção "Permissões individuais", para liberar algo extra só para aquele usuário, além do que o perfil dele já dá.',
+                    '"Ativar/Desativar" controla se o usuário consegue fazer login. "Bloquear/Desbloquear" é usado em caso de suspeita de uso indevido da conta.',
                     'Por segurança, você não pode desativar nem bloquear a própria conta.',
                 ],
                 'exemplos' => [
-                    'Um Irmão eleito Secretário recebe uma conta com o perfil "Secretário", que libera o módulo de Secretaria para ele.',
+                    'Um Irmão eleito Secretário recebe uma conta com o perfil "Secretário", que libera o módulo de Secretaria para ele. Ele entra no sistema com o código CIM dele, não com o e-mail.',
                 ],
             ]],
             [['admin.perfis.'], [
@@ -70,12 +72,14 @@ final class ConteudoAjuda
                 'resumo' => 'Esta tela é somente consulta: mostra os perfis de acesso existentes e as permissões que cada um concede. Para dar um perfil a alguém, use a tela de Usuários.',
                 'itens' => [
                     'Cada perfil listado mostra, em badges, as permissões que ele concede no sistema.',
-                    'O perfil Superadministrador tem acesso total sempre, mesmo quando a lista de permissões dele aparece vazia.',
+                    'O perfil Administrador tem acesso total garantido automaticamente, mesmo que uma permissão nova seja esquecida na lista dele.',
+                    'Os perfis são propositalmente poucos e amplos, um por cargo/situação da Loja. Se uma pessoa específica precisa de uma permissão a mais do que o perfil dela já dá, não crie um perfil novo — conceda essa permissão só para ela em Usuários → Editar → Permissões individuais.',
                     'Para dar ou tirar um perfil de alguém, acesse Usuários → Editar e marque os perfis desejados naquele formulário.',
                     'A criação e edição de novos perfis pelo painel ainda não está disponível nesta versão do sistema.',
                 ],
                 'exemplos' => [
-                    'Perfis já cadastrados: Superadministrador, Administrador, Venerável Mestre, Secretário, Tesoureiro, Chanceler, Bibliotecário, Editor de Conteúdo, Instrutor, Irmão e Visitante Autorizado.',
+                    'Perfis já cadastrados: Administrador, Secretário, Tesoureiro, Chanceler, Irmão e Visitante Autorizado.',
+                    'Um Irmão que ajuda esporadicamente a moderar o Mural pode continuar com o perfil "Irmão" e receber só a permissão "mural.moderar" como permissão individual, sem precisar virar Chanceler.',
                 ],
             ]],
             [['admin.recados.'], [
@@ -134,19 +138,7 @@ final class ConteudoAjuda
                     'Preencher o endereço completo (rua, número, bairro, cidade e UF) garante que os botões de rota do rodapé abram a localização correta.',
                 ],
             ]],
-            [['admin.carrossel.'], [
-                'titulo' => 'Carrossel da Página Inicial',
-                'resumo' => 'Gerencia as imagens em destaque exibidas no topo da home do site público.',
-                'itens' => [
-                    'Cada item tem uma imagem para desktop (obrigatória) e outra para mobile (opcional — se vazia, a versão desktop é reaproveitada).',
-                    'A Ordem de exibição define a sequência dos slides. "Exibir a partir de"/"até" programa um item para aparecer só durante um período específico.',
-                    'Itens marcados como Inativo ficam guardados no sistema, mas somem do carrossel do site.',
-                ],
-                'exemplos' => [
-                    'Um slide de "7 de Setembro" pode ficar programado para aparecer só entre 01/09 e 08/09, sem precisar removê-lo manualmente depois.',
-                ],
-            ]],
-            [['admin.paginas-institucionais.'], [
+[['admin.paginas-institucionais.'], [
                 'titulo' => 'Páginas Institucionais',
                 'resumo' => 'Gerencia o conteúdo das páginas fixas do site público, como Sobre Nós, Nossa História e Política de Privacidade.',
                 'itens' => [

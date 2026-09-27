@@ -9,10 +9,10 @@ $logotipoSite = $configuracaoInstitucional->logotipo
 // O usuário vê o Painel Administrativo no menu assim que tiver qualquer
 // permissão de gestão — quem não tem nenhuma (Irmão comum, Visitante
 // Autorizado) simplesmente não vê o link, sem precisar de uma permissão
-// específica para isso. O Superadministrador não tem permissões atribuídas
-// diretamente (o acesso dele vem do Gate::before em AppServiceProvider), por
+// específica para isso. O Administrador tem acesso total via Gate::before
+// em AppServiceProvider (não depende só das permissões sincronizadas), por
 // isso precisa da checagem de perfil à parte.
-$podeAcessarAdmin = auth()->user()->hasRole('Superadministrador') || auth()->user()->getAllPermissions()->isNotEmpty();
+$podeAcessarAdmin = auth()->user()->hasRole('Administrador') || auth()->user()->getAllPermissions()->isNotEmpty();
 @endphp
 
 <!DOCTYPE html>

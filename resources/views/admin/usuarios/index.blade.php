@@ -12,10 +12,11 @@
     @if ($usuarios->isEmpty())
         <x-ui.empty-state titulo="Nenhum usuário cadastrado" descricao="Cadastre o primeiro usuário para começar." />
     @else
-        <x-ui.table :cabecalhos="['Nome', 'E-mail', 'Status', 'Perfis', 'Último acesso', 'Ações']">
+        <x-ui.table :cabecalhos="['Nome', 'Código CIM', 'E-mail', 'Status', 'Perfis', 'Último acesso', 'Ações']">
             @foreach ($usuarios as $usuario)
                 <tr>
                     <td class="px-4 py-3 font-medium text-gray-900">{{ $usuario->name }}</td>
+                    <td class="px-4 py-3 font-mono text-gray-600">{{ $usuario->codigo_cim }}</td>
                     <td class="px-4 py-3 text-gray-600">{{ $usuario->email }}</td>
                     <td class="px-4 py-3">
                         @if ($usuario->estaBloqueado())
