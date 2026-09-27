@@ -299,7 +299,7 @@ $linksNav = [
         x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 translate-y-2"
         @click="window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })"
-        class="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-brand-navy text-white shadow-lg transition hover:bg-brand-navyDeep"
+        class="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-brand-navy/10 bg-white text-brand-navy shadow-lg ring-1 ring-black/5 transition hover:bg-brand-paperSoft"
         aria-label="Voltar ao topo da página"
     >
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" aria-hidden="true">

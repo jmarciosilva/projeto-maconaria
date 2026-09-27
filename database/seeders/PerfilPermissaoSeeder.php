@@ -23,6 +23,7 @@ final class PerfilPermissaoSeeder extends Seeder
     private const PERMISSOES = [
         'usuarios.visualizar', 'usuarios.criar', 'usuarios.editar', 'usuarios.excluir', 'usuarios.atribuir-perfis',
         'perfis.visualizar', 'perfis.criar', 'perfis.editar', 'perfis.excluir',
+        'recados.visualizar', 'recados.criar', 'recados.editar',
         'irmaos.visualizar', 'irmaos.criar', 'irmaos.editar', 'irmaos.excluir',
         'cms.visualizar', 'cms.editar',
         'noticias.visualizar', 'noticias.criar', 'noticias.editar', 'noticias.publicar', 'noticias.excluir',
@@ -48,17 +49,21 @@ final class PerfilPermissaoSeeder extends Seeder
             'eventos.visualizar', 'tesouraria.visualizar', 'tesouraria.aprovar',
             'secretaria.visualizar', 'secretaria.aprovar-ata', 'chancelaria.visualizar',
             'documentos.visualizar', 'galeria.visualizar', 'mural.visualizar', 'mural.moderar', 'auditoria.visualizar',
+            'recados.visualizar', 'recados.criar', 'recados.editar',
         ],
         'Secretário' => [
             'irmaos.visualizar', 'irmaos.criar', 'irmaos.editar', 'secretaria.visualizar', 'secretaria.criar-ata',
             'secretaria.editar-ata', 'secretaria.publicar-ata', 'eventos.visualizar', 'eventos.criar', 'eventos.editar',
+            'recados.visualizar', 'recados.criar', 'recados.editar',
         ],
         'Tesoureiro' => [
             'tesouraria.visualizar', 'tesouraria.criar', 'tesouraria.editar', 'tesouraria.excluir', 'irmaos.visualizar',
+            'recados.visualizar', 'recados.criar', 'recados.editar',
         ],
         'Chanceler' => [
             'chancelaria.visualizar', 'chancelaria.criar', 'chancelaria.editar', 'irmaos.visualizar',
             'galeria.visualizar', 'galeria.criar', 'mural.visualizar', 'mural.criar', 'mural.moderar',
+            'recados.visualizar', 'recados.criar', 'recados.editar',
         ],
         'Bibliotecário' => [
             'documentos.visualizar', 'documentos.enviar', 'documentos.avaliar',

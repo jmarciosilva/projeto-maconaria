@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\NoticiaCategoriaController;
 use App\Http\Controllers\Admin\NoticiaController;
 use App\Http\Controllers\Admin\NoticiaTagController;
 use App\Http\Controllers\Admin\PaginaInstitucionalController;
+use App\Http\Controllers\Admin\PainelRecadoController;
 use App\Http\Controllers\Admin\PerfilController;
 use App\Http\Controllers\Admin\SecretariaDocumentoController;
 use App\Http\Controllers\Admin\TesourariaCategoriaController;
@@ -49,6 +50,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::patch('/usuarios/{usuario}/desbloquear', [UsuarioController::class, 'desbloquear'])->name('usuarios.desbloquear');
 
     Route::get('/perfis', [PerfilController::class, 'index'])->name('perfis.index');
+
+    Route::resource('/recados', PainelRecadoController::class)
+        ->except(['show'])
+        ->names('recados');
 
     Route::get('/irmaos', [IrmaoController::class, 'index'])->name('irmaos.index');
     Route::get('/irmaos/novo', [IrmaoController::class, 'create'])->name('irmaos.create');

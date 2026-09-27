@@ -78,6 +78,21 @@ final class ConteudoAjuda
                     'Perfis já cadastrados: Superadministrador, Administrador, Venerável Mestre, Secretário, Tesoureiro, Chanceler, Bibliotecário, Editor de Conteúdo, Instrutor, Irmão e Visitante Autorizado.',
                 ],
             ]],
+            [['admin.recados.'], [
+                'titulo' => 'Recados do Painel',
+                'resumo' => 'Controla os recados e avisos exibidos no painel inicial ("Área Restrita") de todos os usuários — Venerável, Secretário, Tesouraria e avisos gerais.',
+                'itens' => [
+                    'Ao criar um recado, escolha a categoria: isso define em qual cartão do painel ele vai aparecer para os usuários.',
+                    'Um recado só aparece no painel quando está marcado como "Ativo" e a data de publicação já passou.',
+                    'O campo "Válido até" é opcional: preenchendo-o, o recado some sozinho do painel depois dessa data, sem precisar voltar aqui para desativá-lo.',
+                    'Só existe um formulário para todas as categorias — qualquer pessoa com esta permissão pode publicar em nome de qualquer cargo.',
+                ],
+                'exemplos' => [
+                    'Categoria "Aviso da Tesouraria", título "Prazo da mensalidade", conteúdo "O último dia para acertar a mensalidade deste mês é dia 26.", válido até o dia 26.',
+                    'Categoria "Recado do Venerável Mestre", título "Convocação para sessão magna", válido até a data da sessão.',
+                    'Categoria "Recado da Chancelaria", título "Uso do traje nas próximas sessões", conteúdo com as orientações de protocolo.',
+                ],
+            ]],
             [['admin.irmaos.'], [
                 'titulo' => 'Irmãos',
                 'resumo' => 'Cadastro completo dos membros da Loja: dados pessoais, endereço, percurso maçônico e, opcionalmente, o login vinculado a cada um.',

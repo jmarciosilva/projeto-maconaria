@@ -1,6 +1,6 @@
 <x-layouts.admin titulo="Painel">
     <div class="mb-6">
-        <p class="text-sm text-gray-600">Bem-vindo(a), {{ auth()->user()->name }}. Aqui está um resumo geral do sistema.</p>
+        <p class="text-sm text-gray-600">Bem-vindo, {{ auth()->user()->name }}. Aqui está um resumo geral do sistema.</p>
     </div>
 
     @if (empty($dados))
