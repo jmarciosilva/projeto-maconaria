@@ -229,9 +229,9 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                         @php($fotoPrincipal = $album->fotografias->first())
                         <a href="{{ route('galeria.mostrar', $album->slug) }}" class="overflow-hidden rounded-lg border border-brand-navy/10 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                             @if ($fotoPrincipal)
-                                <img src="{{ Storage::url($fotoPrincipal->caminho) }}" alt="{{ $fotoPrincipal->texto_alternativo }}" class="aspect-[4/3] w-full object-cover">
+                                <img src="{{ Storage::url($fotoPrincipal->caminho) }}" alt="{{ $fotoPrincipal->texto_alternativo }}" class="aspect-[16/10] w-full object-cover object-center">
                             @else
-                                <div class="flex aspect-[4/3] w-full items-center justify-center bg-gradient-to-br from-brand-skyDeep to-brand-navy">
+                                <div class="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-brand-skyDeep to-brand-navy">
                                     <svg class="h-14 w-14 opacity-70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path d="M50 15 L78 62 H22 Z" stroke="#fff" stroke-width="2" />
                                     </svg>
