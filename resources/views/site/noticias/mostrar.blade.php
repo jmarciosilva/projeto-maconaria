@@ -14,6 +14,27 @@
             <img src="{{ Storage::url($noticia->imagem_capa) }}" alt="{{ $noticia->titulo }}" class="mt-6 aspect-video w-full rounded-lg object-cover">
         @endif
 
+        @if ($noticia->fotos->isNotEmpty())
+            <section class="mt-8">
+                <h2 class="mb-4 text-xl font-semibold text-gray-900">Fotografias</h2>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($noticia->fotos as $foto)
+                        <div class="overflow-hidden rounded-lg">
+                            <div class="aspect-[16/10] w-full">
+                                <img src="{{ Storage::url($foto->caminho) }}"
+                                     alt="{{ $foto->descricao ?: 'Foto da notícia: ' . $noticia->titulo }}"
+                                     class="h-full w-full object-cover object-center"
+                                     loading="lazy">
+                            </div>
+                            @if ($foto->descricao)
+                                <p class="mt-2 px-2 pb-2 text-sm text-gray-600">{{ $foto->descricao }}</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
         @if ($noticia->resumo)
             <p class="mt-6 text-lg text-gray-700">{{ $noticia->resumo }}</p>
         @endif

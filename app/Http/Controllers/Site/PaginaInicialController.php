@@ -42,7 +42,7 @@ final class PaginaInicialController extends Controller
         // Limite 5: a primeira vira a matéria principal e as demais formam a
         // coluna de manchetes secundárias (ver resources/views/site/home.blade.php).
         $noticiasEmDestaque = Noticia::query()
-            ->with('categoria')
+            ->with('categoria', 'fotos')
             ->publicaNoSite()
             ->destaque()
             ->latest('publicado_em')

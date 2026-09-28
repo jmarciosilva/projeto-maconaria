@@ -24,7 +24,7 @@ final class NoticiaController extends Controller
     public function mostrar(string $slug): View
     {
         $noticia = Noticia::query()
-            ->with(['categoria', 'tags'])
+            ->with(['categoria', 'tags', 'fotos'])
             ->publicaNoSite()
             ->where('slug', $slug)
             ->firstOrFail();

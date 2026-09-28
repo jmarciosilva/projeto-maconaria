@@ -506,4 +506,69 @@ class NoticiaControllerTest extends TestCase
             'value="2020-05-10T19:30"',
         ]);
     }
+
+    public function test_home_page_shows_photo_preview_with_up_to_4_photos(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $noticia = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA,
+            'destaque' => true,
+            'publicado_em' => now(),
+        ]);
+
+        for ($i = 0; $i < 6; $i++) {
+            $noticia->fotos()->create(['caminho' => "noticias/fotos/foto$i.jpg", 'ordem' => $i]);
+        }
+
+        $response = $this->get(route('site.index'));
+
+        $response->assertOk();
+        $response->assertSee('Fotografias');
+        // Verify only 4 photos are shown in preview
+        $response->assertSee('Ver todas as 6 fotos');
+    }
+
+    public function test_detail_page_shows_complete_photo_gallery(): void
+    {
+        $noticia = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA,
+            'slug' => 'noticia-com-galeria',
+            'publicado_em' => now(),
+        ]);
+
+        for ($i = 0; $i < 7; $i++) {
+            $noticia->fotos()->create([
+                'caminho' => "noticias/fotos/foto$i.jpg",
+                'descricao' => $i % 2 === 0 ? "Descrição da foto $i" : null,
+                'ordem' => $i,
+            ]);
+        }
+
+        $response = $this->get(route('noticias.mostrar', $noticia->slug));
+
+        $response->assertOk();
+        $response->assertSee('Fotografias');
+        // Verify all photos are shown
+        for ($i = 0; $i < 7; $i++) {
+            $response->assertSee("foto$i.jpg");
+        }
+    }
+
+    public function test_detail_page_without_photos_does_not_show_gallery(): void
+    {
+        $noticia = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA,
+            'slug' => 'noticia-sem-fotos',
+            'publicado_em' => now(),
+        ]);
+
+        $response = $this->get(route('noticias.mostrar', $noticia->slug));
+
+        $response->assertOk();
+        $response->assertDontSee('Fotografias');
+    }
 }

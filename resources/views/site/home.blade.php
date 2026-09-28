@@ -73,6 +73,28 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                                 · por {{ $noticiaPrincipal->autor->name }}
                             @endif
                         </p>
+
+                        @if ($noticiaPrincipal->fotos->isNotEmpty())
+                            <div class="mt-6">
+                                <div class="grid gap-3 {{ $noticiaPrincipal->fotos->count() >= 3 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-' . min($noticiaPrincipal->fotos->count(), 2) }}">
+                                    @foreach ($noticiaPrincipal->fotos->take(4) as $foto)
+                                        <div class="overflow-hidden rounded-lg">
+                                            <img src="{{ Storage::url($foto->caminho) }}"
+                                                 alt="{{ $foto->descricao ?: 'Foto da notícia: ' . $noticiaPrincipal->titulo }}"
+                                                 class="aspect-[16/10] w-full object-cover object-center"
+                                                 loading="lazy">
+                                        </div>
+                                    @endforeach
+                                </div>
+                                @if ($noticiaPrincipal->fotos->count() > 4)
+                                    <p class="mt-2 text-sm text-brand-inkSoft">
+                                        <a href="{{ route('noticias.mostrar', $noticiaPrincipal->slug) }}" class="font-semibold text-brand-navy hover:underline">
+                                            Ver todas as {{ $noticiaPrincipal->fotos->count() }} fotos
+                                        </a>
+                                    </p>
+                                @endif
+                            </div>
+                        @endif
                     </article>
 
                     @if ($noticiasSecundarias->isNotEmpty())
