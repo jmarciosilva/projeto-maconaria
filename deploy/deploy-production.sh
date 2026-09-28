@@ -208,30 +208,48 @@ git_fetch_and_validate() {
   DEPLOYMENT_PHASE="git"
   log_step "Fetching and validating Git"
 
-  OLD_SHA=$(git rev-parse HEAD)
-  log "Current commit: $OLD_SHA"
+  LOCAL_SHA=$(git rev-parse HEAD)
+  log "Current commit: $LOCAL_SHA"
 
-  git fetch origin main:main 2>&1 | tee -a "$DEPLOY_LOG" || abort "Git fetch failed"
+  # Fetch remote-tracking refs only (no checkout of current branch)
+  git fetch --prune origin 2>&1 | tee -a "$DEPLOY_LOG" || abort "Git fetch failed"
 
-  # Check if we can do fast-forward
-  MERGE_BASE=$(git merge-base HEAD origin/main) || abort "Could not determine merge base"
+  # Determine synchronization state
+  REMOTE_SHA=$(git rev-parse origin/main) || abort "Could not determine remote SHA"
+  BASE_SHA=$(git merge-base HEAD origin/main) || abort "Could not determine merge base"
 
-  if [ "$MERGE_BASE" != "$OLD_SHA" ]; then
-    log_warning "Current commit is not ancestor of origin/main"
-    log "This may indicate divergent history. Proceeding carefully..."
-  fi
+  log "Local:  $LOCAL_SHA"
+  log "Remote: $REMOTE_SHA"
+  log "Base:   $BASE_SHA"
 
-  # Attempt fast-forward only
-  if ! git merge --ff-only origin/main 2>&1 | tee -a "$DEPLOY_LOG"; then
-    abort "Could not fast-forward merge. Resolve history manually."
-  fi
-
-  NEW_SHA=$(git rev-parse HEAD)
-  if [ "$NEW_SHA" = "$OLD_SHA" ]; then
+  # CASE A: Already synchronized
+  if [ "$LOCAL_SHA" = "$REMOTE_SHA" ]; then
     log_success "Already up to date (no new commits)"
-  else
-    log_success "Fast-forwarded to: $NEW_SHA"
+    return 0
   fi
+
+  # CASE B: Local is behind remote and fast-forward is possible
+  if [ "$LOCAL_SHA" = "$BASE_SHA" ] && [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
+    log "Fast-forward merge available. Merging..."
+    if ! git merge --ff-only origin/main 2>&1 | tee -a "$DEPLOY_LOG"; then
+      abort "Could not fast-forward merge. Resolve history manually."
+    fi
+
+    NEW_SHA=$(git rev-parse HEAD)
+    if [ "$NEW_SHA" != "$REMOTE_SHA" ]; then
+      abort "Fast-forward merge resulted in unexpected SHA: $NEW_SHA vs $REMOTE_SHA"
+    fi
+    log_success "Fast-forwarded to: $NEW_SHA"
+    return 0
+  fi
+
+  # CASE C: Local is ahead of remote
+  if [ "$REMOTE_SHA" = "$BASE_SHA" ] && [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
+    abort "Local branch is ahead of remote. Cannot auto-push. Resolve manually."
+  fi
+
+  # CASE D: Branches diverged
+  abort "Local and remote branches have diverged (mergebase differs from both). Cannot proceed."
 }
 
 # ============================================================================
