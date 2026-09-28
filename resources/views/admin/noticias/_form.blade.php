@@ -3,6 +3,24 @@ $noticia ??= null;
 $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? []))->map(fn ($id) => (int) $id)->all();
 @endphp
 
+@if ($errors->any())
+    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+        <div class="flex gap-3">
+            <svg class="h-5 w-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c.866-1.5 2.945-2.915 5.304-3.917.520-.265 1.209-.42 1.896-.436a7.5 7.5 0 1 1-5.898 3.75M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+            <div>
+                <h3 class="text-sm font-semibold text-red-800">Erros ao salvar a notícia</h3>
+                <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-red-700">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+@endif
+
 <section class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
     <div class="mb-5 flex items-start gap-3">
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
@@ -16,17 +34,33 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
         </div>
     </div>
 
-    <div class="space-y-4">
-        <x-ui.input rotulo="Título" nome="titulo" :valor="$noticia->titulo ?? null" :erro="$errors->first('titulo')" obrigatorio />
+    <div class="space-y-4" x-data="{ titulo: @json(old('titulo', $noticia->titulo ?? '')), slug: @json(old('slug', $noticia->slug ?? '')) }">
+        <div>
+            <x-ui.input rotulo="Título" nome="titulo" :valor="old('titulo', $noticia->titulo ?? null)" :erro="$errors->first('titulo')" obrigatorio @input="titulo = $event.target.value" />
+            <p class="mt-1.5 text-xs text-gray-500">
+                <span x-text="titulo.length"></span> de 255 caracteres
+            </p>
+        </div>
 
-        <x-ui.input
-            rotulo="Slug"
-            nome="slug"
-            :valor="$noticia->slug ?? null"
-            :erro="$errors->first('slug')"
-            obrigatorio
-            placeholder="ex.: comunicado-da-semana"
-        />
+        <div>
+            <x-ui.input
+                rotulo="Slug"
+                nome="slug"
+                :valor="old('slug', $noticia->slug ?? null)"
+                :erro="$errors->first('slug')"
+                obrigatorio
+                placeholder="ex.: comunicado-da-semana"
+                @input="slug = $event.target.value"
+            />
+            <p class="mt-1.5 text-xs text-gray-500">
+                URL amigável da notícia. Use apenas letras minúsculas, números e hífens.
+            </p>
+            @if ($errors->has('slug'))
+                <p class="mt-1 text-sm text-red-600">
+                    <strong>Dica:</strong> Se o slug "já existe", tente adicionar a data (ex.: comunicado-setembro-2026)
+                </p>
+            @endif
+        </div>
     </div>
 </section>
 
@@ -44,9 +78,24 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
         </div>
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid gap-4 md:grid-cols-2" x-data="{ status: @json(old('status', $noticia->status->value ?? 'rascunho')) }">
         <x-ui.select rotulo="Categoria" nome="categoria_id" :opcoes="['' => 'Sem categoria'] + $categorias->all()" :valor="$noticia->categoria_id ?? null" :erro="$errors->first('categoria_id')" />
-        <x-ui.select rotulo="Status" nome="status" :opcoes="$statusDisponiveis->all()" :valor="$noticia->status->value ?? 'rascunho'" :erro="$errors->first('status')" obrigatorio />
+
+        <div>
+            <x-ui.select rotulo="Status" nome="status" :opcoes="$statusDisponiveis->all()" :valor="$noticia->status->value ?? 'rascunho'" :erro="$errors->first('status')" obrigatorio @change="status = $event.target.value" />
+            <p class="mt-1.5 text-xs text-gray-500">
+                <strong>Dica:</strong>
+                <template x-if="status === 'rascunho'">Use <span class="font-medium">Rascunho</span> enquanto escreve</template>
+                <template x-if="status === 'publicada'">Use <span class="font-medium">Publicada</span> para exibir no site agora</template>
+                <template x-if="status === 'agendada'">Use <span class="font-medium">Agendada</span> para agendar uma data futura</template>
+            </p>
+            @if ($errors->has('status'))
+                <p class="mt-1 text-sm text-red-600">
+                    <strong>Erro:</strong> {{ $errors->first('status') }}
+                </p>
+            @endif
+        </div>
+
         <x-ui.select
             rotulo="Visibilidade"
             nome="visibilidade"
@@ -55,8 +104,16 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
             :erro="$errors->first('visibilidade')"
             obrigatorio
         />
-        <x-ui.input rotulo="Publicado em" nome="publicado_em" tipo="datetime-local" :valor="old('publicado_em', isset($noticia?->publicado_em) ? $noticia->publicado_em->format('Y-m-d\TH:i') : null)" :erro="$errors->first('publicado_em')" />
-        <x-ui.input rotulo="Agendado para" nome="agendado_para" tipo="datetime-local" :valor="old('agendado_para', isset($noticia?->agendado_para) ? $noticia->agendado_para->format('Y-m-d\TH:i') : null)" :erro="$errors->first('agendado_para')" />
+
+        <div x-show="status === 'publicada'">
+            <x-ui.input rotulo="Publicado em" nome="publicado_em" tipo="datetime-local" :valor="old('publicado_em', isset($noticia?->publicado_em) ? $noticia->publicado_em->format('Y-m-d\TH:i') : null)" :erro="$errors->first('publicado_em')" />
+            <p class="mt-1.5 text-xs text-gray-500">Se deixar em branco, usará a data de agora</p>
+        </div>
+
+        <div x-show="status === 'agendada'">
+            <x-ui.input rotulo="Agendado para" nome="agendado_para" tipo="datetime-local" :valor="old('agendado_para', isset($noticia?->agendado_para) ? $noticia->agendado_para->format('Y-m-d\TH:i') : null)" :erro="$errors->first('agendado_para')" />
+            <p class="mt-1.5 text-xs text-gray-500">Obrigatório para notícias agendadas</p>
+        </div>
     </div>
 </section>
 
@@ -95,9 +152,17 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
             @enderror
         </div>
 
-        <div>
+        <div x-data="{ resumo: @json(old('resumo', $noticia->resumo ?? '')) }">
             <label for="resumo" class="block text-sm font-medium text-gray-700">Resumo</label>
-            <textarea id="resumo" name="resumo" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">{{ old('resumo', $noticia->resumo ?? '') }}</textarea>
+            <textarea id="resumo" name="resumo" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('resumo') border-red-400 @enderror" @input="resumo = $event.target.value">{{ old('resumo', $noticia->resumo ?? '') }}</textarea>
+            <div class="mt-1.5 flex justify-between">
+                <p class="text-xs text-gray-500">
+                    <span x-text="resumo.length"></span> de 500 caracteres
+                </p>
+                @if (old('resumo', $noticia->resumo ?? false))
+                    <p class="text-xs text-green-600">✓ Resumo preenchido</p>
+                @endif
+            </div>
             @error('resumo')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror
@@ -118,8 +183,9 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
         </div>
     </div>
 
-    <div id="conteudo-editor" data-quill-editor data-quill-target="conteudo-input" class="bg-white">{!! old('conteudo', $noticia->conteudo ?? '') !!}</div>
+    <div id="conteudo-editor" data-quill-editor data-quill-target="conteudo-input" class="min-h-64 rounded-md border border-gray-200 bg-white">{!! old('conteudo', $noticia->conteudo ?? '') !!}</div>
     <textarea name="conteudo" id="conteudo-input" class="hidden">{{ old('conteudo', $noticia->conteudo ?? '') }}</textarea>
+    <p class="mt-1.5 text-xs text-gray-500">Você pode usar <strong>Bold</strong>, <em>Itálico</em>, listas e links para formatar seu conteúdo.</p>
     @error('conteudo')
         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
     @enderror

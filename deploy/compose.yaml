@@ -1,0 +1,56 @@
+version: '3.9'
+
+# Docker Compose para produção do ARLS Ferraz
+# Arquitetura:
+#   - arls-app: PHP-FPM (porta 9000 interna)
+#   - arls-web: Nginx (porta 9002 localhost apenas)
+#   - MySQL externo: Hostinger (srv1056.hstgr.io:3306)
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: php
+    image: arls-app-php:latest
+    container_name: arls-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      # .env externo (somente leitura, credenciais não em imagem)
+      - ./app.env:/var/www/html/.env:ro
+      # Storage compartilhado entre app e web
+      - storage:/var/www/html/storage
+    networks:
+      - arls-network
+    environment:
+      # Variáveis adicionais podem ser adicionadas aqui se necessário
+      - APP_ENV=production
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: web
+    image: arls-app-web:latest
+    container_name: arls-web
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      # IMPORTANTE: publicar SOMENTE em localhost (127.0.0.1:9002)
+      # Não acessível diretamente pela Internet
+      - "127.0.0.1:9002:80"
+    volumes:
+      # Storage em somente leitura
+      - storage:/var/www/html/storage:ro
+    networks:
+      - arls-network
+
+volumes:
+  storage:
+    driver: local
+
+networks:
+  arls-network:
+    driver: bridge

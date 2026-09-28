@@ -55,12 +55,21 @@ final class CriarNoticiaRequest extends FormRequest
     {
         $validator->after(function (Validator $validator) {
             $status = $this->input('status');
+            $conteudo = strip_tags($this->input('conteudo', ''));
 
             if (
                 in_array($status, [StatusNoticia::PUBLICADA->value, StatusNoticia::AGENDADA->value], true)
                 && $this->user()?->can('noticias.publicar') !== true
             ) {
                 $validator->errors()->add('status', 'Você não possui permissão para publicar ou agendar notícias.');
+            }
+
+            if (empty(trim($conteudo)) && $status === StatusNoticia::PUBLICADA->value) {
+                $validator->errors()->add('conteudo', 'O conteúdo é obrigatório para publicar uma notícia.');
+            }
+
+            if ($status === StatusNoticia::AGENDADA->value && blank($this->input('agendado_para'))) {
+                $validator->errors()->add('agendado_para', 'Selecione uma data para agendar a notícia.');
             }
         });
     }
