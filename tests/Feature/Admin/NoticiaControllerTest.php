@@ -446,4 +446,64 @@ class NoticiaControllerTest extends TestCase
         $this->assertCount(5, $noticia->fotos);
         $this->assertEquals('Título editado', $noticia->titulo);
     }
+
+    public function test_public_news_ordering_respects_publication_date_not_creation_date(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        // Noticia criada hoje mas publicada em 2018 (histórica)
+        $noticiaHistorica = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA,
+            'publicado_em' => now()->subYears(6)->setDate(2018, 3, 15)->setTime(20, 0),
+        ]);
+
+        // Noticia criada ontem mas publicada em 2025 (recente)
+        $noticiaRecente = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA,
+            'publicado_em' => now()->subYears(1)->setDate(2025, 6, 10)->setTime(14, 30),
+            'created_at' => now()->subDay(),
+        ]);
+
+        // Noticia criada hoje mas publicada há 3 anos
+        $noticiaMeio = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA,
+            'publicado_em' => now()->subYears(3)->setDate(2020, 5, 10)->setTime(19, 30),
+        ]);
+
+        // Query pública deve ordenar por publicado_em DESC
+        $noticias = Noticia::query()
+            ->publicaNoSite()
+            ->latest('publicado_em')
+            ->get();
+
+        // Esperado: Recente (2025) → Meio (2020) → Histórica (2018)
+        $this->assertEquals($noticiaRecente->id, $noticias[0]->id);
+        $this->assertEquals($noticiaMeio->id, $noticias[1]->id);
+        $this->assertEquals($noticiaHistorica->id, $noticias[2]->id);
+    }
+
+    public function test_datetime_local_format_for_historical_news_edit(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $dataHistorica = now()->subYears(5)->setDate(2020, 5, 10)->setTime(19, 30);
+
+        $noticia = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'publicado_em' => $dataHistorica,
+        ]);
+
+        $response = $this->actingAs($usuario)->get(route('admin.noticias.edit', $noticia));
+
+        // Verificar que o formato está correto no HTML
+        $response->assertSeeInOrder([
+            'value="2020-05-10T19:30"',
+        ]);
+    }
 }
