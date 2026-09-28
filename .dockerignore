@@ -8,6 +8,13 @@ vendor
 public/build
 public/hot
 public/storage
+# Bootstrap cache - runtime artifacts generated on HOST must not enter image
+bootstrap/cache/config.php
+bootstrap/cache/routes*.php
+bootstrap/cache/events.php
+bootstrap/cache/packages.php
+bootstrap/cache/services.php
+# Storage runtime artifacts
 storage/*.key
 storage/framework/cache/*
 storage/framework/sessions/*
