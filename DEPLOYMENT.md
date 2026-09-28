@@ -83,7 +83,7 @@ FPM workers maintain state in memory. Simply updating code or config files may n
 
 ### Before Deployment
 
-Ensure the HOST is clean:
+**Ensure the HOST is clean:**
 ```bash
 # These files should NOT exist before deployment
 ls -la bootstrap/cache/config.php      # should fail
@@ -94,6 +94,18 @@ ls -la bootstrap/cache/services.php    # should fail
 cat bootstrap/cache/.gitignore         # should show: * + !.gitignore
 ```
 
+**Ensure ENV file permissions are correct:**
+```bash
+# Verify deploy/app.env has secure permissions
+ls -la deploy/app.env
+
+# Expected:
+# -rw-r----- 1 root www-data ...
+# (mode 640 - readable by www-data group, not world-readable)
+```
+
+The deployment script will validate this during preflight.
+
 ### Deployment Process
 
 Use the automated script:
@@ -103,22 +115,40 @@ Use the automated script:
 
 The script handles:
 1. ✓ Deployment lock (prevents concurrent deployments)
-2. ✓ Preflight validation
-3. ✓ Safe Git operations (fetch, no auto-pull, fast-forward only)
+2. ✓ Preflight validation:
+   - Directory and file checks
+   - Docker Compose v2 availability
+   - Git repository status
+   - **ENV file permissions and readability** (aborts if insecure)
+3. ✓ Safe Git operations (fetch with explicit A-D case handling, no auto-pull)
 4. ✓ Image backup with rollback tags (preserves current Image IDs)
 5. ✓ Build new images (while old containers still running)
 6. ✓ Image integrity verification (no HOST paths)
 7. ✓ Container recreation with `--force-recreate` (no `docker compose down`)
-8. ✓ PHP-FPM readiness verification
+8. ✓ Application readiness verification:
+   - Container running check
+   - PHP-FPM process verification (via `docker top`)
+   - **HTTP response validation through Nginx** (more reliable than process checks)
 9. ✓ Artisan cache generation IN RUNTIME:
-   - `package:discover` (discovers Laravel packages)
+   - `optimize:clear` (clears old caches)
+   - `package:discover` (discovers Laravel packages from Composer)
    - `config:cache` (with correct `/var/www/html` context)
-   - Path validation (ensures `/var/www/html`, not HOST paths)
-   - `route:cache` (if compatible with application routes)
+   - Path validation (ensures `/var/www/html`, aborts if `/opt/arls-ferraz/producao` found)
+   - `route:cache` (with fallback to `route:clear` if incompatible)
    - `view:cache` (compiles Blade templates)
 10. ✓ App container restart (loads fresh cache into new PHP-FPM workers)
 11. ✓ Complete health checks (home, login, external, logs)
-12. ✓ Automatic rollback if health checks fail
+12. ✓ **Automatic rollback if ANY critical failure occurs after container recreation**
+
+### Deployment Safety Features
+
+- **Post-Recreate Rollback:** Any failure after containers are recreated automatically triggers rollback to previous images
+- **Recursive Rollback Protection:** Script prevents rollback from attempting to rollback itself
+- **Signal Handling:** Ctrl+C after recreate triggers automatic rollback (SIGINT/SIGTERM)
+- **Immutable Lock:** Only one deployment can run at a time (flock-based)
+- **Runtime-Only Caches:** All Laravel caches generated inside container with correct environment
+- **Path Validation:** Deployment aborts if HOST paths leak into container caches
+- **Health Checks with Timeouts:** HTTP checks include connection timeouts and retry logic
 
 ### After Deployment
 

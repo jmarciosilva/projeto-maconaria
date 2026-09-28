@@ -22,6 +22,11 @@ DEPLOYMENT_PHASE="preflight"
 # Lock file for concurrent execution protection
 LOCK_FILE="/var/run/arls-deploy.lock"
 
+# State tracking for rollback decisions
+RECREATE_STARTED=false
+ROLLBACK_IN_PROGRESS=false
+DEPLOY_SUCCESS=false
+
 # ============================================================================
 # CLEANUP & SIGNAL HANDLING
 # ============================================================================
@@ -41,6 +46,9 @@ handle_interrupt() {
 
   if [ "$DEPLOYMENT_PHASE" = "preflight" ] || [ "$DEPLOYMENT_PHASE" = "build" ]; then
     log_warning "Production unchanged. Interrupted during safe phase."
+  elif [ "$RECREATE_STARTED" = "true" ] && [ "$DEPLOY_SUCCESS" != "true" ]; then
+    log_warning "Containers were recreated. Triggering automatic rollback..."
+    rollback_deployment
   else
     log_warning "Production may be in intermediate state. Check logs and validate manually."
   fi
@@ -139,6 +147,34 @@ compose() {
 }
 
 # ============================================================================
+# ENV FILE VALIDATION
+# ============================================================================
+
+validate_env_file() {
+  local env_file="deploy/app.env"
+
+  if [ ! -f "$env_file" ]; then
+    abort "ENV file not found: $env_file"
+  fi
+
+  if [ ! -s "$env_file" ]; then
+    abort "ENV file is empty: $env_file"
+  fi
+
+  local mode=$(stat -c '%a' "$env_file" 2>/dev/null || stat -f '%OLp' "$env_file" 2>/dev/null | tail -c 4)
+
+  if [ "$mode" = "644" ] || [ "$mode" = "666" ] || [ "$mode" = "777" ]; then
+    abort "ENV file permissions are world-readable (mode $mode). Set to 640 or 600 for security."
+  fi
+
+  if [ "$mode" != "640" ] && [ "$mode" != "600" ]; then
+    log_warning "ENV file mode is $mode (expected 640 or 600), but proceeding..."
+  fi
+
+  log_success "ENV file validation passed"
+}
+
+# ============================================================================
 # PREFLIGHT CHECKS
 # ============================================================================
 
@@ -174,6 +210,9 @@ preflight_checks() {
     abort "deploy/app.env not found"
   fi
   log_success "Production .env exists"
+
+  # Validate ENV file permissions and readability
+  validate_env_file
 
   # Check Git
   if ! git rev-parse --git-dir > /dev/null 2>&1; then
@@ -355,27 +394,45 @@ recreate_containers() {
 }
 
 # ============================================================================
-# WAIT FOR PHP-FPM
+# WAIT FOR APPLICATION READINESS
 # ============================================================================
 
-wait_for_php_fpm() {
-  log_step "Waiting for PHP-FPM to be ready"
+wait_for_app_readiness() {
+  log_step "Waiting for application to be ready"
 
   MAX_ATTEMPTS=30
   ATTEMPT=0
 
   while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    if docker exec arls-app sh -c 'ps aux | grep -q [p]hp-fpm' 2>/dev/null; then
-      log_success "PHP-FPM is running"
+    ATTEMPT=$((ATTEMPT + 1))
+
+    # Check 1: Container is running
+    if ! docker ps --filter "name=arls-app" --format "{{.State}}" 2>/dev/null | grep -q "running"; then
+      echo -n "."
+      sleep 1
+      continue
+    fi
+
+    # Check 2: PHP-FPM processes exist
+    local fpm_count=$(docker top arls-app 2>/dev/null | grep -c "php-fpm" || echo "0")
+    if [ "$fpm_count" -lt 1 ]; then
+      echo -n "."
+      sleep 1
+      continue
+    fi
+
+    # Check 3: Application responds to HTTP (through Nginx)
+    local http_status=$(http_check "http://127.0.0.1:9002/" 10 5 1)
+    if [ "$http_status" = "200" ] || [ "$http_status" = "302" ]; then
+      log_success "Application is ready (HTTP $http_status)"
       return 0
     fi
 
-    ATTEMPT=$((ATTEMPT + 1))
     echo -n "."
     sleep 1
   done
 
-  abort "PHP-FPM did not start after $MAX_ATTEMPTS attempts"
+  abort "Application did not become ready after $MAX_ATTEMPTS attempts"
 }
 
 # ============================================================================
@@ -445,10 +502,12 @@ restart_app_container() {
   docker restart arls-app || abort "Failed to restart arls-app"
   sleep 2
 
-  if ! docker exec arls-app sh -c 'ps aux | grep -q [p]hp-fpm' 2>/dev/null; then
+  # Verify PHP-FPM restarted using docker top (more reliable than grep)
+  local fpm_count=$(docker top arls-app 2>/dev/null | grep -c "php-fpm" || echo "0")
+  if [ "$fpm_count" -lt 1 ]; then
     abort "PHP-FPM did not restart properly"
   fi
-  log_success "arls-app restarted with fresh cache"
+  log_success "arls-app restarted with fresh cache ($fpm_count processes)"
 }
 
 # ============================================================================
@@ -521,6 +580,12 @@ run_health_checks() {
 
 rollback_deployment() {
   log_step "ROLLING BACK to previous images"
+
+  # Prevent recursive rollback
+  if [ "$ROLLBACK_IN_PROGRESS" = "true" ]; then
+    log_error "Rollback already in progress - preventing recursive rollback"
+    return 1
+  fi
 
   if [ -z "${ROLLBACK_TAG:-}" ]; then
     abort "No rollback tag available. Manual intervention required."
@@ -605,18 +670,43 @@ main() {
   identify_and_backup_images
   build_images
   verify_image_integrity
-  recreate_containers
-  wait_for_php_fpm
-  run_artisan_commands
+
+  # Critical point: containers are about to be recreated
+  RECREATE_STARTED=true
+
+  recreate_containers || {
+    log_error "Container recreation failed"
+    exit 1
+  }
+
+  # After recreate, any critical failure triggers automatic rollback
+  wait_for_app_readiness || {
+    log_error "Application readiness failed"
+    log "Triggering automatic rollback..."
+    ROLLBACK_IN_PROGRESS=true
+    rollback_deployment || abort "Rollback itself failed - manual intervention required"
+    abort "Deploy failed, automatic rollback completed"
+  }
+
+  run_artisan_commands || {
+    log_error "Artisan commands failed"
+    log "Triggering automatic rollback..."
+    ROLLBACK_IN_PROGRESS=true
+    rollback_deployment || abort "Rollback itself failed - manual intervention required"
+    abort "Deploy failed, automatic rollback completed"
+  }
+
   restart_app_container
 
   if ! run_health_checks; then
     log_error "Health checks failed"
-    log "Attempting rollback..."
-    rollback_deployment
-    abort "Deploy failed, rollback completed"
+    log "Triggering automatic rollback..."
+    ROLLBACK_IN_PROGRESS=true
+    rollback_deployment || abort "Rollback itself failed - manual intervention required"
+    abort "Deploy failed, automatic rollback completed"
   fi
 
+  DEPLOY_SUCCESS=true
   DEPLOYMENT_PHASE="completed"
   log_success "All health checks passed"
   generate_report
