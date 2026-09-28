@@ -43,6 +43,10 @@ final class CriarNoticiaRequest extends FormRequest
             'resumo' => ['nullable', 'string', 'max:500'],
             'conteudo' => ['nullable', 'string'],
             'imagem_capa' => ['nullable', 'image', 'max:4096'],
+            'fotos' => ['nullable', 'array', 'max:10'],
+            'fotos.*' => ['image', 'max:4096'],
+            'fotos_descricao' => ['nullable', 'array'],
+            'fotos_descricao.*' => ['string', 'max:255'],
             'status' => ['required', Rule::enum(StatusNoticia::class)],
             'visibilidade' => ['required', Rule::enum(VisibilidadeNoticia::class)],
             'destaque' => ['boolean'],
@@ -82,6 +86,9 @@ final class CriarNoticiaRequest extends FormRequest
             'slug.regex' => 'O slug deve conter apenas letras minúsculas, números e hífens.',
             'slug.unique' => 'Já existe uma notícia com este slug.',
             'agendado_para.required_if' => 'Informe a data de agendamento da notícia.',
+            'fotos.max' => 'Máximo de 10 fotos permitidas.',
+            'fotos.*.image' => 'Todos os arquivos devem ser imagens válidas.',
+            'fotos.*.max' => 'Cada foto deve ter no máximo 4 MB.',
         ];
     }
 

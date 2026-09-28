@@ -193,6 +193,77 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
 
 <section class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
     <div class="mb-5 flex items-start gap-3">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-700">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+        </span>
+        <div>
+            <h2 class="text-base font-semibold text-gray-900">Fotos da notícia</h2>
+            <p class="mt-0.5 text-sm text-gray-500">Adicione uma ou mais fotos para ilustrar sua notícia.</p>
+        </div>
+    </div>
+
+    <div class="space-y-5">
+        <div x-data="{ arquivos: @json($noticia?->fotos ?? []), arquivosNovos: [] }">
+            @if (isset($noticia) && $noticia->fotos->isNotEmpty())
+                <div>
+                    <h3 class="mb-3 text-sm font-medium text-gray-700">Fotos atuais</h3>
+                    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($noticia->fotos as $foto)
+                            <div class="group relative">
+                                <div class="aspect-video overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+                                    <img src="{{ asset('storage/'.$foto->caminho) }}" alt="{{ $foto->descricao }}" class="h-full w-full object-cover">
+                                </div>
+                                <div class="mt-2 flex gap-2">
+                                    <input type="text" name="fotos_descricao[{{ $foto->id }}]" value="{{ $foto->descricao }}" placeholder="Descrição (alt text)" class="flex-1 rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <label class="inline-flex cursor-pointer items-center">
+                                        <input type="checkbox" name="fotos_para_remover[]" value="{{ $foto->id }}" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                        <span class="ml-2 text-sm text-red-600">Remover</span>
+                                    </label>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Adicionar novas fotos</label>
+                <div class="mt-1.5 flex flex-col gap-3">
+                    <div class="rounded-md border-2 border-dashed border-gray-300 px-6 py-8 text-center">
+                        <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3 12V4.5A1.5 1.5 0 0 1 4.5 3h15A1.5 1.5 0 0 1 21 4.5v15a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 19.5V12Z" />
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-600">
+                            <label for="fotos" class="font-semibold text-blue-600 hover:text-blue-500 cursor-pointer">Clique para adicionar fotos</label>
+                            ou arraste aqui
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">JPG, PNG ou WebP até 4 MB cada. Máximo 10 fotos.</p>
+                    </div>
+                    <input type="file" id="fotos" name="fotos[]" accept="image/*" multiple class="sr-only" @change="arquivosNovos = $event.target.files; console.log('Arquivos:', $event.target.files.length)">
+
+                    <div x-show="arquivosNovos.length > 0" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        <template x-for="(arquivo, index) in arquivosNovos" :key="index">
+                            <div class="group relative">
+                                <div class="aspect-video overflow-hidden rounded-md border border-blue-200 bg-blue-50 flex items-center justify-center">
+                                    <span class="text-sm text-blue-600" x-text="arquivo.name"></span>
+                                </div>
+                                <input type="text" name="fotos_descricao[]" placeholder="Descrição (alt text)" class="mt-2 w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                @error('fotos')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div class="mb-5 flex items-start gap-3">
         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.169.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />

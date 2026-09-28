@@ -47,6 +47,12 @@ final class AtualizarNoticiaRequest extends FormRequest
             'resumo' => ['nullable', 'string', 'max:500'],
             'conteudo' => ['nullable', 'string'],
             'imagem_capa' => ['nullable', 'image', 'max:4096'],
+            'fotos' => ['nullable', 'array', 'max:10'],
+            'fotos.*' => ['image', 'max:4096'],
+            'fotos_descricao' => ['nullable', 'array'],
+            'fotos_descricao.*' => ['string', 'max:255'],
+            'fotos_para_remover' => ['nullable', 'array'],
+            'fotos_para_remover.*' => ['integer'],
             'status' => ['required', Rule::enum(StatusNoticia::class)],
             'visibilidade' => ['required', Rule::enum(VisibilidadeNoticia::class)],
             'destaque' => ['boolean'],
@@ -84,6 +90,9 @@ final class AtualizarNoticiaRequest extends FormRequest
             'titulo.required' => 'Informe o título da notícia.',
             'slug.unique' => 'Já existe uma notícia com este slug.',
             'agendado_para.required_if' => 'Informe a data de agendamento da notícia.',
+            'fotos.max' => 'Máximo de 10 fotos permitidas.',
+            'fotos.*.image' => 'Todos os arquivos devem ser imagens válidas.',
+            'fotos.*.max' => 'Cada foto deve ter no máximo 4 MB.',
         ];
     }
 

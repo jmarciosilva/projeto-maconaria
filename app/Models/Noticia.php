@@ -68,6 +68,11 @@ final class Noticia extends Model
         return $this->hasMany(NoticiaVersao::class);
     }
 
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(NoticiaFoto::class)->orderBy('ordem');
+    }
+
     public function scopePublicaNoSite(Builder $query): Builder
     {
         return $query

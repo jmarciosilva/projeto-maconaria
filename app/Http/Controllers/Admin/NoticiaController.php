@@ -42,7 +42,7 @@ final class NoticiaController extends Controller
     public function store(CriarNoticiaRequest $request): RedirectResponse
     {
         $noticia = DB::transaction(function () use ($request): Noticia {
-            $dados = $request->safe()->except('tags', 'conteudo', 'imagem_capa');
+            $dados = $request->safe()->except('tags', 'conteudo', 'imagem_capa', 'fotos');
             $dados['autor_id'] = $request->user()->id;
             $dados['conteudo'] = ProcessadorConteudoNoticia::prepararParaSalvar($request->input('conteudo'));
             $dados['destaque'] = $request->boolean('destaque');
@@ -57,6 +57,7 @@ final class NoticiaController extends Controller
 
             $noticia = Noticia::create($dados);
             $noticia->tags()->sync($request->input('tags', []));
+            $this->processarFotos($request, $noticia);
             $this->registrarVersao($noticia);
 
             RegistradorDeAuditoria::registrar('criar', 'noticias', 'Noticia', $noticia->id);
@@ -85,7 +86,7 @@ final class NoticiaController extends Controller
     {
         DB::transaction(function () use ($request, $noticia): void {
             $dadosAnteriores = $noticia->only(['titulo', 'slug', 'status', 'visibilidade', 'destaque']);
-            $dados = $request->safe()->except('tags', 'conteudo', 'imagem_capa');
+            $dados = $request->safe()->except('tags', 'conteudo', 'imagem_capa', 'fotos', 'fotos_para_remover');
             $dados['conteudo'] = ProcessadorConteudoNoticia::prepararParaSalvar($request->input('conteudo'));
             $dados['destaque'] = $request->boolean('destaque');
 
@@ -103,6 +104,7 @@ final class NoticiaController extends Controller
 
             $noticia->fill($dados)->save();
             $noticia->tags()->sync($request->input('tags', []));
+            $this->processarFotos($request, $noticia);
             $this->registrarVersao($noticia);
 
             RegistradorDeAuditoria::registrar(
@@ -140,6 +142,36 @@ final class NoticiaController extends Controller
             'tags' => NoticiaTag::query()->orderBy('nome')->get(),
             'statusDisponiveis' => collect(StatusNoticia::cases())->mapWithKeys(fn (StatusNoticia $status) => [$status->value => $status->rotulo()]),
         ];
+    }
+
+    private function processarFotos(CriarNoticiaRequest|AtualizarNoticiaRequest $request, Noticia $noticia): void
+    {
+        if ($request->has('fotos_para_remover')) {
+            $fotosParaRemover = (array) $request->input('fotos_para_remover', []);
+            foreach ($fotosParaRemover as $fotoId) {
+                $foto = $noticia->fotos()->find($fotoId);
+                if ($foto) {
+                    Storage::disk('public')->delete($foto->caminho);
+                    $foto->delete();
+                }
+            }
+        }
+
+        if ($request->hasFile('fotos')) {
+            $proximaOrdem = $noticia->fotos()->max('ordem') ?? -1;
+
+            foreach ($request->file('fotos', []) as $file) {
+                $proximaOrdem++;
+                $caminho = $file->store('noticias/fotos', 'public');
+                $descricao = $request->input('fotos_descricao.'.$file->hashName()) ?? '';
+
+                $noticia->fotos()->create([
+                    'caminho' => $caminho,
+                    'descricao' => $descricao,
+                    'ordem' => $proximaOrdem,
+                ]);
+            }
+        }
     }
 
     private function registrarVersao(Noticia $noticia): void
