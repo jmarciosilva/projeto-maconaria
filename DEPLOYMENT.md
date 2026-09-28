@@ -151,7 +151,7 @@ Using the rollback tag created by the deploy script:
 ```bash
 docker tag arls-app-php:rollback-<timestamp> arls-app-php:latest
 docker tag arls-app-web:rollback-<timestamp> arls-app-web:latest
-docker-compose -f deploy/compose.yaml up -d --force-recreate app web
+docker compose -f deploy/compose.yaml up -d --force-recreate app web
 sleep 3
 curl http://127.0.0.1:9002/
 ```
@@ -187,6 +187,6 @@ curl http://127.0.0.1:9002/
 ## See Also
 
 - `deploy/deploy-production.sh` - Automated deployment script
-- `docker-compose.yml` - Service definitions
+- `deploy/compose.yaml` - Service definitions
 - `deploy/Dockerfile` - Multi-stage build configuration
 - `.dockerignore` - Files excluded from Docker build context

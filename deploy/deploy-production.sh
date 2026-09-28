@@ -131,6 +131,14 @@ http_check() {
 }
 
 # ============================================================================
+# DOCKER COMPOSE WRAPPER
+# ============================================================================
+
+compose() {
+  docker compose -f deploy/compose.yaml "$@"
+}
+
+# ============================================================================
 # PREFLIGHT CHECKS
 # ============================================================================
 
@@ -150,11 +158,11 @@ preflight_checks() {
   fi
   log_success "Docker available"
 
-  # Check Docker Compose is available
-  if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
-    abort "Docker Compose is not available"
+  # Check Docker Compose v2 is available
+  if ! docker compose version &> /dev/null; then
+    abort "Docker Compose v2 is not available. Install Docker with integrated compose plugin."
   fi
-  log_success "Docker Compose available"
+  log_success "Docker Compose v2 available"
 
   # Check deploy files exist
   if [ ! -f "deploy/Dockerfile" ]; then
@@ -340,7 +348,7 @@ recreate_containers() {
   log_step "Recreating ARLS containers with --force-recreate"
 
   log "Forcing recreation of app and web services..."
-  if ! docker-compose -f deploy/compose.yaml up -d --force-recreate app web 2>&1 | tee -a "$DEPLOY_LOG"; then
+  if ! compose up -d --force-recreate app web 2>&1 | tee -a "$DEPLOY_LOG"; then
     abort "Failed to recreate containers"
   fi
   log_success "Containers recreated"
@@ -523,7 +531,7 @@ rollback_deployment() {
   docker tag "arls-app-web:$ROLLBACK_TAG" arls-app-web:latest || log_warning "Could not restore web image"
 
   log "Recreating containers with previous images..."
-  if ! docker-compose -f deploy/compose.yaml up -d --force-recreate app web 2>&1 | tee -a "$DEPLOY_LOG"; then
+  if ! compose up -d --force-recreate app web 2>&1 | tee -a "$DEPLOY_LOG"; then
     abort "Rollback failed to recreate containers"
   fi
 
@@ -572,7 +580,7 @@ Next Steps:
 Rollback (if needed):
   docker tag arls-app-php:${ROLLBACK_TAG} arls-app-php:latest
   docker tag arls-app-web:${ROLLBACK_TAG} arls-app-web:latest
-  docker-compose -f deploy/compose.yaml up -d --force-recreate app web
+  docker compose -f deploy/compose.yaml up -d --force-recreate app web
 
 ================================================================================
 EOF
