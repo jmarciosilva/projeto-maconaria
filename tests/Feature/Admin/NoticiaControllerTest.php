@@ -158,4 +158,292 @@ class NoticiaControllerTest extends TestCase
         Storage::disk('public')->assertMissing($caminhoOriginal);
         Storage::disk('public')->assertExists($noticia->imagem_capa);
     }
+
+    public function test_photo_description_is_optional_when_creating_news(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia com fotos sem descrição',
+            'slug' => 'noticia-fotos-sem-descricao',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => [
+                UploadedFile::fake()->image('foto1.jpg'),
+                UploadedFile::fake()->image('foto2.jpg'),
+            ],
+            'fotos_descricao' => [],
+        ])->assertRedirect();
+
+        $noticia = Noticia::where('slug', 'noticia-fotos-sem-descricao')->firstOrFail();
+
+        $this->assertCount(2, $noticia->fotos);
+        $noticia->fotos->each(fn ($foto) => $this->assertNull($foto->descricao));
+    }
+
+    public function test_photo_description_is_optional_when_editing_news(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar', 'noticias.editar');
+
+        $noticia = Noticia::factory()->create();
+        $noticia->fotos()->create(['caminho' => 'foto1.jpg', 'descricao' => 'descrição antiga', 'ordem' => 0]);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos_descricao' => [
+                'foto1.jpg' => '',
+            ],
+        ])->assertRedirect();
+
+        $noticia->refresh();
+        $this->assertEmpty($noticia->fotos->first()->descricao);
+    }
+
+    public function test_can_create_news_with_up_to_50_photos(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $fotos = array_map(fn ($i) => UploadedFile::fake()->image("foto$i.jpg"), range(1, 50));
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia com 50 fotos',
+            'slug' => 'noticia-50-fotos',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => $fotos,
+        ])->assertRedirect();
+
+        $noticia = Noticia::where('slug', 'noticia-50-fotos')->firstOrFail();
+
+        $this->assertCount(50, $noticia->fotos);
+    }
+
+    public function test_cannot_create_news_with_more_than_50_photos(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $fotos = array_map(fn ($i) => UploadedFile::fake()->image("foto$i.jpg"), range(1, 51));
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia com 51 fotos',
+            'slug' => 'noticia-51-fotos',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => $fotos,
+        ])->assertSessionHasErrors('fotos');
+
+        $this->assertDatabaseMissing('noticias', ['slug' => 'noticia-51-fotos']);
+    }
+
+    public function test_cannot_exceed_50_photos_total_when_editing(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create();
+
+        for ($i = 0; $i < 35; $i++) {
+            $noticia->fotos()->create(['caminho' => "foto$i.jpg", 'ordem' => $i]);
+        }
+
+        $novasFotos = array_map(fn ($i) => UploadedFile::fake()->image("nova$i.jpg"), range(1, 16));
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => $novasFotos,
+        ])->assertSessionHasErrors('fotos');
+    }
+
+    public function test_can_add_photos_when_editing_keeping_total_under_50(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create();
+
+        for ($i = 0; $i < 35; $i++) {
+            $noticia->fotos()->create(['caminho' => "foto$i.jpg", 'ordem' => $i]);
+        }
+
+        $novasFotos = array_map(fn ($i) => UploadedFile::fake()->image("nova$i.jpg"), range(1, 15));
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => $novasFotos,
+        ])->assertRedirect();
+
+        $noticia->refresh();
+
+        $this->assertCount(50, $noticia->fotos);
+    }
+
+    public function test_can_remove_and_add_photos_maintaining_total_limit(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create();
+
+        for ($i = 0; $i < 35; $i++) {
+            $noticia->fotos()->create(['caminho' => "foto$i.jpg", 'ordem' => $i]);
+        }
+
+        $fotosParaRemover = $noticia->fotos()->take(10)->pluck('id')->toArray();
+        $novasFotos = array_map(fn ($i) => UploadedFile::fake()->image("nova$i.jpg"), range(1, 15));
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => $novasFotos,
+            'fotos_para_remover' => $fotosParaRemover,
+        ])->assertRedirect();
+
+        $noticia->refresh();
+
+        $this->assertCount(40, $noticia->fotos);
+    }
+
+    public function test_can_publish_news_with_retroactive_date(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar', 'noticias.publicar');
+
+        $dataHistorica = now()->subMonths(6);
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Evento histórico da Loja',
+            'slug' => 'evento-historico',
+            'status' => StatusNoticia::PUBLICADA->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Registramos um momento histórico.</p>',
+            'publicado_em' => $dataHistorica->format('Y-m-d H:i'),
+        ])->assertRedirect();
+
+        $noticia = Noticia::where('slug', 'evento-historico')->firstOrFail();
+
+        $this->assertTrue($dataHistorica->isSameAs($noticia->publicado_em, 'minute'));
+    }
+
+    public function test_can_edit_publication_date_of_already_published_news(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->publicada()->create();
+        $dataAnterior = $noticia->publicado_em->copy();
+        $dataNovaHistorica = now()->subMonths(3);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::PUBLICADA->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => $noticia->conteudo,
+            'publicado_em' => $dataNovaHistorica->format('Y-m-d H:i'),
+        ])->assertRedirect();
+
+        $noticia->refresh();
+
+        $this->assertTrue($dataNovaHistorica->isSameAs($noticia->publicado_em, 'minute'));
+        $this->assertNotEquals($dataAnterior, $noticia->publicado_em);
+    }
+
+    public function test_created_at_is_not_altered_when_setting_retroactive_publication_date(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar', 'noticias.publicar');
+
+        $dataHistorica = now()->subYears(1);
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia histórica',
+            'slug' => 'noticia-historica',
+            'status' => StatusNoticia::PUBLICADA->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Histórico.</p>',
+            'publicado_em' => $dataHistorica->format('Y-m-d H:i'),
+        ])->assertRedirect();
+
+        $noticia = Noticia::where('slug', 'noticia-historica')->firstOrFail();
+
+        $this->assertTrue($dataHistorica->isSameAs($noticia->publicado_em, 'minute'));
+        $this->assertTrue(now()->subMinutes(5)->isBefore($noticia->created_at));
+    }
+
+    public function test_editing_published_news_with_existing_photos_works_without_photo_input(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar', 'noticias.publicar');
+
+        $noticia = Noticia::factory()->publicada()->create();
+
+        for ($i = 0; $i < 5; $i++) {
+            $noticia->fotos()->create(['caminho' => "foto$i.jpg", 'descricao' => null, 'ordem' => $i]);
+        }
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => 'Título editado',
+            'slug' => $noticia->slug,
+            'status' => StatusNoticia::PUBLICADA->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo editado.</p>',
+        ])->assertRedirect();
+
+        $noticia->refresh();
+
+        $this->assertCount(5, $noticia->fotos);
+        $this->assertEquals('Título editado', $noticia->titulo);
+    }
 }

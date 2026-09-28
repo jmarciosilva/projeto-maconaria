@@ -43,10 +43,10 @@ final class CriarNoticiaRequest extends FormRequest
             'resumo' => ['nullable', 'string', 'max:500'],
             'conteudo' => ['nullable', 'string'],
             'imagem_capa' => ['nullable', 'image', 'max:4096'],
-            'fotos' => ['nullable', 'array', 'max:10'],
+            'fotos' => ['nullable', 'array', 'max:50'],
             'fotos.*' => ['image', 'max:4096'],
             'fotos_descricao' => ['nullable', 'array'],
-            'fotos_descricao.*' => ['string', 'max:255'],
+            'fotos_descricao.*' => ['nullable', 'string', 'max:255'],
             'status' => ['required', Rule::enum(StatusNoticia::class)],
             'visibilidade' => ['required', Rule::enum(VisibilidadeNoticia::class)],
             'destaque' => ['boolean'],
@@ -74,6 +74,12 @@ final class CriarNoticiaRequest extends FormRequest
 
             if ($status === StatusNoticia::AGENDADA->value && blank($this->input('agendado_para'))) {
                 $validator->errors()->add('agendado_para', 'Selecione uma data para agendar a notícia.');
+            }
+
+            // Validar total de fotos
+            $fotosNovas = count($this->file('fotos', []));
+            if ($fotosNovas > 50) {
+                $validator->errors()->add('fotos', 'Uma notícia pode possuir no máximo 50 fotos.');
             }
         });
     }
