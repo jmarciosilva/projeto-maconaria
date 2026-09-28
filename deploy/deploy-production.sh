@@ -400,14 +400,14 @@ recreate_containers() {
 wait_for_app_readiness() {
   log_step "Waiting for application to be ready"
 
-  MAX_ATTEMPTS=30
+  MAX_ATTEMPTS=60
   ATTEMPT=0
 
   while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     ATTEMPT=$((ATTEMPT + 1))
 
-    # Check 1: Container is running
-    if ! docker ps --filter "name=arls-app" --format "{{.State}}" 2>/dev/null | grep -q "running"; then
+    # Check 1: Container is running (explicitly use correct filter)
+    if ! docker ps --filter "name=^arls-app$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "arls-app"; then
       echo -n "."
       sleep 1
       continue
@@ -432,7 +432,8 @@ wait_for_app_readiness() {
     sleep 1
   done
 
-  abort "Application did not become ready after $MAX_ATTEMPTS attempts"
+  log_error "Application did not become ready after $MAX_ATTEMPTS attempts"
+  return 1
 }
 
 # ============================================================================
@@ -450,13 +451,15 @@ run_artisan_commands() {
 
   log "Running package discovery..."
   if ! docker exec arls-app php /var/www/html/artisan package:discover --ansi 2>&1 | tee -a "$DEPLOY_LOG"; then
-    abort "package:discover failed"
+    log_error "package:discover failed"
+    return 1
   fi
   log_success "Package discovery completed"
 
   log "Generating config cache..."
   if ! docker exec arls-app php /var/www/html/artisan config:cache 2>&1 | tee -a "$DEPLOY_LOG"; then
-    abort "config:cache failed"
+    log_error "config:cache failed"
+    return 1
   fi
   log_success "Config cache generated"
 
@@ -472,7 +475,8 @@ run_artisan_commands() {
   echo "$VALIDATION" | tee -a "$DEPLOY_LOG"
 
   if echo "$VALIDATION" | grep -q "/opt/arls-ferraz/producao"; then
-    abort "CRITICAL: Cached paths still contain /opt/arls-ferraz/producao"
+    log_error "CRITICAL: Cached paths still contain /opt/arls-ferraz/producao"
+    return 1
   fi
   log_success "Paths validated: /var/www/html"
 
@@ -499,15 +503,14 @@ run_artisan_commands() {
 restart_app_container() {
   log_step "Restarting app container to load fresh cache"
 
-  docker restart arls-app || abort "Failed to restart arls-app"
-  sleep 2
+  docker restart arls-app || {
+    log_error "Failed to restart arls-app"
+    return 1
+  }
 
-  # Verify PHP-FPM restarted using docker top (more reliable than grep)
-  local fpm_count=$(docker top arls-app 2>/dev/null | grep -c "php-fpm" || echo "0")
-  if [ "$fpm_count" -lt 1 ]; then
-    abort "PHP-FPM did not restart properly"
-  fi
-  log_success "arls-app restarted with fresh cache ($fpm_count processes)"
+  # Don't verify immediately after restart - use wait_for_app_readiness instead
+  log "Container restart signal sent"
+  return 0
 }
 
 # ============================================================================
@@ -520,12 +523,14 @@ run_health_checks() {
 
   # Check container status
   if ! docker ps | grep -q arls-app; then
-    abort "Container arls-app is not running"
+    log_error "Container arls-app is not running"
+    return 1
   fi
   log_success "Container arls-app is running"
 
   if ! docker ps | grep -q arls-web; then
-    abort "Container arls-web is not running"
+    log_error "Container arls-web is not running"
+    return 1
   fi
   log_success "Container arls-web is running"
 
@@ -536,7 +541,8 @@ run_health_checks() {
   if [ "$RESPONSE" = "200" ]; then
     log_success "Home page: HTTP $RESPONSE"
   else
-    abort "Home page returned HTTP $RESPONSE (expected 200)"
+    log_error "Home page returned HTTP $RESPONSE (expected 200)"
+    return 1
   fi
 
   # Check internal login page
@@ -558,7 +564,8 @@ run_health_checks() {
   elif [ "$EXT_RESPONSE" = "000" ]; then
     log_warning "Could not reach external endpoint (DNS/network issue, not a deploy failure)"
   elif [ "$EXT_RESPONSE" = "500" ] || [ "$EXT_RESPONSE" = "502" ] || [ "$EXT_RESPONSE" = "503" ]; then
-    abort "External endpoint returned HTTP $EXT_RESPONSE (server error)"
+    log_error "External endpoint returned HTTP $EXT_RESPONSE (server error)"
+    return 1
   else
     log_warning "External endpoint returned HTTP $EXT_RESPONSE"
   fi
@@ -568,7 +575,8 @@ run_health_checks() {
   NEW_LOG_ENTRIES=$(docker logs --since "$DEPLOY_START_ISO" arls-app 2>&1 | wc -l)
 
   if docker logs --since "$DEPLOY_START_ISO" arls-app 2>&1 | grep -i "/opt/arls-ferraz/producao" > /dev/null 2>&1; then
-    abort "CRITICAL: Found /opt/arls-ferraz/producao in NEW logs after deployment started"
+    log_error "CRITICAL: Found /opt/arls-ferraz/producao in NEW logs after deployment started"
+    return 1
   fi
   log_success "No HOST path references in new logs"
   log "Processed $NEW_LOG_ENTRIES new log entries"
