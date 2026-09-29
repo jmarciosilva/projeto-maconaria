@@ -120,6 +120,7 @@ Route::get('/paginas-institucionais', [PaginaInstitucionalController::class, 'in
     Route::post('/chancelaria/frequencias', [ChancelariaFrequenciaController::class, 'armazenarSessao'])->name('chancelaria.frequencias.armazenar-sessao');
     Route::get('/chancelaria/frequencias/{evento}', [ChancelariaFrequenciaController::class, 'edit'])->name('chancelaria.frequencias.edit');
     Route::put('/chancelaria/frequencias/{evento}', [ChancelariaFrequenciaController::class, 'update'])->name('chancelaria.frequencias.update');
+    Route::delete('/chancelaria/frequencias/{evento}/irmaos/{irmao}', [ChancelariaFrequenciaController::class, 'limpar'])->name('chancelaria.frequencias.limpar');
     Route::resource('/chancelaria/visitantes', ChancelariaVisitanteController::class)
         ->except(['show'])
         ->names('chancelaria.visitantes');

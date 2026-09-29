@@ -156,8 +156,9 @@ final class ConteudoAjuda
                 'itens' => [
                     'Não tem a sessão cadastrada ainda? Use o formulário "Registrar sessão passada" no topo desta tela — só título (opcional), data e local. Ele já leva direto para a tela de lançar presença.',
                     'Se a sessão já existir na lista (ou for um evento cadastrado pela Secretaria), escolha ela na lista — as mais recentes aparecem primeiro.',
-                    'Em seguida, marque para cada Irmão o status: Presente, Ausente ou Justificado, com uma observação opcional. O botão "Marcar todos como Presente" agiliza quando quase todos compareceram.',
-                    'Deixar o status de um Irmão em branco remove a marcação dele para aquele evento, caso já exista uma.',
+                    'Em seguida, marque para cada Irmão o status: Presente, Ausente ou Justificado. Ao escolher Justificado, informe o motivo no campo ao lado — ele será exigido quando a frequência da sessão for concluída.',
+                    'Os botões "Marcar pendentes como presentes" e "Marcar pendentes como ausentes" agilizam o preenchimento, e alteram apenas quem ainda está sem lançamento: ninguém já marcado é sobrescrito.',
+                    'Salvar nunca apaga um lançamento. Para remover a marcação de um Irmão naquela sessão, use "Limpar lançamento" na linha dele e confirme — a remoção fica registrada na auditoria.',
                     'Se um Irmão ainda não está cadastrado, cadastre-o primeiro em Irmãos → Novo Irmão — ele só aparece nesta lista depois de cadastrado.',
                 ],
                 'exemplos' => [

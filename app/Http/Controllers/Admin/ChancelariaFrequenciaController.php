@@ -117,12 +117,10 @@ final class ChancelariaFrequenciaController extends Controller
     {
         DB::transaction(function () use ($request, $evento): void {
             foreach ($request->input('frequencias', []) as $irmaoId => $dados) {
+                // Campo sem lançamento significa "nada a dizer sobre este
+                // Irmão", e não "apague o que já foi lançado". Remover um
+                // registro é ação explícita — ver limpar().
                 if (blank($dados['status'] ?? null)) {
-                    ChancelariaFrequencia::query()
-                        ->where('evento_id', $evento->id)
-                        ->where('irmao_id', $irmaoId)
-                        ->delete();
-
                     continue;
                 }
 
@@ -143,5 +141,45 @@ final class ChancelariaFrequenciaController extends Controller
         });
 
         return back()->with('sucesso', 'Frequência registrada com sucesso.');
+    }
+
+    /**
+     * Remove o lançamento de um Irmão nesta sessão.
+     *
+     * Existe para que apagar um registro seja sempre um ato deliberado e
+     * auditável, nunca efeito colateral de salvar o formulário.
+     */
+    public function limpar(Evento $evento, Irmao $irmao): RedirectResponse
+    {
+        $this->authorize('chancelaria.editar');
+
+        $frequencia = ChancelariaFrequencia::query()
+            ->where('evento_id', $evento->id)
+            ->where('irmao_id', $irmao->id)
+            ->first();
+
+        if ($frequencia === null) {
+            return back()->with('erro', 'Este Irmão não possui lançamento nesta sessão.');
+        }
+
+        DB::transaction(function () use ($evento, $irmao, $frequencia): void {
+            // Guarda o que havia antes: é o que permite reconstruir o
+            // lançamento removido a partir da auditoria.
+            RegistradorDeAuditoria::registrar(
+                acao: 'limpar-frequencia',
+                modulo: 'chancelaria',
+                entidade: 'Evento',
+                entidadeId: $evento->id,
+                dadosAnteriores: [
+                    'irmao_id' => $irmao->id,
+                    'status' => $frequencia->status->value,
+                    'observacao' => $frequencia->observacao,
+                ],
+            );
+
+            $frequencia->delete();
+        });
+
+        return back()->with('sucesso', "Lançamento de {$irmao->nome_completo} removido desta sessão.");
     }
 }
