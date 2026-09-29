@@ -1,0 +1,341 @@
+/*
+ * Impressão de documentos institucionais (Chancelaria).
+ *
+ * O painel administrativo é uma interface de trabalho; o papel é outro
+ * artefato. Estas regras transformam a página do relatório em documento:
+ * escondem a moldura administrativa e reconstroem o conteúdo em A4
+ * paisagem, com cabeçalho institucional, tabela de larguras fixas e
+ * quebras de página controladas.
+ *
+ * Tudo aqui é aditivo e quase todo restrito a `@media print` — a única
+ * regra de tela é a troca entre rótulos longos e abreviados.
+ */
+
+/* Rótulos abreviados existem no HTML o tempo todo (leitores de tela e
+   testes enxergam ambos), mas só aparecem no papel. */
+.rotulo-curto {
+    display: none;
+}
+
+@media print {
+    @page {
+        size: A4 landscape;
+        /* Margem inferior maior: sobra para o rodapé do navegador quando o
+           usuário mantém cabeçalho/rodapé ligados no diálogo de impressão. */
+        margin: 14mm 15mm 16mm;
+    }
+
+    /* ---------------------------------------------------------------
+       1. Só o documento vai ao papel
+       --------------------------------------------------------------- */
+
+    .nao-imprimir {
+        display: none !important;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    /* A moldura do painel é construída com flex e min-h-screen; no papel
+       isso vira fluxo de blocos, senão o documento herda altura de tela. */
+    body.layout-admin {
+        min-height: 0 !important;
+        font-size: 10pt;
+    }
+
+    body.layout-admin > div,
+    body.layout-admin > div > div {
+        display: block !important;
+        min-height: 0 !important;
+    }
+
+    body.layout-admin main {
+        padding: 0 !important;
+    }
+
+    /* ---------------------------------------------------------------
+       2. O documento
+       --------------------------------------------------------------- */
+
+    .documento {
+        background: #fff !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        color: #000 !important;
+        padding: 0 !important;
+    }
+
+    .documento__cabecalho {
+        border-bottom: 1pt solid #1d2a5c;
+        break-after: avoid;
+        margin: 0 0 6mm;
+        padding: 0 0 4mm;
+        text-align: center;
+    }
+
+    .documento__brasao {
+        display: block;
+        height: 20mm;
+        margin: 0 auto 2mm;
+        object-fit: contain;
+        width: auto;
+    }
+
+    .documento__loja {
+        font-size: 13pt;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    .documento__orgao {
+        font-size: 9.5pt;
+        letter-spacing: 0.18em;
+        margin: 1mm 0 0;
+        text-transform: uppercase;
+    }
+
+    .documento__titulo {
+        font-size: 15pt;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        margin: 3mm 0 0;
+        text-transform: uppercase;
+    }
+
+    .documento__periodo {
+        font-size: 10pt;
+        margin: 1.5mm 0 0;
+    }
+
+    /* ---------------------------------------------------------------
+       3. Resumo
+       --------------------------------------------------------------- */
+
+    .documento__resumo {
+        border: 0.5pt solid #9aa3b2;
+        break-inside: avoid;
+        display: flex;
+        gap: 0;
+        margin: 0 0 5mm;
+        padding: 0;
+    }
+
+    .documento__resumo-item {
+        border-left: 0.5pt solid #c7ccd6;
+        flex: 1;
+        padding: 2.5mm 4mm;
+    }
+
+    .documento__resumo-item:first-child {
+        border-left: 0;
+    }
+
+    .documento__resumo-rotulo {
+        display: block;
+        font-size: 7.5pt;
+        letter-spacing: 0.08em;
+        margin: 0 0 0.8mm;
+        text-transform: uppercase;
+    }
+
+    .documento__resumo-valor {
+        display: block;
+        font-size: 10.5pt;
+        font-weight: 700;
+    }
+
+    /* ---------------------------------------------------------------
+       4. Tabela
+       --------------------------------------------------------------- */
+
+    /* Na tela a tabela rola na horizontal; no papel isso cortaria colunas. */
+    .documento__tabela-wrap {
+        overflow: visible !important;
+    }
+
+    .documento__tabela {
+        border-collapse: collapse;
+        font-size: 8.5pt;
+        /* Larguras fixas garantem que as 9 colunas caibam na página:
+           é o que impede o corte horizontal. */
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    /* Cabeçalho repetido em toda página; nota de rodapé da tabela ao fim. */
+    .documento__tabela thead {
+        display: table-header-group;
+    }
+
+    .documento__tabela tfoot {
+        display: table-footer-group;
+    }
+
+    .documento__tabela tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .documento__tabela th,
+    .documento__tabela td {
+        border: 0.4pt solid #8d95a3;
+        overflow-wrap: break-word;
+        padding: 1.6mm 2mm;
+        vertical-align: top;
+    }
+
+    .documento__tabela thead th {
+        background: #e8ecf2 !important;
+        font-size: 7.5pt;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        /* Sem isto o Chrome descarta o fundo quando "gráficos de plano de
+           fundo" está desligado — as bordas seguram a estrutura de qualquer
+           forma, então o documento continua legível se for ignorado. */
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        text-transform: uppercase;
+    }
+
+    /* As larguras somam exatamente 100%: com table-layout fixo, é isso que
+       mantém as 9 colunas dentro da página, sem corte horizontal. */
+    .documento__tabela .col-cim {
+        width: 8%;
+    }
+
+    .documento__tabela .col-nome {
+        width: 28%;
+    }
+
+    .documento__tabela .col-num {
+        text-align: center;
+        width: 7.6%;
+    }
+
+    .documento__tabela .col-freq {
+        text-align: center;
+        width: 9%;
+    }
+
+    .documento__tabela .col-indicador {
+        width: 17%;
+    }
+
+    .documento__celula-nome {
+        font-weight: 600;
+    }
+
+    .documento__celula-freq {
+        font-weight: 700;
+    }
+
+    .documento__sem-dados {
+        font-weight: 400;
+    }
+
+    /* Indicador legível em preto e branco: o contorno e o símbolo carregam
+       a informação, a cor é só reforço. */
+    .documento__indicador {
+        border: 0.5pt solid #000;
+        display: inline-block;
+        font-size: 7.5pt;
+        font-weight: 700;
+        padding: 0.4mm 1.5mm;
+        white-space: nowrap;
+    }
+
+    .documento__rodape-tabela td {
+        border: 0 !important;
+        font-size: 7.5pt;
+        padding: 1.5mm 0 0 !important;
+    }
+
+    /* ---------------------------------------------------------------
+       5. Critério, emissão e assinatura
+       --------------------------------------------------------------- */
+
+    .documento__criterio,
+    .documento__emissao,
+    .documento__assinatura,
+    .documento__rodape {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .documento__criterio {
+        border: 0.5pt solid #9aa3b2;
+        font-size: 8pt;
+        line-height: 1.45;
+        margin: 6mm 0 0;
+        padding: 3mm 4mm;
+    }
+
+    .documento__criterio-titulo {
+        font-size: 8pt;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        margin: 0 0 1.5mm;
+        text-transform: uppercase;
+    }
+
+    .documento__criterio p {
+        margin: 0 0 1.5mm;
+    }
+
+    .documento__criterio p:last-child {
+        margin-bottom: 0;
+    }
+
+    .documento__emissao {
+        display: flex;
+        font-size: 8.5pt;
+        gap: 10mm;
+        justify-content: space-between;
+        margin: 6mm 0 0;
+    }
+
+    .documento__assinatura {
+        margin: 14mm auto 0;
+        text-align: center;
+        width: 90mm;
+    }
+
+    .documento__assinatura-linha {
+        border-top: 0.5pt solid #000;
+        display: block;
+        margin: 0 0 1.5mm;
+    }
+
+    .documento__assinatura-rotulo {
+        font-size: 8.5pt;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .documento__rodape {
+        border-top: 0.5pt solid #9aa3b2;
+        display: flex;
+        font-size: 7.5pt;
+        justify-content: space-between;
+        margin: 8mm 0 0;
+        padding: 1.5mm 0 0;
+    }
+
+    /* ---------------------------------------------------------------
+       6. Rótulos
+       --------------------------------------------------------------- */
+
+    .rotulo-completo {
+        display: none !important;
+    }
+
+    .rotulo-curto {
+        display: inline !important;
+    }
+}

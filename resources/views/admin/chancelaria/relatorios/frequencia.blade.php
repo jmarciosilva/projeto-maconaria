@@ -1,19 +1,15 @@
-<x-layouts.admin titulo="Relatório de Frequência">
-    {{-- Estilo de impressão local a esta página: o layout admin não expõe stack de styles. --}}
-    <style>
-        @media print {
-            /* Mantém só o relatório: título, período, tabela, nota e responsável. */
-            body * { visibility: hidden; }
-            #relatorio-frequencia, #relatorio-frequencia * { visibility: visible; }
-            #relatorio-frequencia { position: absolute; inset: 0; width: 100%; padding: 0; }
-            .nao-imprimir { display: none !important; }
-            table { font-size: 11px; }
-            thead { display: table-header-group; }
-            tr { break-inside: avoid; }
-            @page { margin: 12mm; }
-        }
-    </style>
+@php
+    $configuracaoInstitucional = \App\Models\ConfiguracaoInstitucional::atual();
 
+    // Mesmo asset e mesmo fallback usados pelo site público e pela área
+    // restrita: arquivo local, nunca URL externa, para que o navegador o
+    // tenha em cache no momento da impressão.
+    $brasao = $configuracaoInstitucional->logotipo
+        ? asset('storage/'.$configuracaoInstitucional->logotipo)
+        : asset('images/logo-loja.png');
+@endphp
+
+<x-layouts.admin titulo="Relatório de Frequência">
     <section class="nao-imprimir mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 class="text-base font-semibold text-gray-900">Relatório de frequência</h2>
         <p class="mt-0.5 text-sm text-gray-500">Informe o período para apurar a frequência dos Irmãos nas sessões registradas.</p>
@@ -23,10 +19,22 @@
             <x-ui.input rotulo="Data final" nome="fim" tipo="date" :valor="request('fim', $fim->toDateString())" :erro="$errors->first('fim')" />
             <x-ui.select rotulo="Ordenar por" nome="ordenar" :opcoes="['nome' => 'Nome', 'frequencia' => 'Frequência']" :valor="$ordenar" />
 
-            <div class="sm:col-span-4">
+            <div class="flex flex-wrap items-center gap-3 sm:col-span-4">
                 <x-ui.button tipo="submit">Gerar relatório</x-ui.button>
+
                 @if ($gerou)
-                    <button type="button" onclick="window.print()" class="ml-3 text-sm font-semibold text-blue-800 hover:underline">Imprimir / Salvar PDF</button>
+                    <button
+                        type="button"
+                        onclick="window.print()"
+                        class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+                    >
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829V6.75a1.5 1.5 0 0 1 1.5-1.5h7.56a1.5 1.5 0 0 1 1.5 1.5v7.079M6.72 13.829H5.25a1.5 1.5 0 0 0-1.5 1.5v2.25a1.5 1.5 0 0 0 1.5 1.5h1.47m0-5.25h10.56m0 0h1.47a1.5 1.5 0 0 1 1.5 1.5v2.25a1.5 1.5 0 0 1-1.5 1.5h-1.47m-10.56 0v3.421a.75.75 0 0 0 .75.75h9.06a.75.75 0 0 0 .75-.75v-3.421" />
+                        </svg>
+                        Imprimir / Salvar PDF
+                    </button>
+
+                    <span class="text-xs text-gray-500">Impressão em A4 paisagem.</span>
                 @endif
             </div>
         </form>
@@ -35,55 +43,85 @@
     @if (! $gerou)
         <x-ui.empty-state titulo="Selecione um período" descricao="Escolha a data inicial e a data final e clique em Gerar relatório." />
     @else
-        <div id="relatorio-frequencia" class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <header class="mb-5 border-b border-gray-200 pb-4">
-                <h1 class="text-lg font-bold text-gray-900">Relatório de Frequência</h1>
-                <dl class="mt-2 grid gap-x-8 gap-y-1 text-sm text-gray-700 sm:grid-cols-2">
-                    <div><dt class="inline font-medium">Período:</dt> <dd class="inline">{{ $inicio->format('d/m/Y') }} a {{ $fim->format('d/m/Y') }}</dd></div>
-                    <div><dt class="inline font-medium">Sessões encontradas no período:</dt> <dd class="inline">{{ $totalSessoes }}</dd></div>
-                    <div><dt class="inline font-medium">Gerado em:</dt> <dd class="inline">{{ now()->format('d/m/Y H:i') }}</dd></div>
-                    <div><dt class="inline font-medium">Gerado por:</dt> <dd class="inline">{{ auth()->user()?->name }}</dd></div>
-                </dl>
+        <article id="relatorio-frequencia" class="documento rounded-lg border border-gray-200 bg-white p-6 text-gray-900 shadow-sm sm:p-8">
+            {{-- Cabeçalho institucional: reutiliza apenas o que já está
+                 configurado no sistema (brasão e nome da Loja). --}}
+            <header class="documento__cabecalho mb-6 border-b border-gray-300 pb-5 text-center">
+                <img src="{{ $brasao }}" alt="Brasão da {{ $configuracaoInstitucional->nome() }}" class="documento__brasao mx-auto mb-3 h-16 w-16 object-contain">
+
+                <p class="documento__loja text-sm font-bold uppercase tracking-wide text-gray-900 sm:text-base">{{ $configuracaoInstitucional->nome() }}</p>
+                <p class="documento__orgao mt-0.5 text-xs uppercase tracking-[0.18em] text-gray-600">Chancelaria</p>
+
+                <h2 class="documento__titulo mt-4 text-lg font-bold uppercase tracking-wide text-gray-900 sm:text-xl">Relatório de Frequência</h2>
+                <p class="documento__periodo mt-1 text-sm text-gray-700">Período: {{ $inicio->format('d/m/Y') }} a {{ $fim->format('d/m/Y') }}</p>
             </header>
+
+            {{-- Resumo: apenas totais que a apuração já devolve. --}}
+            <section class="documento__resumo mb-6 grid gap-px overflow-hidden rounded-md border border-gray-300 bg-gray-300 sm:grid-cols-3">
+                <div class="documento__resumo-item bg-white px-4 py-3">
+                    <span class="documento__resumo-rotulo block text-[0.7rem] uppercase tracking-wider text-gray-600">Período</span>
+                    <span class="documento__resumo-valor block text-sm font-bold text-gray-900">{{ $inicio->format('d/m/Y') }} a {{ $fim->format('d/m/Y') }}</span>
+                </div>
+                <div class="documento__resumo-item bg-white px-4 py-3">
+                    <span class="documento__resumo-rotulo block text-[0.7rem] uppercase tracking-wider text-gray-600">Sessões encontradas no período</span>
+                    <span class="documento__resumo-valor block text-sm font-bold text-gray-900">{{ $totalSessoes }}</span>
+                </div>
+                <div class="documento__resumo-item bg-white px-4 py-3">
+                    <span class="documento__resumo-rotulo block text-[0.7rem] uppercase tracking-wider text-gray-600">Irmãos relacionados</span>
+                    <span class="documento__resumo-valor block text-sm font-bold text-gray-900">{{ $linhas->count() }}</span>
+                </div>
+            </section>
 
             @if ($linhas->isEmpty())
                 <p class="text-sm text-gray-600">Nenhum Irmão cadastrado para apurar.</p>
             @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-600">
-                            <tr>
-                                <th class="px-3 py-2">CIM</th>
-                                <th class="px-3 py-2">Irmão</th>
-                                <th class="px-3 py-2 text-right">Sessões consideradas</th>
-                                <th class="px-3 py-2 text-right">Presenças</th>
-                                <th class="px-3 py-2 text-right">Ausências</th>
-                                <th class="px-3 py-2 text-right">Justificadas</th>
-                                <th class="px-3 py-2 text-right">Não informadas</th>
-                                <th class="px-3 py-2 text-right">Frequência</th>
-                                <th class="px-3 py-2">Indicador</th>
+                <div class="documento__tabela-wrap overflow-x-auto">
+                    <table class="documento__tabela min-w-full border-collapse text-sm">
+                        <thead>
+                            <tr class="border-y border-gray-300 bg-gray-100 text-left text-xs font-semibold uppercase tracking-wide text-gray-700">
+                                <th scope="col" class="col-cim px-3 py-2">CIM</th>
+                                <th scope="col" class="col-nome px-3 py-2">Irmão</th>
+                                <th scope="col" class="col-num px-3 py-2 text-center">
+                                    <span class="rotulo-completo">Sessões consideradas</span><span class="rotulo-curto">Consider.</span>
+                                </th>
+                                <th scope="col" class="col-num px-3 py-2 text-center">
+                                    <span class="rotulo-completo">Presenças</span><span class="rotulo-curto">Pres.</span>
+                                </th>
+                                <th scope="col" class="col-num px-3 py-2 text-center">
+                                    <span class="rotulo-completo">Ausências</span><span class="rotulo-curto">Aus.</span>
+                                </th>
+                                <th scope="col" class="col-num px-3 py-2 text-center">
+                                    <span class="rotulo-completo">Justificadas</span><span class="rotulo-curto">Just.</span>
+                                </th>
+                                <th scope="col" class="col-num px-3 py-2 text-center">
+                                    <span class="rotulo-completo">Não informadas</span><span class="rotulo-curto">N/Inf.</span>
+                                </th>
+                                <th scope="col" class="col-freq px-3 py-2 text-center">
+                                    <span class="rotulo-completo">Frequência</span><span class="rotulo-curto">Freq.</span>
+                                </th>
+                                <th scope="col" class="col-indicador px-3 py-2">Indicador</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-gray-200">
                             @foreach ($linhas as $linha)
                                 <tr>
                                     <td class="px-3 py-2 text-gray-600">{{ $linha['cim'] ?: '—' }}</td>
-                                    <td class="px-3 py-2 font-medium text-gray-900">{{ $linha['nome'] }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-700">{{ $linha['consideradas'] }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-700">{{ $linha['presencas'] }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-700">{{ $linha['ausencias'] }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-700">{{ $linha['justificadas'] }}</td>
-                                    <td class="px-3 py-2 text-right text-gray-500">{{ $linha['nao_informadas'] }}</td>
-                                    <td class="px-3 py-2 text-right font-semibold text-gray-900">
+                                    <td class="documento__celula-nome px-3 py-2 font-medium text-gray-900">{{ $linha['nome'] }}</td>
+                                    <td class="px-3 py-2 text-center text-gray-700">{{ $linha['consideradas'] }}</td>
+                                    <td class="px-3 py-2 text-center text-gray-700">{{ $linha['presencas'] }}</td>
+                                    <td class="px-3 py-2 text-center text-gray-700">{{ $linha['ausencias'] }}</td>
+                                    <td class="px-3 py-2 text-center text-gray-700">{{ $linha['justificadas'] }}</td>
+                                    <td class="px-3 py-2 text-center text-gray-500">{{ $linha['nao_informadas'] }}</td>
+                                    <td class="documento__celula-freq px-3 py-2 text-center font-semibold text-gray-900">
                                         @if ($linha['percentual'] === null)
-                                            <span class="font-normal text-gray-500" title="Sem sessões consideradas no período">— Sem dados</span>
+                                            <span class="documento__sem-dados font-normal text-gray-500" title="Sem sessões consideradas no período">— Sem dados</span>
                                         @else
                                             {{ number_format($linha['percentual'], 1, ',', '.') }}%
                                         @endif
                                     </td>
                                     <td class="px-3 py-2">
                                         @if ($linha['abaixo_do_limite'])
-                                            <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                                            <span class="documento__indicador inline-flex items-center rounded border border-gray-400 bg-gray-50 px-2 py-0.5 text-xs font-semibold text-gray-800">
                                                 &#9888; Frequência abaixo de {{ (int) $limiteIndicador }}%
                                             </span>
                                         @endif
@@ -91,22 +129,51 @@
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot>
+                            <tr class="documento__rodape-tabela">
+                                <td colspan="9" class="px-3 pt-2 text-xs text-gray-500">
+                                    &#9888; Indicador para análise da Chancelaria. Não representa decisão sobre a situação do Irmão.
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             @endif
 
-            <footer class="mt-6 border-t border-gray-200 pt-4 text-xs leading-relaxed text-gray-600">
+            <section class="documento__criterio mt-6 rounded-md border border-gray-300 p-4 text-xs leading-relaxed text-gray-700">
+                <h3 class="documento__criterio-titulo mb-1.5 text-xs font-bold uppercase tracking-widest text-gray-900">Critério deste relatório</h3>
                 <p>
-                    <strong>Critério deste relatório:</strong> o percentual de frequência considera apenas as sessões
-                    do período em que houve lançamento explícito de frequência para o Irmão. Registros justificados
-                    são contabilizados como ausência para efeito do percentual, mas permanecem discriminados em coluna
-                    própria. Sessões sem lançamento são apresentadas como &ldquo;Não informadas&rdquo; e não integram o cálculo.
+                    O percentual de frequência considera apenas as sessões do período em que houve lançamento explícito
+                    de frequência para o Irmão. Registros justificados são contabilizados como ausência para efeito do
+                    percentual, mas permanecem discriminados em coluna própria. Sessões sem lançamento são apresentadas
+                    como &ldquo;Não informadas&rdquo; e não integram o cálculo.
                 </p>
-                <p class="mt-2">
+                <p class="mt-1.5">
                     Frequência abaixo de {{ (int) $limiteIndicador }}% é apenas um indicador para análise e não representa
                     decisão automática sobre a situação do Irmão.
                 </p>
+            </section>
+
+            <section class="documento__emissao mt-6 flex flex-wrap justify-between gap-x-10 gap-y-1 text-xs text-gray-700">
+                <span>Emitido em: {{ now()->format('d/m/Y') }} às {{ now()->format('H:i') }}</span>
+                @if (filled(auth()->user()?->name))
+                    <span>Emitido por: {{ auth()->user()->name }}</span>
+                @endif
+            </section>
+
+            {{-- Linha de assinatura deliberadamente em branco: o sistema sabe
+                 quem emitiu o relatório, mas não tem como afirmar quem responde
+                 pela Chancelaria, então nada é preenchido automaticamente. --}}
+            <section class="documento__assinatura mx-auto mt-12 w-72 text-center">
+                <span class="documento__assinatura-linha block border-t border-gray-500"></span>
+                <span class="documento__assinatura-rotulo mt-1.5 inline-block text-xs uppercase tracking-widest text-gray-700">Chancelaria</span>
+            </section>
+
+            <footer class="documento__rodape mt-8 flex flex-wrap justify-between gap-x-6 gap-y-1 border-t border-gray-300 pt-2 text-[0.7rem] text-gray-500">
+                <span>Relatório de Frequência — Chancelaria</span>
+                <span>{{ $configuracaoInstitucional->nome() }}</span>
+                <span>Emitido em {{ now()->format('d/m/Y') }}</span>
             </footer>
-        </div>
+        </article>
     @endif
 </x-layouts.admin>

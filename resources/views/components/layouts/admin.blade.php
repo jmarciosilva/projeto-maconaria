@@ -16,14 +16,14 @@ $ajuda = \App\Support\Ajuda\ConteudoAjuda::paraRota(request()->route()?->getName
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body
-    class="min-h-screen bg-gray-100 font-sans text-gray-900 antialiased"
+    class="layout-admin min-h-screen bg-gray-100 font-sans text-gray-900 antialiased"
     x-data="{ menuAberto: false, sidebarColapsada: localStorage.getItem('admin-sidebar-colapsada') === '1' }"
 >
     <div class="flex min-h-screen">
         {{-- Menu lateral (desktop): sticky e com rolagem própria, para que
              descer até um item no fim do menu não role a página inteira. --}}
         <aside
-            class="hidden shrink-0 overflow-hidden bg-[#14213D] text-white transition-[width] duration-200 lg:sticky lg:top-0 lg:block lg:h-screen lg:overflow-y-auto"
+            class="nao-imprimir hidden shrink-0 overflow-hidden bg-[#14213D] text-white transition-[width] duration-200 lg:sticky lg:top-0 lg:block lg:h-screen lg:overflow-y-auto"
             :class="sidebarColapsada ? 'lg:w-0' : 'lg:w-64'"
         >
             <div class="w-64">
@@ -32,7 +32,7 @@ $ajuda = \App\Support\Ajuda\ConteudoAjuda::paraRota(request()->route()?->getName
         </aside>
 
         {{-- Menu lateral (mobile, sobreposto) --}}
-        <div x-show="menuAberto" x-cloak class="fixed inset-0 z-40 lg:hidden">
+        <div x-show="menuAberto" x-cloak class="nao-imprimir fixed inset-0 z-40 lg:hidden">
             <div class="fixed inset-0 bg-black/50" @click="menuAberto = false"></div>
             <aside class="relative z-50 h-full w-64 overflow-y-auto bg-[#14213D] text-white">
                 @include('components.layouts.partials.admin-nav')
@@ -40,7 +40,7 @@ $ajuda = \App\Support\Ajuda\ConteudoAjuda::paraRota(request()->route()?->getName
         </div>
 
         <div class="flex flex-1 flex-col">
-            <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
+            <header class="nao-imprimir flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
                 <div class="flex items-center gap-1">
                     <button
                         type="button"
