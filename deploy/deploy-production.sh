@@ -406,8 +406,17 @@ wait_for_app_readiness() {
   while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     ATTEMPT=$((ATTEMPT + 1))
 
-    # Check 1: Container is running (explicitly use correct filter)
-    if ! docker ps --filter "name=^arls-app$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "arls-app"; then
+    # Check 1: app container is running (exact name match to avoid matching the
+    # web container, whose image name "arls-app-web" also contains "arls-app")
+    if ! docker ps --filter "name=^arls-app$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "^arls-app$"; then
+      echo -n "."
+      sleep 1
+      continue
+    fi
+
+    # Check 1b: web (nginx) container is running — health checks and the public
+    # endpoint depend on it, so readiness must wait for it too
+    if ! docker ps --filter "name=^arls-web$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "^arls-web$"; then
       echo -n "."
       sleep 1
       continue
@@ -521,14 +530,16 @@ run_health_checks() {
   DEPLOYMENT_PHASE="healthcheck"
   log_step "Running health checks"
 
-  # Check container status
-  if ! docker ps | grep -q arls-app; then
+  # Check container status (exact, running-only filters — a plain
+  # "docker ps | grep arls-app" also matches the web container's image name
+  # "arls-app-web" and ignores whether the container is actually running)
+  if ! docker ps --filter "name=^arls-app$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "^arls-app$"; then
     log_error "Container arls-app is not running"
     return 1
   fi
   log_success "Container arls-app is running"
 
-  if ! docker ps | grep -q arls-web; then
+  if ! docker ps --filter "name=^arls-web$" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "^arls-web$"; then
     log_error "Container arls-web is not running"
     return 1
   fi
@@ -587,13 +598,17 @@ run_health_checks() {
 # ============================================================================
 
 rollback_deployment() {
-  log_step "ROLLING BACK to previous images"
-
-  # Prevent recursive rollback
+  # Prevent recursive rollback (e.g. an interrupt fired while already rolling
+  # back). This guard must be checked BEFORE the flag is set, and the flag is
+  # owned by this function — callers must NOT pre-set it, otherwise the first,
+  # legitimate rollback would be refused as if it were a recursive call.
   if [ "$ROLLBACK_IN_PROGRESS" = "true" ]; then
     log_error "Rollback already in progress - preventing recursive rollback"
     return 1
   fi
+  ROLLBACK_IN_PROGRESS=true
+
+  log_step "ROLLING BACK to previous images"
 
   if [ -z "${ROLLBACK_TAG:-}" ]; then
     abort "No rollback tag available. Manual intervention required."
@@ -691,7 +706,6 @@ main() {
   wait_for_app_readiness || {
     log_error "Application readiness failed"
     log "Triggering automatic rollback..."
-    ROLLBACK_IN_PROGRESS=true
     rollback_deployment || abort "Rollback itself failed - manual intervention required"
     abort "Deploy failed, automatic rollback completed"
   }
@@ -699,17 +713,30 @@ main() {
   run_artisan_commands || {
     log_error "Artisan commands failed"
     log "Triggering automatic rollback..."
-    ROLLBACK_IN_PROGRESS=true
     rollback_deployment || abort "Rollback itself failed - manual intervention required"
     abort "Deploy failed, automatic rollback completed"
   }
 
-  restart_app_container
+  restart_app_container || {
+    log_error "Application restart failed"
+    log "Triggering automatic rollback..."
+    rollback_deployment || abort "Rollback itself failed - manual intervention required"
+    abort "Deploy failed, automatic rollback completed"
+  }
+
+  # The restart above only sends the signal and returns immediately. Wait for
+  # the app (and web) to be ready again BEFORE health-checking, otherwise the
+  # checks race the still-restarting containers and report a false negative.
+  wait_for_app_readiness || {
+    log_error "Application did not become ready after restart"
+    log "Triggering automatic rollback..."
+    rollback_deployment || abort "Rollback itself failed - manual intervention required"
+    abort "Deploy failed, automatic rollback completed"
+  }
 
   if ! run_health_checks; then
     log_error "Health checks failed"
     log "Triggering automatic rollback..."
-    ROLLBACK_IN_PROGRESS=true
     rollback_deployment || abort "Rollback itself failed - manual intervention required"
     abort "Deploy failed, automatic rollback completed"
   fi
