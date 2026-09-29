@@ -28,10 +28,10 @@
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($noticia->fotos as $foto)
                         <div class="overflow-hidden rounded-lg">
-                            <div class="aspect-[16/10] w-full">
+                            <div class="aspect-square w-full rounded-lg bg-gray-50">
                                 <img src="{{ Storage::url($foto->caminho) }}"
                                      alt="{{ $foto->descricao ?: 'Foto da notícia: ' . $noticia->titulo }}"
-                                     class="h-full w-full object-cover object-center"
+                                     class="h-full w-full object-contain object-center"
                                      loading="lazy">
                             </div>
                             @if ($foto->descricao)

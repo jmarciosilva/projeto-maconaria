@@ -738,6 +738,8 @@ class NoticiaControllerTest extends TestCase
         $response->assertSee('preview3.jpg', false);
         $response->assertDontSee('preview4.jpg', false);
         $response->assertDontSee('preview5.jpg', false);
+        // As 4 fotos da prévia devem aparecer inteiras (object-contain), sem recorte
+        $this->assertSame(4, substr_count($response->getContent(), 'aspect-square w-full object-contain object-center'));
     }
 
     public function test_create_form_shows_publication_datetime_field(): void

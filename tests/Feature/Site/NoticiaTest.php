@@ -40,6 +40,44 @@ class NoticiaTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_gallery_photos_are_shown_whole_and_not_cropped(): void
+    {
+        $noticia = Noticia::factory()->publicada()->create([
+            'slug' => 'noticia-galeria-sem-corte',
+        ]);
+
+        for ($i = 0; $i < 3; $i++) {
+            $noticia->fotos()->create([
+                'caminho' => "noticias/fotos/inteira$i.jpg",
+                'ordem' => $i,
+            ]);
+        }
+
+        $html = $this->get(route('noticias.mostrar', $noticia->slug))
+            ->assertOk()
+            ->getContent();
+
+        // Uma foto recortada usaria object-cover; a galeria deve exibir a
+        // fotografia inteira (object-contain), uma ocorrência por foto.
+        $this->assertSame(3, substr_count($html, 'h-full w-full object-contain object-center'));
+        $this->assertStringNotContainsString('object-cover object-center', $html);
+    }
+
+    public function test_news_without_photos_has_no_gallery_image_styling(): void
+    {
+        $noticia = Noticia::factory()->publicada()->create([
+            'slug' => 'noticia-galeria-vazia',
+        ]);
+
+        $html = $this->get(route('noticias.mostrar', $noticia->slug))
+            ->assertOk()
+            ->getContent();
+
+        // Garante que a marcação medida acima vem da galeria, e não do layout
+        // (o logotipo do site também usa object-contain em toda página).
+        $this->assertSame(0, substr_count($html, 'h-full w-full object-contain object-center'));
+    }
+
     public function test_public_detail_renders_content_before_photo_gallery(): void
     {
         $noticia = Noticia::factory()->publicada()->create([

@@ -78,10 +78,10 @@ $noticiasSecundarias = $noticiasEmDestaque->slice(1);
                             <div class="mt-6">
                                 <div class="grid gap-3 {{ $noticiaPrincipal->fotos->count() >= 3 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-' . min($noticiaPrincipal->fotos->count(), 2) }}">
                                     @foreach ($noticiaPrincipal->fotos->take(4) as $foto)
-                                        <div class="overflow-hidden rounded-lg">
+                                        <div class="overflow-hidden rounded-lg bg-gray-50">
                                             <img src="{{ Storage::url($foto->caminho) }}"
                                                  alt="{{ $foto->descricao ?: 'Foto da notícia: ' . $noticiaPrincipal->titulo }}"
-                                                 class="aspect-[16/10] w-full object-cover object-center"
+                                                 class="aspect-square w-full object-contain object-center"
                                                  loading="lazy">
                                         </div>
                                     @endforeach
