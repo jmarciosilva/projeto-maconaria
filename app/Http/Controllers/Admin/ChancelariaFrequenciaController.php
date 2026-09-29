@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ClasseSessao;
 use App\Enums\StatusEvento;
 use App\Enums\StatusFrequencia;
 use App\Enums\TipoEvento;
@@ -16,6 +17,7 @@ use App\Models\Evento;
 use App\Models\Irmao;
 use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,16 +25,39 @@ use Illuminate\View\View;
 
 final class ChancelariaFrequenciaController extends Controller
 {
-    public function selecionarEvento(): View
+    public function selecionarEvento(Request $request): View
     {
         $this->authorize('chancelaria.visualizar');
 
-        $eventos = Evento::query()
+        // Anos que realmente possuem sessão registrada, para o filtro.
+        // Derivado em PHP para não depender de função de data específica do
+        // banco (YEAR() não existe no SQLite usado nos testes).
+        $anosDisponiveis = Evento::query()
+            ->where('tipo', TipoEvento::SESSAO->value)
             ->orderByDesc('inicio_em')
-            ->limit(30)
-            ->get();
+            ->pluck('inicio_em')
+            ->map(fn ($data) => (int) $data->format('Y'))
+            ->unique()
+            ->values();
 
-        return view('admin.chancelaria.frequencias.selecionar-evento', compact('eventos'));
+        $ano = $request->integer('ano') ?: null;
+
+        $eventos = Evento::query()
+            ->where('tipo', TipoEvento::SESSAO->value)
+            ->when($ano, fn ($query) => $query->whereYear('inicio_em', $ano))
+            // Cronológica crescente: o lançamento histórico é feito da sessão
+            // mais antiga para a mais recente, acompanhando o livro.
+            ->orderBy('inicio_em')
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('admin.chancelaria.frequencias.selecionar-evento', [
+            'eventos' => $eventos,
+            'anosDisponiveis' => $anosDisponiveis,
+            'ano' => $ano,
+            'classesDisponiveis' => collect(ClasseSessao::cases())
+                ->mapWithKeys(fn (ClasseSessao $classe) => [$classe->value => $classe->rotulo()]),
+        ]);
     }
 
     /**
@@ -42,6 +67,8 @@ final class ChancelariaFrequenciaController extends Controller
      */
     public function armazenarSessao(SalvarSessaoChancelariaRequest $request): RedirectResponse
     {
+        $this->authorize('chancelaria.criar');
+
         $dados = $request->validated();
         $titulo = filled($dados['titulo'] ?? null)
             ? $dados['titulo']
@@ -52,6 +79,7 @@ final class ChancelariaFrequenciaController extends Controller
             'titulo' => $titulo,
             'slug' => Str::slug($titulo).'-'.now()->format('Ymd-His'),
             'tipo' => TipoEvento::SESSAO,
+            'sessao_classe' => $dados['sessao_classe'] ?? null,
             'status' => StatusEvento::PUBLICADO,
             'visibilidade' => VisibilidadeEvento::RESTRITA,
             'local' => $dados['local'] ?? null,
@@ -69,7 +97,9 @@ final class ChancelariaFrequenciaController extends Controller
     {
         $this->authorize('chancelaria.editar');
 
-        $irmaos = Irmao::query()->orderBy('nome_completo')->get();
+        $irmaos = Irmao::query()
+            ->orderBy('nome_completo')
+            ->get(['id', 'nome_completo', 'cim']);
         $frequencias = ChancelariaFrequencia::query()
             ->where('evento_id', $evento->id)
             ->get()

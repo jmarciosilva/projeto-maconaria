@@ -10,6 +10,7 @@ use App\Enums\VisibilidadeEvento;
 use App\Models\Evento;
 use App\Support\NormalizadorTexto;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -58,6 +59,20 @@ final class SalvarEventoRequest extends FormRequest
             'capacidade' => ['nullable', 'integer', 'min:1', 'max:100000'],
             'permite_confirmacao' => ['boolean'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            // Defesa em profundidade: sessão da Loja não pode ser marcada como
+            // pública. A consulta pública também filtra o tipo (Evento::scopePublicoNoSite).
+            if (
+                $this->input('tipo') === TipoEvento::SESSAO->value
+                && $this->input('visibilidade') === VisibilidadeEvento::PUBLICA->value
+            ) {
+                $validator->errors()->add('visibilidade', 'Uma sessão da Loja não pode ter visibilidade pública.');
+            }
+        });
     }
 
     public function messages(): array

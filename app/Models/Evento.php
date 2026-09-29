@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ClasseSessao;
 use App\Enums\StatusEvento;
 use App\Enums\TipoEvento;
 use App\Enums\VisibilidadeEvento;
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'descricao',
     'imagem_capa',
     'tipo',
+    'sessao_classe',
     'status',
     'visibilidade',
     'local',
@@ -43,6 +45,7 @@ final class Evento extends Model
     {
         return [
             'tipo' => TipoEvento::class,
+            'sessao_classe' => ClasseSessao::class,
             'status' => StatusEvento::class,
             'visibilidade' => VisibilidadeEvento::class,
             'inicio_em' => 'datetime',
@@ -72,7 +75,10 @@ final class Evento extends Model
     {
         return $query
             ->publicado()
-            ->where('visibilidade', VisibilidadeEvento::PUBLICA->value);
+            ->where('visibilidade', VisibilidadeEvento::PUBLICA->value)
+            // Sessão da Loja nunca é conteúdo de site público, mesmo que a
+            // visibilidade seja marcada como pública por engano no admin.
+            ->where('tipo', '!=', TipoEvento::SESSAO->value);
     }
 
     public function scopeVisivelNaAreaRestrita(Builder $query): Builder

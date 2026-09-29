@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\ClasseSessao;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Registro rápido de uma sessão (geralmente passada) pela Chancelaria, só
@@ -24,6 +26,7 @@ final class SalvarSessaoChancelariaRequest extends FormRequest
         return [
             'titulo' => ['nullable', 'string', 'max:255'],
             'inicio_em' => ['required', 'date'],
+            'sessao_classe' => ['nullable', Rule::enum(ClasseSessao::class)],
             'local' => ['nullable', 'string', 'max:255'],
         ];
     }

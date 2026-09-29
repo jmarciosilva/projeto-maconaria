@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ChancelariaComunicadoController;
 use App\Http\Controllers\Admin\ChancelariaController;
 use App\Http\Controllers\Admin\ChancelariaFrequenciaController;
+use App\Http\Controllers\Admin\ChancelariaRelatorioController;
 use App\Http\Controllers\Admin\ChancelariaVisitanteController;
 use App\Http\Controllers\Admin\ConfiguracaoEmailController;
 use App\Http\Controllers\Admin\ConfiguracaoInstitucionalController;
@@ -121,6 +122,7 @@ Route::get('/paginas-institucionais', [PaginaInstitucionalController::class, 'in
     Route::resource('/chancelaria/visitantes', ChancelariaVisitanteController::class)
         ->except(['show'])
         ->names('chancelaria.visitantes');
+    Route::get('/chancelaria/relatorios/frequencia', [ChancelariaRelatorioController::class, 'frequencia'])->name('chancelaria.relatorios.frequencia');
     Route::resource('/chancelaria/comunicados', ChancelariaComunicadoController::class)
         ->except(['show'])
         ->names('chancelaria.comunicados');

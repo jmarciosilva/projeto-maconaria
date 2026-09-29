@@ -22,7 +22,7 @@ $usuarioOpcoes = collect(['' => 'Nenhum'])->union($usuariosDisponiveis)->all();
         <x-ui.input rotulo="Nome completo" nome="nome_completo" :valor="$irmao->nome_completo ?? null" :erro="$errors->first('nome_completo')" obrigatorio />
         <x-ui.input rotulo="Nome social" nome="nome_social" :valor="$irmao->nome_social ?? null" :erro="$errors->first('nome_social')" />
         <x-ui.input rotulo="Data de nascimento" nome="data_nascimento" tipo="date" :valor="optional($irmao->data_nascimento ?? null)->format('Y-m-d')" :erro="$errors->first('data_nascimento')" />
-        <x-ui.input rotulo="CPF" nome="cpf" :valor="$irmao->cpf ?? null" :erro="$errors->first('cpf')" obrigatorio maxlength="11" placeholder="Somente números" />
+        <x-ui.input rotulo="CPF" nome="cpf" :valor="$irmao->cpf ?? null" :erro="$errors->first('cpf')" maxlength="11" placeholder="Somente números (opcional)" />
         <x-ui.input rotulo="RG" nome="rg" :valor="$irmao->rg ?? null" :erro="$errors->first('rg')" placeholder="Somente números" />
         <x-ui.input rotulo="E-mail" nome="email" tipo="email" :valor="$irmao->email ?? null" :erro="$errors->first('email')" />
         <x-ui.input rotulo="Telefone" nome="telefone" :valor="$irmao->telefone ?? null" :erro="$errors->first('telefone')" data-mascara="telefone" maxlength="15" placeholder="(00) 00000-0000" />
