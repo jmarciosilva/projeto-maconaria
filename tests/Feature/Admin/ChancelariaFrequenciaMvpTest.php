@@ -77,8 +77,8 @@ class ChancelariaFrequenciaMvpTest extends TestCase
     public function test_varios_irmaos_podem_coexistir_sem_cpf(): void
     {
         // O índice único de cpf é mantido; vários NULL são permitidos.
-        $this->irmao('Primeiro Sem CPF', '111');
-        $this->irmao('Segundo Sem CPF', '222');
+        $this->irmao('Primeiro Sem CPF', '111001');
+        $this->irmao('Segundo Sem CPF', '222002');
 
         $this->assertSame(2, Irmao::query()->whereNull('cpf')->count());
     }
@@ -228,10 +228,10 @@ class ChancelariaFrequenciaMvpTest extends TestCase
         $usuario = $this->chanceler();
         $sessao = $this->sessao('2025-01-15 20:00');
 
-        $presente = $this->irmao('Irmão Presente', '001');
-        $ausente = $this->irmao('Irmão Ausente', '002');
-        $justificado = $this->irmao('Irmão Justificado', '003');
-        $naoInformado = $this->irmao('Irmão Não Informado', '004');
+        $presente = $this->irmao('Irmão Presente', '100001');
+        $ausente = $this->irmao('Irmão Ausente', '100002');
+        $justificado = $this->irmao('Irmão Justificado', '100003');
+        $naoInformado = $this->irmao('Irmão Não Informado', '100004');
 
         $this->actingAs($usuario)->put(route('admin.chancelaria.frequencias.update', $sessao), [
             'frequencias' => [
@@ -251,7 +251,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
     {
         $usuario = $this->chanceler();
         $sessao = $this->sessao('2025-01-15 20:00');
-        $irmao = $this->irmao('Irmão Sem Lançamento', '010');
+        $irmao = $this->irmao('Irmão Sem Lançamento', '100010');
 
         $this->actingAs($usuario)->put(route('admin.chancelaria.frequencias.update', $sessao), [
             'frequencias' => [
@@ -275,7 +275,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
     public function test_calculo_de_frequencia_do_cenario_oficial(): void
     {
         $irmao = $this->irmao('Irmão Referência', '519328');
-        $outro = $this->irmao('Irmão Sem Dados', '000');
+        $outro = $this->irmao('Irmão Sem Dados', '100000');
 
         $distribuicao = array_merge(
             array_fill(0, 9, StatusFrequencia::PRESENTE),
@@ -318,7 +318,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
 
     public function test_nao_informado_fica_fora_do_denominador(): void
     {
-        $irmao = $this->irmao('Irmão Parcial', '123');
+        $irmao = $this->irmao('Irmão Parcial', '100123');
 
         $comRegistro = $this->sessao('2025-01-15 20:00');
         $this->sessao('2025-02-15 20:00'); // sem lançamento para este Irmão
@@ -344,7 +344,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
 
     public function test_justificado_conta_apenas_no_denominador(): void
     {
-        $irmao = $this->irmao('Irmão Justificado', '456');
+        $irmao = $this->irmao('Irmão Justificado', '100456');
 
         $presenca = $this->sessao('2025-01-15 20:00');
         $justificada = $this->sessao('2025-02-15 20:00');
@@ -364,7 +364,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
 
     public function test_relatorio_respeita_o_periodo_informado(): void
     {
-        $irmao = $this->irmao('Irmão Periodo', '789');
+        $irmao = $this->irmao('Irmão Periodo', '100789');
 
         $dentro = $this->sessao('2025-06-15 20:00');
         $fora = $this->sessao('2024-06-15 20:00');
@@ -386,7 +386,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
     public function test_tela_do_relatorio_exibe_indicador_e_nota_de_criterio(): void
     {
         $usuario = $this->chanceler();
-        $irmao = $this->irmao('Irmão Abaixo', '321');
+        $irmao = $this->irmao('Irmão Abaixo', '100321');
 
         $sessaoPresente = $this->sessao('2025-01-15 20:00');
         $sessaoAusente = $this->sessao('2025-02-15 20:00');
@@ -403,7 +403,7 @@ class ChancelariaFrequenciaMvpTest extends TestCase
 
         $resposta->assertOk();
         $resposta->assertSee('Irmão Abaixo');
-        $resposta->assertSee('321');
+        $resposta->assertSee('100321');
         $resposta->assertSee('Frequência abaixo de 50%');
         $resposta->assertSee('Sessões encontradas no período');
         $resposta->assertSee('Critério deste relatório');

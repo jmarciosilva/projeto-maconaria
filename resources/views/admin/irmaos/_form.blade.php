@@ -82,7 +82,20 @@ $usuarioOpcoes = collect(['' => 'Nenhum'])->union($usuariosDisponiveis)->all();
     </div>
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <x-ui.input rotulo="CIM / Matrícula" nome="cim" :valor="$irmao->cim ?? null" :erro="$errors->first('cim')" />
+        <div x-data>
+            <x-ui.input
+                rotulo="CIM / Matrícula"
+                nome="cim"
+                :valor="$irmao->cim ?? null"
+                :erro="$errors->first('cim')"
+                maxlength="6"
+                inputmode="numeric"
+                placeholder="123456"
+                autocomplete="off"
+                @input="$event.target.value = $event.target.value.replace(/\D/g, '').slice(0, 6)"
+            />
+            <p class="mt-1.5 text-xs text-gray-500">Informe os 6 dígitos do CIM.</p>
+        </div>
         <x-ui.select rotulo="Grau atual" nome="grau_atual" :opcoes="$grauOpcoes" :valor="$irmao->grau_atual?->value ?? null" :erro="$errors->first('grau_atual')" />
         <x-ui.select rotulo="Situação cadastral" nome="situacao_cadastral" :opcoes="$situacaoOpcoes" :valor="$irmao->situacao_cadastral?->value ?? 'ativo'" :erro="$errors->first('situacao_cadastral')" obrigatorio />
         <x-ui.input rotulo="Cargo atual" nome="cargo_atual" :valor="$irmao->cargo_atual ?? null" :erro="$errors->first('cargo_atual')" />
