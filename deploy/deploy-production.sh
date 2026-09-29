@@ -652,9 +652,9 @@ Timestamp:        $TIMESTAMP
 Log file:         $DEPLOY_LOG
 
 Git Information:
-  Previous SHA:   $OLD_SHA
+  Previous SHA:   ${LOCAL_SHA:-unknown}
   Current SHA:    $FINAL_SHA
-  Branch:         $CURRENT_BRANCH
+  Branch:         ${CURRENT_BRANCH:-unknown}
 
 Deployment Result: SUCCESS
 
