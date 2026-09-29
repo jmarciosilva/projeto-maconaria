@@ -15,7 +15,8 @@
     </div>
 
     <div class="mb-6 flex flex-wrap gap-3">
-        <a href="{{ route('admin.chancelaria.frequencias.selecionar-evento') }}"><x-ui.button>Registrar frequência</x-ui.button></a>
+        <a href="{{ route('admin.chancelaria.sessoes.index') }}"><x-ui.button>Sessões</x-ui.button></a>
+        <a href="{{ route('admin.chancelaria.frequencias.selecionar-evento') }}"><x-ui.button variante="secundario">Registrar frequência</x-ui.button></a>
         <a href="{{ route('admin.chancelaria.visitantes.index') }}"><x-ui.button variante="secundario">Visitantes</x-ui.button></a>
         <a href="{{ route('admin.chancelaria.comunicados.index') }}"><x-ui.button variante="secundario">Comunicados</x-ui.button></a>
     </div>

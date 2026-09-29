@@ -66,6 +66,16 @@ final class Evento extends Model
         return $this->hasMany(EventoConfirmacaoPresenca::class);
     }
 
+    /**
+     * Lançamentos de frequência da Chancelaria (inverso de
+     * ChancelariaFrequencia::evento). Usado para impedir a exclusão de uma
+     * sessão que já possui presença registrada.
+     */
+    public function frequencias(): HasMany
+    {
+        return $this->hasMany(ChancelariaFrequencia::class);
+    }
+
     public function scopePublicado(Builder $query): Builder
     {
         return $query->where('status', StatusEvento::PUBLICADO->value);
