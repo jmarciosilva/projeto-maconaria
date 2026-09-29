@@ -34,8 +34,13 @@
             text-align: center;
         }
 
+        /* O DomPDF respeita height em imagens com precisão (medido: 17mm
+           pedidos = 17,0mm no papel), então o cabeçalho tem altura estável
+           mesmo que o administrador envie um logotipo grande. O max-width
+           cobre o caso extremo de um logotipo muito alongado. */
         .cabecalho img {
             height: 17mm;
+            max-width: 60mm;
             width: auto;
         }
 
@@ -221,10 +226,7 @@
 <body>
     <div class="cabecalho">
         @if ($brasao)
-            {{-- Dimensões nos atributos HTML, em pontos: o DomPDF desenha a
-                 imagem no tamanho natural quando só o CSS informa a altura.
-                 48pt = 17mm, proporção preservada a partir de 112x92px. --}}
-            <img src="{{ $brasao }}" alt="" width="58" height="48">
+            <img src="{{ $brasao }}" alt="">
         @endif
 
         <div class="loja">{{ $configuracaoInstitucional->nome() }}</div>
