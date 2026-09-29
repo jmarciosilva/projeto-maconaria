@@ -102,6 +102,156 @@ class NoticiaControllerTest extends TestCase
         ])->assertSessionHasErrors('slug');
     }
 
+    public function test_can_create_news_with_a_brand_new_slug(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia inédita',
+            'slug' => 'slug-inedito',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('noticias', ['slug' => 'slug-inedito']);
+    }
+
+    public function test_updating_news_keeping_its_own_slug_is_allowed(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create([
+            'slug' => 'slug-proprio',
+            'status' => StatusNoticia::RASCUNHO,
+        ]);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => 'Título alterado, slug mantido',
+            'slug' => 'slug-proprio',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $noticia->refresh();
+        $this->assertSame('slug-proprio', $noticia->slug);
+        $this->assertSame('Título alterado, slug mantido', $noticia->titulo);
+    }
+
+    public function test_updating_news_keeping_own_slug_is_allowed_even_with_a_soft_deleted_duplicate(): void
+    {
+        // Regressão do bug real de produção: a notícia ID 7 (slug ativo) não podia
+        // ser salva porque uma notícia soft-deleted (ID 2) tinha o mesmo slug e a
+        // validação unique contava linhas removidas.
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $trashed = Noticia::factory()->create(['slug' => 'projeto-profissoes-e-seus-desafios']);
+        $trashed->delete();
+
+        $noticia = Noticia::factory()->create([
+            'slug' => 'projeto-profissoes-e-seus-desafios',
+            'status' => StatusNoticia::RASCUNHO,
+        ]);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => 'Projeto Profissões editado',
+            'slug' => 'projeto-profissoes-e-seus-desafios',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $noticia->refresh();
+        $this->assertSame('projeto-profissoes-e-seus-desafios', $noticia->slug);
+        $this->assertSame('Projeto Profissões editado', $noticia->titulo);
+    }
+
+    public function test_updating_news_to_another_active_news_slug_is_rejected(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        Noticia::factory()->create(['slug' => 'slug-de-outra-noticia']);
+        $noticia = Noticia::factory()->create([
+            'slug' => 'slug-original',
+            'status' => StatusNoticia::RASCUNHO,
+        ]);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => 'slug-de-outra-noticia',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+        ])->assertSessionHasErrors('slug');
+
+        $noticia->refresh();
+        $this->assertSame('slug-original', $noticia->slug);
+    }
+
+    public function test_updating_news_to_a_brand_new_slug_is_allowed(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create([
+            'slug' => 'slug-antigo',
+            'status' => StatusNoticia::RASCUNHO,
+        ]);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => 'slug-totalmente-novo',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $noticia->refresh();
+        $this->assertSame('slug-totalmente-novo', $noticia->slug);
+    }
+
+    public function test_updating_publication_datetime_keeping_own_slug_is_allowed(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create([
+            'slug' => 'slug-com-data',
+            'status' => StatusNoticia::RASCUNHO,
+        ]);
+
+        $dataRetroativa = now()->subYears(2)->setDate(2018, 8, 15)->setTime(20, 30);
+
+        $this->actingAs($usuario)->put(route('admin.noticias.update', $noticia), [
+            'titulo' => $noticia->titulo,
+            'slug' => 'slug-com-data',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'publicado_em' => $dataRetroativa->format('Y-m-d H:i'),
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $noticia->refresh();
+        $this->assertSame('slug-com-data', $noticia->slug);
+        $this->assertSame($dataRetroativa->format('Y-m-d H:i'), $noticia->publicado_em->format('Y-m-d H:i'));
+    }
+
     public function test_user_can_upload_a_cover_image_when_creating_a_news(): void
     {
         Storage::fake('public');

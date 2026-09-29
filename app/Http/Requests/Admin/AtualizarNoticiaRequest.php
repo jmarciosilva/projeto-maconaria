@@ -43,7 +43,7 @@ final class AtualizarNoticiaRequest extends FormRequest
             'tags' => ['array'],
             'tags.*' => ['integer', Rule::exists('noticia_tags', 'id')],
             'titulo' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:140', 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/', Rule::unique('noticias', 'slug')->ignore($noticia)],
+            'slug' => ['required', 'string', 'max:140', 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/', Rule::unique('noticias', 'slug')->ignore($noticia)->whereNull('deleted_at')],
             'resumo' => ['nullable', 'string', 'max:500'],
             'conteudo' => ['nullable', 'string'],
             'imagem_capa' => ['nullable', 'image', 'max:4096'],
