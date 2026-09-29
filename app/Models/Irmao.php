@@ -6,9 +6,11 @@ namespace App\Models;
 
 use App\Enums\GrauMaconico;
 use App\Enums\SituacaoCadastralIrmao;
+use App\Support\NormalizadorTexto;
 use Database\Factories\IrmaoFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -60,6 +62,19 @@ final class Irmao extends Model
             'grau_atual' => GrauMaconico::class,
             'situacao_cadastral' => SituacaoCadastralIrmao::class,
         ];
+    }
+
+    /**
+     * Centraliza a capitalização do nome: create e update passam pela mesma
+     * regra, sem depender de cada formulário ou importação lembrar disso.
+     *
+     * @return Attribute<never, string|null>
+     */
+    protected function nomeCompleto(): Attribute
+    {
+        return Attribute::make(
+            set: static fn (?string $valor): ?string => NormalizadorTexto::nomeProprio($valor),
+        );
     }
 
     public function usuario(): HasOne

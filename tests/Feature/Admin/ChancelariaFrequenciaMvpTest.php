@@ -71,7 +71,8 @@ class ChancelariaFrequenciaMvpTest extends TestCase
             'situacao_cadastral' => SituacaoCadastralIrmao::ATIVO->value,
         ])->assertRedirect()->assertSessionHasNoErrors();
 
-        $this->assertDatabaseHas('irmaos', ['nome_completo' => 'Irmão Sem CPF', 'cim' => '519328', 'cpf' => null]);
+        // O nome passa pelo mutator de normalização: siglas não são preservadas.
+        $this->assertDatabaseHas('irmaos', ['nome_completo' => 'Irmão Sem Cpf', 'cim' => '519328', 'cpf' => null]);
     }
 
     public function test_varios_irmaos_podem_coexistir_sem_cpf(): void
@@ -140,7 +141,8 @@ class ChancelariaFrequenciaMvpTest extends TestCase
             'situacao_cadastral' => SituacaoCadastralIrmao::ATIVO->value,
         ])->assertRedirect()->assertSessionHasNoErrors();
 
-        $this->assertSame('Irmão Editado com Novo Nome', $irmao->fresh()->nome_completo);
+        // "com" não é partícula: o mutator a capitaliza como qualquer palavra.
+        $this->assertSame('Irmão Editado Com Novo Nome', $irmao->fresh()->nome_completo);
     }
 
     // ---------------------------------------------------------------
