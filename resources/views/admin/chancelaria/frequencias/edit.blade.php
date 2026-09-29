@@ -15,6 +15,43 @@
         </div>
     </div>
 
+    @if ($concluida)
+        <div class="mb-4 rounded-lg border border-green-300 bg-green-50 p-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p class="text-sm font-semibold text-green-900">Frequência concluída</p>
+                    <p class="mt-0.5 text-sm text-green-800">
+                        Concluída em {{ $evento->frequencia_concluida_em->format('d/m/Y \à\s H:i') }}
+                        @if ($evento->frequenciaConcluidaPor)
+                            por {{ $evento->frequenciaConcluidaPor->name }}
+                        @endif
+                        &middot; a sessão está em somente leitura.
+                    </p>
+                </div>
+
+                @can('chancelaria.editar')
+                    <form method="POST" action="{{ route('admin.chancelaria.frequencias.reabrir', $evento) }}"
+                        onsubmit="return confirm('Reabrir a frequência desta sessão para edição? A reabertura fica registrada na auditoria.')">
+                        @csrf
+                        <x-ui.button variante="secundario" tipo="submit">Reabrir frequência</x-ui.button>
+                    </form>
+                @endcan
+            </div>
+        </div>
+    @elseif ($possuiPendencias)
+        <div class="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
+            <p class="text-sm font-semibold text-amber-900">Frequência pendente</p>
+            <p class="mt-0.5 text-sm text-amber-800">{{ $mensagemDePendencias }}</p>
+        </div>
+    @else
+        <div class="mb-4 rounded-lg border border-blue-300 bg-blue-50 p-4">
+            <p class="text-sm font-semibold text-blue-900">Frequência pendente</p>
+            <p class="mt-0.5 text-sm text-blue-800">
+                Todos os Irmãos abrangidos por esta sessão possuem lançamento. Você pode concluir a frequência.
+            </p>
+        </div>
+    @endif
+
     {{-- O x-data envolve formulário e modal: a confirmação de "Limpar
          lançamento" tem form próprio e não pode ficar aninhada no
          formulário principal. --}}
@@ -68,20 +105,24 @@
                         <span class="text-gray-700">Justificados: <strong class="text-amber-700" x-text="contagem.justificado"></strong></span>
                         <span class="text-gray-700">Sem lançamento: <strong class="text-gray-500" x-text="contagem.semLancamento"></strong></span>
                     </div>
-                    <div class="flex flex-wrap gap-3">
-                        <button type="button" @click="marcarPendentes('presente')" class="text-sm font-semibold text-blue-800 hover:underline">
-                            Marcar pendentes como presentes
-                        </button>
-                        <button type="button" @click="marcarPendentes('ausente')" class="text-sm font-semibold text-blue-800 hover:underline">
-                            Marcar pendentes como ausentes
-                        </button>
-                    </div>
+                    @unless ($concluida)
+                        <div class="flex flex-wrap gap-3">
+                            <button type="button" @click="marcarPendentes('presente')" class="text-sm font-semibold text-blue-800 hover:underline">
+                                Marcar pendentes como presentes
+                            </button>
+                            <button type="button" @click="marcarPendentes('ausente')" class="text-sm font-semibold text-blue-800 hover:underline">
+                                Marcar pendentes como ausentes
+                            </button>
+                        </div>
+                    @endunless
                 </div>
 
-                <p class="text-xs text-gray-500">
-                    As ações em massa alteram apenas Irmãos sem lançamento. Quem já está como presente, ausente ou
-                    justificado permanece como está.
-                </p>
+                @unless ($concluida)
+                    <p class="text-xs text-gray-500">
+                        As ações em massa alteram apenas Irmãos sem lançamento. Quem já está como presente, ausente ou
+                        justificado permanece como está.
+                    </p>
+                @endunless
 
                 <x-ui.table :cabecalhos="['CIM', 'Irmão', 'Status', 'Motivo / observação', '']">
                     @foreach ($irmaos as $irmao)
@@ -95,7 +136,8 @@
                                     data-frequencia
                                     x-model="status"
                                     @change="recontar()"
-                                    class="block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    @disabled($concluida)
+                                    class="block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-600"
                                 >
                                     {{-- A opção vazia só existe enquanto não há lançamento.
                                          Depois de lançado, voltar para vazio não apaga nada:
@@ -116,14 +158,17 @@
                                     value="{{ old("frequencias.$irmao->id.observacao", $frequencia?->observacao ?? '') }}"
                                     :placeholder="status === 'justificado' ? 'Motivo da justificativa (ex.: emergência médica, compromisso profissional)' : 'Observação (opcional)'"
                                     :class="status === 'justificado' ? 'border-amber-400 bg-amber-50' : 'border-gray-300'"
-                                    class="block w-full rounded-md text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    @readonly($concluida)
+                                    class="block w-full rounded-md text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 read-only:bg-gray-100 read-only:text-gray-600"
                                 >
-                                <p x-show="status === 'justificado'" x-cloak class="mt-1 text-xs text-amber-800">
-                                    Informe o motivo: ele será exigido para concluir a frequência desta sessão.
-                                </p>
+                                @unless ($concluida)
+                                    <p x-show="status === 'justificado'" x-cloak class="mt-1 text-xs text-amber-800">
+                                        Informe o motivo: ele será exigido para concluir a frequência desta sessão.
+                                    </p>
+                                @endunless
                             </td>
                             <td class="px-4 py-3 text-right">
-                                @if ($frequencia)
+                                @if ($frequencia && ! $concluida)
                                     <button
                                         type="button"
                                         @click="confirmarLimpeza(@js($irmao->nome_completo), @js(route('admin.chancelaria.frequencias.limpar', [$evento, $irmao])))"
@@ -137,11 +182,30 @@
                     @endforeach
                 </x-ui.table>
 
-                <x-ui.button tipo="submit">Salvar frequência</x-ui.button>
+                @unless ($concluida)
+                    <div class="flex flex-wrap items-center gap-3">
+                        <x-ui.button tipo="submit">Salvar frequência</x-ui.button>
+                        <span class="text-sm text-gray-500">
+                            Salve o que já lançou; concluir é um passo à parte.
+                        </span>
+                    </div>
+                @endunless
             @endif
         </form>
 
-        {{-- Confirmação de limpeza, fora do formulário principal. --}}
+        @if (! $concluida && $irmaos->isNotEmpty())
+            @can('chancelaria.editar')
+                <form method="POST" action="{{ route('admin.chancelaria.frequencias.concluir', $evento) }}" class="mt-4"
+                    onsubmit="return confirm('Concluir a frequência desta sessão? Ela ficará em somente leitura até ser reaberta.')">
+                    @csrf
+                    <x-ui.button tipo="submit">Concluir frequência</x-ui.button>
+                </form>
+            @endcan
+        @endif
+
+        {{-- Confirmação de limpeza, fora do formulário principal. Não existe
+             em sessão concluída: lá não há o que limpar. --}}
+        @unless ($concluida)
         <div x-show="limpar.aberto" x-cloak class="fixed inset-0 z-50 overflow-y-auto px-4 py-6">
             <div class="fixed inset-0 bg-gray-500/75" @click="limpar.aberto = false"></div>
 
@@ -162,5 +226,6 @@
                 </form>
             </div>
         </div>
+        @endunless
     </div>
 </x-layouts.admin>

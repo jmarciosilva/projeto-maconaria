@@ -51,9 +51,25 @@ final class Evento extends Model
             'inicio_em' => 'datetime',
             'fim_em' => 'datetime',
             'inscricoes_ate' => 'datetime',
+            'frequencia_concluida_em' => 'datetime',
             'capacidade' => 'integer',
             'permite_confirmacao' => 'boolean',
         ];
+    }
+
+    /**
+     * Frequência concluída é o Chanceler afirmando que o lançamento daquela
+     * sessão terminou. Sessão sem a marca está pendente — inclusive todas as
+     * históricas, que nunca recebem conclusão automática.
+     */
+    public function frequenciaConcluida(): bool
+    {
+        return $this->frequencia_concluida_em !== null;
+    }
+
+    public function frequenciaConcluidaPor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'frequencia_concluida_por_id');
     }
 
     public function autor(): BelongsTo

@@ -15,6 +15,7 @@ use App\Http\Requests\Admin\SalvarSessaoChancelariaRequest;
 use App\Models\ChancelariaFrequencia;
 use App\Models\Evento;
 use App\Models\Irmao;
+use App\Support\Chancelaria\ConclusaoDeFrequencia;
 use App\Support\RegistradorDeAuditoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -105,16 +106,26 @@ final class ChancelariaFrequenciaController extends Controller
             ->get()
             ->keyBy('irmao_id');
 
+        $pendencias = ConclusaoDeFrequencia::pendencias($evento);
+
         return view('admin.chancelaria.frequencias.edit', [
             'evento' => $evento,
             'irmaos' => $irmaos,
             'frequencias' => $frequencias,
+            'concluida' => $evento->frequenciaConcluida(),
+            'pendencias' => $pendencias,
+            'possuiPendencias' => ConclusaoDeFrequencia::possuiPendencias($pendencias),
+            'mensagemDePendencias' => ConclusaoDeFrequencia::mensagemDePendencias($pendencias),
             'statusDisponiveis' => collect(StatusFrequencia::cases())->mapWithKeys(fn (StatusFrequencia $status) => [$status->value => $status->rotulo()]),
         ]);
     }
 
     public function update(SalvarFrequenciaChancelariaRequest $request, Evento $evento): RedirectResponse
     {
+        if ($evento->frequenciaConcluida()) {
+            return back()->with('erro', 'A frequência desta sessão está concluída. Reabra antes de alterar.');
+        }
+
         DB::transaction(function () use ($request, $evento): void {
             foreach ($request->input('frequencias', []) as $irmaoId => $dados) {
                 // Campo sem lançamento significa "nada a dizer sobre este
@@ -153,6 +164,10 @@ final class ChancelariaFrequenciaController extends Controller
     {
         $this->authorize('chancelaria.editar');
 
+        if ($evento->frequenciaConcluida()) {
+            return back()->with('erro', 'A frequência desta sessão está concluída. Reabra antes de alterar.');
+        }
+
         $frequencia = ChancelariaFrequencia::query()
             ->where('evento_id', $evento->id)
             ->where('irmao_id', $irmao->id)
@@ -181,5 +196,79 @@ final class ChancelariaFrequenciaController extends Controller
         });
 
         return back()->with('sucesso', "Lançamento de {$irmao->nome_completo} removido desta sessão.");
+    }
+
+    /**
+     * Marca o lançamento da sessão como terminado.
+     *
+     * Só valida e bloqueia: nunca preenche presença, ausência ou motivo por
+     * conta própria. O Chanceler resolve as pendências e conclui.
+     */
+    public function concluir(Evento $evento): RedirectResponse
+    {
+        $this->authorize('chancelaria.editar');
+
+        if ($evento->frequenciaConcluida()) {
+            return back()->with('erro', 'A frequência desta sessão já está concluída.');
+        }
+
+        $pendencias = ConclusaoDeFrequencia::pendencias($evento);
+
+        if (ConclusaoDeFrequencia::possuiPendencias($pendencias)) {
+            return back()->with('erro', ConclusaoDeFrequencia::mensagemDePendencias($pendencias));
+        }
+
+        DB::transaction(function () use ($evento): void {
+            $evento->forceFill([
+                'frequencia_concluida_em' => now(),
+                'frequencia_concluida_por_id' => request()->user()?->id,
+            ])->save();
+
+            RegistradorDeAuditoria::registrar(
+                acao: 'concluir-frequencia',
+                modulo: 'chancelaria',
+                entidade: 'Evento',
+                entidadeId: $evento->id,
+                dadosNovos: [
+                    'frequencia_concluida_em' => $evento->frequencia_concluida_em?->toDateTimeString(),
+                    'total_lancamentos' => $evento->frequencias()->count(),
+                ],
+            );
+        });
+
+        return back()->with('sucesso', 'Frequência da sessão concluída.');
+    }
+
+    /**
+     * Devolve a sessão para edição. A marca de quem havia concluído fica na
+     * auditoria, que é o que torna a reabertura rastreável.
+     */
+    public function reabrir(Evento $evento): RedirectResponse
+    {
+        $this->authorize('chancelaria.editar');
+
+        if (! $evento->frequenciaConcluida()) {
+            return back()->with('erro', 'A frequência desta sessão não está concluída.');
+        }
+
+        DB::transaction(function () use ($evento): void {
+            RegistradorDeAuditoria::registrar(
+                acao: 'reabrir-frequencia',
+                modulo: 'chancelaria',
+                entidade: 'Evento',
+                entidadeId: $evento->id,
+                dadosAnteriores: [
+                    'frequencia_concluida_em' => $evento->frequencia_concluida_em?->toDateTimeString(),
+                    'frequencia_concluida_por_id' => $evento->frequencia_concluida_por_id,
+                ],
+            );
+
+            $evento->forceFill([
+                'frequencia_concluida_em' => null,
+                'frequencia_concluida_por_id' => null,
+            ])->save();
+        });
+
+        return back()->with('sucesso', 'Frequência reaberta para edição.');
     }
 }
