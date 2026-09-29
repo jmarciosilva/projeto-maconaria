@@ -289,7 +289,7 @@ class ChancelariaRelatorioFrequenciaPdfTest extends TestCase
 
         $texto = $this->textoDoPdf((string) $this->baixarPdf($this->chanceler())->getContent());
 
-        foreach (['João Carlos dos Santos', "Ana-Maria D'Ávila", 'Frequência', 'justificados', 'Não informadas', 'José Márcio'] as $trecho) {
+        foreach (['João Carlos dos Santos', "Ana-Maria D'Ávila", 'Frequência', 'ausência justificada', 'Sem registro', 'José Márcio'] as $trecho) {
             $this->assertPdfContem($texto, $trecho, "Acentuação perdida em \"{$trecho}\".");
         }
     }
@@ -300,12 +300,45 @@ class ChancelariaRelatorioFrequenciaPdfTest extends TestCase
 
         $texto = $this->textoDoPdf((string) $this->baixarPdf($this->chanceler())->getContent());
 
-        foreach (['CIM', 'Irmão', 'Consider.', 'Pres.', 'Aus.', 'Just.', 'N/Inf.', 'Freq.', 'Indicador'] as $coluna) {
+        foreach (['CIM', 'Irmão', 'Sessões', 'Presenças', 'Ausências', 'Justificadas', 'Sem registro', 'Frequência', 'Observação'] as $coluna) {
             $this->assertPdfContem($texto, $coluna);
         }
 
-        // Preserva exatamente o indicador da tela, com o símbolo de atenção.
-        $this->assertPdfContem($texto, '⚠ Frequência abaixo de 50%');
+        // As abreviações não podem sobreviver em lugar nenhum do documento.
+        foreach (['Consider.', 'Pres.', 'Aus.', 'Just.', 'N/Inf.', 'Freq.', 'Não informadas'] as $abreviacao) {
+            $this->assertPdfNaoContem($texto, $abreviacao);
+        }
+
+        $this->assertPdfContem($texto, '⚠ Abaixo de 50%');
+    }
+
+    public function test_criterio_define_cada_coluna_da_tabela(): void
+    {
+        $this->cenario();
+
+        $texto = $this->textoDoPdf((string) $this->baixarPdf($this->chanceler())->getContent());
+
+        $this->assertPdfContem($texto, 'Critério deste relatório');
+        $this->assertPdfContem($texto, 'Sessões: quantidade de sessões do período com lançamento explícito');
+        $this->assertPdfContem($texto, 'Presenças: sessões registradas como presença');
+        $this->assertPdfContem($texto, 'Ausências: sessões registradas como ausência');
+        $this->assertPdfContem($texto, 'Justificadas: sessões com ausência justificada');
+        $this->assertPdfContem($texto, 'contam como ausência no cálculo atual');
+        $this->assertPdfContem($texto, 'Sem registro: sessões do período sem lançamento de frequência');
+        $this->assertPdfContem($texto, 'Não integram o cálculo do percentual');
+        $this->assertPdfContem($texto, 'Frequência: Presenças ÷ Sessões × 100');
+        $this->assertPdfContem($texto, 'não representa decisão automática sobre a situação do Irmão');
+    }
+
+    public function test_linha_sem_ocorrencia_traz_travessao_na_observacao(): void
+    {
+        $this->cenario();
+
+        $texto = $this->textoDoPdf((string) $this->baixarPdf($this->chanceler())->getContent());
+
+        // Ana-Maria tem 100%: a coluna Observação fica com travessão, nunca
+        // com um rótulo que sugira julgamento.
+        $this->assertPdfContem($texto, '100,0%—');
     }
 
     public function test_pdf_nao_emite_julgamento_institucional(): void
@@ -370,7 +403,7 @@ class ChancelariaRelatorioFrequenciaPdfTest extends TestCase
         $comparavel = $this->comparavel($texto);
         $this->assertSame(
             $paginas,
-            substr_count($comparavel, $this->comparavel('Consider.Pres.Aus.Just.')),
+            substr_count($comparavel, $this->comparavel('SessõesPresençasAusênciasJustificadas')),
             'O cabeçalho da tabela deve se repetir em todas as páginas.',
         );
         $this->assertSame(
@@ -400,7 +433,7 @@ class ChancelariaRelatorioFrequenciaPdfTest extends TestCase
         $this->assertPdfNaoContem($texto, '33,3%');
         // A frase do critério permanece; o que não pode existir é o selo na
         // coluna Indicador.
-        $this->assertPdfNaoContem($texto, '⚠ Frequência abaixo de 50%');
+        $this->assertPdfNaoContem($texto, '⚠ Abaixo de 50%');
     }
 
     public function test_pdf_sem_periodo_volta_para_a_tela(): void

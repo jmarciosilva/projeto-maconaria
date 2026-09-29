@@ -119,21 +119,32 @@
 
         .tabela thead th {
             background-color: #e8ecf2;
-            font-size: 7.5pt;
+            /* 7pt é o mínimo confortável: os rótulos por extenso cabem nas
+               larguras abaixo sem apertar a leitura. */
+            font-size: 7pt;
             font-weight: bold;
             text-align: left;
             text-transform: uppercase;
+            /* Normal, e não break-word: um rótulo só pode quebrar no espaço
+               ("SEM / REGISTRO"), nunca no meio da palavra. */
+            word-wrap: normal;
         }
 
         .tabela tr {
             page-break-inside: avoid;
         }
 
-        .col-cim { width: 8%; }
-        .col-nome { width: 28%; }
-        .col-num { text-align: center; width: 7.6%; }
+        /* Larguras somam 100%, na ordem de prioridade acordada: nome do Irmão
+           primeiro, depois Observação e os rótulos longos. */
+        .col-cim { width: 7%; }
+        .col-nome { width: 25%; }
+        .col-sessoes { text-align: center; width: 8%; }
+        .col-presencas { text-align: center; width: 8.5%; }
+        .col-ausencias { text-align: center; width: 8.5%; }
+        .col-justificadas { text-align: center; width: 10%; }
+        .col-sem-registro { text-align: center; width: 10%; }
         .col-freq { text-align: center; width: 9%; }
-        .col-indicador { width: 17%; }
+        .col-observacao { width: 14%; }
 
         .celula-nome { font-weight: bold; }
         .celula-num { text-align: center; }
@@ -178,7 +189,18 @@
         }
 
         .criterio p.ultimo {
-            margin-bottom: 0;
+            margin: 1.5mm 0 0;
+        }
+
+        .verbetes {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .verbetes td {
+            padding: 0 4mm 1.2mm 0;
+            vertical-align: top;
+            width: 50%;
         }
 
         /* Emissão e assinatura dividem a mesma linha: além de ser o arranjo
@@ -260,13 +282,13 @@
                 <tr>
                     <th class="col-cim">CIM</th>
                     <th class="col-nome">Irmão</th>
-                    <th class="col-num">Consider.</th>
-                    <th class="col-num">Pres.</th>
-                    <th class="col-num">Aus.</th>
-                    <th class="col-num">Just.</th>
-                    <th class="col-num">N/Inf.</th>
-                    <th class="col-freq">Freq.</th>
-                    <th class="col-indicador">Indicador</th>
+                    <th class="col-sessoes">Sessões</th>
+                    <th class="col-presencas">Presenças</th>
+                    <th class="col-ausencias">Ausências</th>
+                    <th class="col-justificadas">Justificadas</th>
+                    <th class="col-sem-registro">Sem registro</th>
+                    <th class="col-freq">Frequência</th>
+                    <th class="col-observacao">Observação</th>
                 </tr>
             </thead>
             <tbody>
@@ -286,9 +308,11 @@
                                 {{ number_format($linha['percentual'], 1, ',', '.') }}%
                             @endif
                         </td>
-                        <td>
+                        <td class="celula-observacao">
                             @if ($linha['abaixo_do_limite'])
-                                <span class="indicador">&#9888; Frequência abaixo de {{ (int) $limiteIndicador }}%</span>
+                                <span class="indicador">&#9888; Abaixo de {{ (int) $limiteIndicador }}%</span>
+                            @else
+                                &mdash;
                             @endif
                         </td>
                     </tr>
@@ -303,15 +327,37 @@
 
     <div class="criterio">
         <div class="criterio-titulo">Critério deste relatório</div>
-        <p>
-            O percentual de frequência considera apenas as sessões do período em que houve lançamento explícito
-            de frequência para o Irmão. Registros justificados são contabilizados como ausência para efeito do
-            percentual, mas permanecem discriminados em coluna própria. Sessões sem lançamento são apresentadas
-            como &ldquo;Não informadas&rdquo; e não integram o cálculo.
-        </p>
+
+        {{-- Verbetes em duas colunas: o mesmo conteúdo em metade da altura,
+             o que mantém o fecho do documento na primeira página em
+             relatórios curtos. --}}
+        <table class="verbetes">
+            <tr>
+                <td>
+                    <b>Sessões:</b> quantidade de sessões do período com lançamento explícito de frequência
+                    para o Irmão, e que por isso entram no cálculo do percentual.
+                </td>
+                <td>
+                    <b>Justificadas:</b> sessões com ausência justificada. Permanecem discriminadas em coluna
+                    própria, mas contam como ausência no cálculo atual.
+                </td>
+            </tr>
+            <tr>
+                <td><b>Presenças:</b> sessões registradas como presença.</td>
+                <td>
+                    <b>Sem registro:</b> sessões do período sem lançamento de frequência para aquele Irmão.
+                    Não integram o cálculo do percentual.
+                </td>
+            </tr>
+            <tr>
+                <td><b>Ausências:</b> sessões registradas como ausência.</td>
+                <td><b>Frequência:</b> Presenças &divide; Sessões &times; 100.</td>
+            </tr>
+        </table>
+
         <p class="ultimo">
-            Frequência abaixo de {{ (int) $limiteIndicador }}% é apenas um indicador para análise e não representa
-            decisão automática sobre a situação do Irmão.
+            <b>Observação:</b> frequência abaixo de {{ (int) $limiteIndicador }}% é apenas um indicador para
+            análise da Chancelaria e não representa decisão automática sobre a situação do Irmão.
         </p>
     </div>
 
