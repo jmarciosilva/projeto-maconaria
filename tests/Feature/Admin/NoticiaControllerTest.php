@@ -366,7 +366,7 @@ class NoticiaControllerTest extends TestCase
 
         $noticia = Noticia::where('slug', 'evento-historico')->firstOrFail();
 
-        $this->assertTrue($dataHistorica->isSameAs($noticia->publicado_em, 'minute'));
+        $this->assertSame($dataHistorica->format('Y-m-d H:i'), $noticia->publicado_em->format('Y-m-d H:i'));
     }
 
     public function test_can_edit_publication_date_of_already_published_news(): void
@@ -374,7 +374,8 @@ class NoticiaControllerTest extends TestCase
         $this->seed(PerfilPermissaoSeeder::class);
 
         $usuario = User::factory()->create();
-        $usuario->givePermissionTo('noticias.editar');
+        // Editar uma notícia já publicada mantendo o status "publicada" exige a permissão de publicar
+        $usuario->givePermissionTo('noticias.editar', 'noticias.publicar');
 
         $noticia = Noticia::factory()->publicada()->create();
         $dataAnterior = $noticia->publicado_em->copy();
@@ -387,11 +388,11 @@ class NoticiaControllerTest extends TestCase
             'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
             'conteudo' => $noticia->conteudo,
             'publicado_em' => $dataNovaHistorica->format('Y-m-d H:i'),
-        ])->assertRedirect();
+        ])->assertRedirect()->assertSessionHasNoErrors();
 
         $noticia->refresh();
 
-        $this->assertTrue($dataNovaHistorica->isSameAs($noticia->publicado_em, 'minute'));
+        $this->assertSame($dataNovaHistorica->format('Y-m-d H:i'), $noticia->publicado_em->format('Y-m-d H:i'));
         $this->assertNotEquals($dataAnterior, $noticia->publicado_em);
     }
 
@@ -415,7 +416,7 @@ class NoticiaControllerTest extends TestCase
 
         $noticia = Noticia::where('slug', 'noticia-historica')->firstOrFail();
 
-        $this->assertTrue($dataHistorica->isSameAs($noticia->publicado_em, 'minute'));
+        $this->assertSame($dataHistorica->format('Y-m-d H:i'), $noticia->publicado_em->format('Y-m-d H:i'));
         $this->assertTrue(now()->subMinutes(5)->isBefore($noticia->created_at));
     }
 
@@ -519,15 +520,79 @@ class NoticiaControllerTest extends TestCase
         ]);
 
         for ($i = 0; $i < 6; $i++) {
-            $noticia->fotos()->create(['caminho' => "noticias/fotos/foto$i.jpg", 'ordem' => $i]);
+            $noticia->fotos()->create(['caminho' => "noticias/fotos/preview$i.jpg", 'ordem' => $i]);
         }
 
-        $response = $this->get(route('site.index'));
+        $response = $this->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('Fotografias');
-        // Verify only 4 photos are shown in preview
+        // Indicador "Ver todas" quando há mais de 4 fotos
         $response->assertSee('Ver todas as 6 fotos');
+        // Apenas as 4 primeiras fotos aparecem na prévia (take(4) por ordem)
+        $response->assertSee('preview0.jpg', false);
+        $response->assertSee('preview1.jpg', false);
+        $response->assertSee('preview2.jpg', false);
+        $response->assertSee('preview3.jpg', false);
+        $response->assertDontSee('preview4.jpg', false);
+        $response->assertDontSee('preview5.jpg', false);
+    }
+
+    public function test_create_form_shows_publication_datetime_field(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $response = $this->actingAs($usuario)->get(route('admin.noticias.create'));
+
+        $response->assertOk();
+        $response->assertSee('name="publicado_em"', false);
+        $response->assertSee('type="datetime-local"', false);
+        $response->assertSee('Data e hora da publicação');
+        // Visibilidade do campo não pode depender do status selecionado
+        $response->assertDontSee('x-show="status === \'publicada\'"', false);
+    }
+
+    public function test_edit_form_shows_publication_datetime_field_regardless_of_status(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        // Notícia em rascunho: o campo deve aparecer mesmo sem estar "Publicada"
+        $noticia = Noticia::factory()->create([
+            'status' => StatusNoticia::RASCUNHO,
+        ]);
+
+        $response = $this->actingAs($usuario)->get(route('admin.noticias.edit', $noticia));
+
+        $response->assertOk();
+        $response->assertSee('name="publicado_em"', false);
+        $response->assertSee('type="datetime-local"', false);
+        $response->assertSee('Data e hora da publicação');
+        $response->assertDontSee('x-show="status === \'publicada\'"', false);
+    }
+
+    public function test_edit_form_prefills_existing_publication_datetime(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $dataHistorica = now()->subYears(5)->setDate(2020, 5, 10)->setTime(19, 30);
+
+        $noticia = Noticia::factory()->create([
+            'status' => StatusNoticia::PUBLICADA,
+            'publicado_em' => $dataHistorica,
+        ]);
+
+        $response = $this->actingAs($usuario)->get(route('admin.noticias.edit', $noticia));
+
+        $response->assertOk();
+        $response->assertSee('value="2020-05-10T19:30"', false);
     }
 
     public function test_detail_page_shows_complete_photo_gallery(): void

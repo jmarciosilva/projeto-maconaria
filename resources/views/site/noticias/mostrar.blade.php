@@ -14,6 +14,14 @@
             <img src="{{ Storage::url($noticia->imagem_capa) }}" alt="{{ $noticia->titulo }}" class="mt-6 aspect-video w-full rounded-lg object-cover">
         @endif
 
+        @if ($noticia->resumo)
+            <p class="mt-6 text-lg text-gray-700">{{ $noticia->resumo }}</p>
+        @endif
+
+        <div class="prose prose-blue mt-8 max-w-none">
+            {!! $noticia->conteudo !!}
+        </div>
+
         @if ($noticia->fotos->isNotEmpty())
             <section class="mt-8">
                 <h2 class="mb-4 text-xl font-semibold text-gray-900">Fotografias</h2>
@@ -34,14 +42,6 @@
                 </div>
             </section>
         @endif
-
-        @if ($noticia->resumo)
-            <p class="mt-6 text-lg text-gray-700">{{ $noticia->resumo }}</p>
-        @endif
-
-        <div class="prose prose-blue mt-8 max-w-none">
-            {!! $noticia->conteudo !!}
-        </div>
 
         @if ($noticia->tags->isNotEmpty())
             <div class="mt-8 flex flex-wrap gap-2">

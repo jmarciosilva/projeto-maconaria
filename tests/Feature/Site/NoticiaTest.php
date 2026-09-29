@@ -39,4 +39,34 @@ class NoticiaTest extends TestCase
         $this->get(route('noticias.mostrar', $restrita->slug))
             ->assertNotFound();
     }
+
+    public function test_public_detail_renders_content_before_photo_gallery(): void
+    {
+        $noticia = Noticia::factory()->publicada()->create([
+            'slug' => 'noticia-ordem-conteudo-galeria',
+            'conteudo' => '<p>MARCADOR_CONTEUDO_UNICO_DA_NOTICIA</p>',
+        ]);
+
+        for ($i = 0; $i < 3; $i++) {
+            $noticia->fotos()->create([
+                'caminho' => "noticias/fotos/ordem$i.jpg",
+                'descricao' => $i === 0 ? 'Legenda opcional' : null,
+                'ordem' => $i,
+            ]);
+        }
+
+        $response = $this->get(route('noticias.mostrar', $noticia->slug));
+
+        $response->assertOk();
+        // F) conteúdo/texto da notícia é renderizado
+        $response->assertSee('MARCADOR_CONTEUDO_UNICO_DA_NOTICIA', false);
+        // G) galeria de fotografias é renderizada
+        $response->assertSee('Fotografias');
+        $response->assertSee('ordem0.jpg', false);
+        // H) o conteúdo aparece ANTES da seção Fotografias no HTML
+        $response->assertSeeInOrder([
+            'MARCADOR_CONTEUDO_UNICO_DA_NOTICIA',
+            'Fotografias',
+        ], false);
+    }
 }

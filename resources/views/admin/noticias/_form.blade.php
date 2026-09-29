@@ -105,9 +105,9 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
             obrigatorio
         />
 
-        <div x-show="status === 'publicada'">
-            <x-ui.input rotulo="Publicado em" nome="publicado_em" tipo="datetime-local" :valor="old('publicado_em', isset($noticia?->publicado_em) ? $noticia->publicado_em->format('Y-m-d\TH:i') : null)" :erro="$errors->first('publicado_em')" />
-            <p class="mt-1.5 text-xs text-gray-500">Se deixar em branco, usará a data de agora</p>
+        <div>
+            <x-ui.input rotulo="Data e hora da publicação" nome="publicado_em" tipo="datetime-local" :valor="old('publicado_em', isset($noticia?->publicado_em) ? $noticia->publicado_em->format('Y-m-d\TH:i') : null)" :erro="$errors->first('publicado_em')" />
+            <p class="mt-1.5 text-xs text-gray-500">Define a data e hora utilizada para ordenar e exibir a notícia no site. Aceita datas retroativas para notícias antigas da Loja. Se deixar em branco ao publicar, será usada a data atual.</p>
         </div>
 
         <div x-show="status === 'agendada'">
