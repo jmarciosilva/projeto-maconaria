@@ -23,18 +23,22 @@
                 <x-ui.button tipo="submit">Gerar relatório</x-ui.button>
 
                 @if ($gerou)
-                    <button
-                        type="button"
-                        onclick="window.print()"
+                    {{-- O PDF é gerado no servidor, a partir da mesma apuração
+                         exibida aqui. Abre em nova aba para não perder os
+                         filtros já preenchidos nesta tela. --}}
+                    <a
+                        href="{{ route('admin.chancelaria.relatorios.frequencia.pdf', ['inicio' => $inicio->toDateString(), 'fim' => $fim->toDateString(), 'ordenar' => $ordenar]) }}"
+                        target="_blank"
+                        rel="noopener"
                         class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
                     >
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829V6.75a1.5 1.5 0 0 1 1.5-1.5h7.56a1.5 1.5 0 0 1 1.5 1.5v7.079M6.72 13.829H5.25a1.5 1.5 0 0 0-1.5 1.5v2.25a1.5 1.5 0 0 0 1.5 1.5h1.47m0-5.25h10.56m0 0h1.47a1.5 1.5 0 0 1 1.5 1.5v2.25a1.5 1.5 0 0 1-1.5 1.5h-1.47m-10.56 0v3.421a.75.75 0 0 0 .75.75h9.06a.75.75 0 0 0 .75-.75v-3.421" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5A3.375 3.375 0 0 0 10.125 2.25H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                         </svg>
-                        Imprimir / Salvar PDF
-                    </button>
+                        Gerar PDF
+                    </a>
 
-                    <span class="text-xs text-gray-500">Impressão em A4 paisagem.</span>
+                    <span class="text-xs text-gray-500">Documento A4 paisagem, gerado pelo servidor.</span>
                 @endif
             </div>
         </form>

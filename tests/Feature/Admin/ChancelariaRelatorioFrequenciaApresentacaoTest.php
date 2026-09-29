@@ -207,21 +207,33 @@ class ChancelariaRelatorioFrequenciaApresentacaoTest extends TestCase
     // 7 e 8 — impressão
     // ---------------------------------------------------------------
 
-    public function test_botao_de_imprimir_existe_e_usa_window_print(): void
+    public function test_acao_principal_e_gerar_pdf_no_servidor(): void
     {
         $resposta = $this->relatorioComIrmaoAbaixoDoLimite();
 
-        $resposta->assertSee('Imprimir / Salvar PDF');
-        $resposta->assertSee('window.print()', false);
+        $resposta->assertSee('Gerar PDF');
+        // e(): o Blade escapa os "&" da querystring como "&amp;".
+        $resposta->assertSee(
+            e(route('admin.chancelaria.relatorios.frequencia.pdf', [
+                'inicio' => '2025-01-01',
+                'fim' => '2025-12-31',
+                'ordenar' => 'nome',
+            ])),
+            false,
+        );
+
+        // A geração passou a ser server-side: a tela não dispara mais a caixa
+        // de impressão do navegador.
+        $resposta->assertDontSee('window.print()', false);
     }
 
-    public function test_botao_de_imprimir_nao_aparece_antes_de_gerar(): void
+    public function test_botao_de_gerar_pdf_nao_aparece_antes_de_gerar(): void
     {
         $resposta = $this->actingAs($this->chanceler())
             ->get(route('admin.chancelaria.relatorios.frequencia'));
 
         $resposta->assertOk();
-        $resposta->assertDontSee('Imprimir / Salvar PDF');
+        $resposta->assertDontSee('Gerar PDF');
     }
 
     public function test_elementos_administrativos_sao_marcados_para_nao_imprimir(): void

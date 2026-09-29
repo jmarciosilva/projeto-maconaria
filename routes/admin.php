@@ -130,6 +130,7 @@ Route::get('/paginas-institucionais', [PaginaInstitucionalController::class, 'in
     Route::put('/chancelaria/sessoes/{evento}', [ChancelariaSessaoController::class, 'update'])->name('chancelaria.sessoes.update');
     Route::delete('/chancelaria/sessoes/{evento}', [ChancelariaSessaoController::class, 'destroy'])->name('chancelaria.sessoes.destroy');
     Route::get('/chancelaria/relatorios/frequencia', [ChancelariaRelatorioController::class, 'frequencia'])->name('chancelaria.relatorios.frequencia');
+    Route::get('/chancelaria/relatorios/frequencia/pdf', [ChancelariaRelatorioController::class, 'frequenciaPdf'])->name('chancelaria.relatorios.frequencia.pdf');
     Route::resource('/chancelaria/comunicados', ChancelariaComunicadoController::class)
         ->except(['show'])
         ->names('chancelaria.comunicados');
