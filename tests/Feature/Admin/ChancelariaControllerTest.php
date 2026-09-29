@@ -102,21 +102,28 @@ class ChancelariaControllerTest extends TestCase
         $this->assertStringNotContainsString('javascript:', $comunicado->conteudo);
     }
 
-    public function test_dashboard_displays_frequency_and_visitors(): void
+    public function test_dashboard_displays_frequency_totals_and_recent_sessions(): void
     {
         $this->seed(PerfilPermissaoSeeder::class);
 
         $usuario = User::factory()->create();
         $usuario->givePermissionTo('chancelaria.visualizar');
-        $evento = Evento::factory()->publicado()->create(['titulo' => 'Sessão no painel']);
+
+        $sessao = Evento::factory()->publicado()->create([
+            'titulo' => 'Sessão no painel',
+            'tipo' => \App\Enums\TipoEvento::SESSAO,
+        ]);
         $irmao = Irmao::factory()->create();
         ChancelariaFrequencia::create([
-            'evento_id' => $evento->id,
+            'evento_id' => $sessao->id,
             'irmao_id' => $irmao->id,
             'status' => StatusFrequencia::PRESENTE,
         ]);
+
+        // A tabela de visitantes saiu do painel (segue disponível em Visitantes),
+        // mas o registro continua existindo normalmente.
         ChancelariaVisitante::factory()->create([
-            'evento_id' => $evento->id,
+            'evento_id' => $sessao->id,
             'nome' => 'Visitante no painel',
         ]);
 
@@ -124,6 +131,7 @@ class ChancelariaControllerTest extends TestCase
             ->get(route('admin.chancelaria.index'))
             ->assertOk()
             ->assertSee('Sessão no painel')
-            ->assertSee('Visitante no painel');
+            ->assertSee('Resumo dos últimos 3 meses')
+            ->assertDontSee('Visitante no painel');
     }
 }
