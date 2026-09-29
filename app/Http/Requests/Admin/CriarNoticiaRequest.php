@@ -92,7 +92,7 @@ final class CriarNoticiaRequest extends FormRequest
             'slug.regex' => 'O slug deve conter apenas letras minúsculas, números e hífens.',
             'slug.unique' => 'Já existe uma notícia com este slug.',
             'agendado_para.required_if' => 'Informe a data de agendamento da notícia.',
-            'fotos.max' => 'Máximo de 10 fotos permitidas.',
+            'fotos.max' => 'Máximo de 50 fotos permitidas.',
             'fotos.*.image' => 'Todos os arquivos devem ser imagens válidas.',
             'fotos.*.max' => 'Cada foto deve ter no máximo 4 MB.',
         ];

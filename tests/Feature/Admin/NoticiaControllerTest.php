@@ -386,6 +386,59 @@ class NoticiaControllerTest extends TestCase
         $this->assertCount(50, $noticia->fotos);
     }
 
+    public function test_photo_larger_than_4mb_is_rejected(): void
+    {
+        Storage::fake('public');
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        // 4 MB = 4096 KB é o limite; 5 MB deve ser recusado
+        $this->actingAs($usuario)->post(route('admin.noticias.store'), [
+            'titulo' => 'Notícia com foto pesada',
+            'slug' => 'noticia-foto-pesada',
+            'status' => StatusNoticia::RASCUNHO->value,
+            'visibilidade' => VisibilidadeNoticia::PUBLICA->value,
+            'conteudo' => '<p>Conteúdo.</p>',
+            'fotos' => [
+                UploadedFile::fake()->image('grande.jpg')->size(5120),
+            ],
+        ])->assertSessionHasErrors('fotos.0');
+
+        $this->assertDatabaseMissing('noticias', ['slug' => 'noticia-foto-pesada']);
+    }
+
+    public function test_create_form_states_the_50_photo_limit(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.criar');
+
+        $response = $this->actingAs($usuario)->get(route('admin.noticias.create'));
+
+        $response->assertOk();
+        $response->assertSee('Máximo 50 fotos por notícia');
+        $response->assertDontSee('Máximo 10 fotos');
+    }
+
+    public function test_edit_form_states_the_50_photo_limit(): void
+    {
+        $this->seed(PerfilPermissaoSeeder::class);
+
+        $usuario = User::factory()->create();
+        $usuario->givePermissionTo('noticias.editar');
+
+        $noticia = Noticia::factory()->create(['status' => StatusNoticia::RASCUNHO]);
+
+        $response = $this->actingAs($usuario)->get(route('admin.noticias.edit', $noticia));
+
+        $response->assertOk();
+        $response->assertSee('Máximo 50 fotos por notícia');
+        $response->assertDontSee('Máximo 10 fotos');
+    }
+
     public function test_cannot_create_news_with_more_than_50_photos(): void
     {
         Storage::fake('public');

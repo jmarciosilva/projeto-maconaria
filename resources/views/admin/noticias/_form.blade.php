@@ -205,7 +205,60 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
     </div>
 
     <div class="space-y-5">
-        <div x-data="{ arquivos: @json($noticia?->fotos ?? []), arquivosNovos: [] }">
+        @php
+            $maxFotos = 50;
+            $maxMbPorFoto = 4;
+            $maxMbPorEnvio = 80;
+            $fotosExistentes = isset($noticia) ? $noticia->fotos->count() : 0;
+        @endphp
+
+        <div
+            x-data="{
+                maxFotos: {{ $maxFotos }},
+                maxBytesPorFoto: {{ $maxMbPorFoto }} * 1024 * 1024,
+                maxBytesPorEnvio: {{ $maxMbPorEnvio }} * 1024 * 1024,
+                fotosExistentes: {{ $fotosExistentes }},
+                removidas: 0,
+                arquivosNovos: [],
+                erro: '',
+                get totalBytes() {
+                    return this.arquivosNovos.reduce((soma, arquivo) => soma + arquivo.size, 0);
+                },
+                get totalFotos() {
+                    return (this.fotosExistentes - this.removidas) + this.arquivosNovos.length;
+                },
+                formatar(bytes) {
+                    if (bytes < 1048576) {
+                        return Math.round(bytes / 1024) + ' KB';
+                    }
+                    return (bytes / 1048576).toFixed(1).replace('.', ',') + ' MB';
+                },
+                selecionar(evento) {
+                    this.arquivosNovos = Array.from(evento.target.files);
+                    this.validar();
+                },
+                validar() {
+                    this.erro = '';
+                    const acimaDoLimite = this.arquivosNovos.filter((arquivo) => arquivo.size > this.maxBytesPorFoto);
+
+                    if (this.totalFotos > this.maxFotos) {
+                        this.erro = 'Máximo de ' + this.maxFotos + ' fotos por notícia. Seleção atual: ' + this.totalFotos + '.';
+                    } else if (acimaDoLimite.length > 0) {
+                        this.erro = 'Cada foto deve ter no máximo {{ $maxMbPorFoto }} MB. Acima do limite: ' + acimaDoLimite.map((arquivo) => arquivo.name).join(', ') + '.';
+                    } else if (this.totalBytes > this.maxBytesPorEnvio) {
+                        this.erro = 'As fotos selecionadas somam ' + this.formatar(this.totalBytes) + ', acima do limite de {{ $maxMbPorEnvio }} MB por envio. Envie em lotes menores.';
+                    }
+
+                    return this.erro === '';
+                },
+            }"
+            x-init="$el.closest('form')?.addEventListener('submit', (evento) => {
+                if (! validar()) {
+                    evento.preventDefault();
+                    $el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            })"
+        >
             @if (isset($noticia) && $noticia->fotos->isNotEmpty())
                 <div>
                     <h3 class="mb-3 text-sm font-medium text-gray-700">Fotos atuais</h3>
@@ -218,7 +271,7 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
                                 <div class="mt-2 flex gap-2">
                                     <input type="text" name="fotos_descricao[{{ $foto->id }}]" value="{{ $foto->descricao }}" placeholder="Descrição (alt text)" class="flex-1 rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <label class="inline-flex cursor-pointer items-center">
-                                        <input type="checkbox" name="fotos_para_remover[]" value="{{ $foto->id }}" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                        <input type="checkbox" name="fotos_para_remover[]" value="{{ $foto->id }}" @change="removidas += $event.target.checked ? 1 : -1; validar()" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
                                         <span class="ml-2 text-sm text-red-600">Remover</span>
                                     </label>
                                 </div>
@@ -239,9 +292,19 @@ $tagsSelecionadas = collect(old('tags', $noticia?->tags->pluck('id')->all() ?? [
                             <label for="fotos" class="font-semibold text-blue-600 hover:text-blue-500 cursor-pointer">Clique para adicionar fotos</label>
                             ou arraste aqui
                         </p>
-                        <p class="text-xs text-gray-500 mt-1">JPG, PNG ou WebP até 4 MB cada. Máximo 10 fotos.</p>
+                        <p class="text-xs text-gray-500 mt-1">JPG, PNG ou WebP até {{ $maxMbPorFoto }} MB cada. Máximo {{ $maxFotos }} fotos por notícia.</p>
                     </div>
-                    <input type="file" id="fotos" name="fotos[]" accept="image/*" multiple class="sr-only" @change="arquivosNovos = $event.target.files; console.log('Arquivos:', $event.target.files.length)">
+                    <input type="file" id="fotos" name="fotos[]" accept="image/*" multiple class="sr-only" @change="selecionar($event)">
+
+                    <div x-show="arquivosNovos.length > 0" class="flex flex-wrap items-center gap-x-2 text-sm text-gray-600">
+                        <span x-text="arquivosNovos.length + (arquivosNovos.length === 1 ? ' foto selecionada' : ' fotos selecionadas')"></span>
+                        <span aria-hidden="true">·</span>
+                        <span x-text="formatar(totalBytes)"></span>
+                        <span aria-hidden="true">·</span>
+                        <span x-text="'total na notícia: ' + totalFotos + ' de ' + maxFotos"></span>
+                    </div>
+
+                    <p x-show="erro" x-cloak x-text="erro" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></p>
 
                     <div x-show="arquivosNovos.length > 0" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         <template x-for="(arquivo, index) in arquivosNovos" :key="index">
